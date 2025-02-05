@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -493,6 +494,37 @@ public class PlayerManager implements KonquestPlayerManager {
 		for (KonPlayer player : onlinePlayers.values()) {
 			player.clearAllMobAttackers();
 		}
+	}
+
+	public boolean togglePlayerFly(KonPlayer player) {
+		Player bukkitPlayer = player.getBukkitPlayer();
+		if(bukkitPlayer.getGameMode().equals(GameMode.SURVIVAL)) {
+			if(player.isFlyEnabled()) {
+				player.setIsFlyEnabled(false);
+				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
+				return true;
+			} else {
+				// Verify player is in friendly territory
+				boolean isFriendly = false;
+				if(konquest.getTerritoryManager().isChunkClaimed(bukkitPlayer.getLocation())) {
+					KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(bukkitPlayer.getLocation());
+					if(territory != null && territory.getKingdom().equals(player.getKingdom())) {
+						isFriendly = true;
+					}
+				}
+				if(isFriendly) {
+					player.setIsFlyEnabled(true);
+					player.setFlyDisableWarmup(false);
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
+					return true;
+				} else {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+				}
+			}
+		} else {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+		}
+		return false;
 	}
 
 }

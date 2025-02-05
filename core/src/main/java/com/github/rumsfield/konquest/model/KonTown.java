@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownRaidEvent;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
@@ -49,6 +50,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final BossBar capitalSwapBar;
 	private UUID lord;
 	private final HashMap<UUID,Boolean> residents;
+	private final HashMap<UUID,Double> purchaseOffers;
 	private RequestKeeper joinRequestKeeper;
 	private final HashMap<KonTownOption,Boolean> townOptions;
 	private boolean isAttacked;
@@ -101,6 +103,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		// Other stuff
 		this.lord = null; // init with no lord
 		this.residents = new HashMap<>();
+		this.purchaseOffers = new HashMap<>();
 		this.joinRequestKeeper = new RequestKeeper();
 		this.isAttacked = false;
 		this.isShielded = false;
@@ -1377,7 +1380,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 	public boolean canClaimLordship(KonPlayer player) {
 		boolean result = false;
-		if(!isLordValid()) {
+		if(!isLordValid() && player.getKingdom().equals(this.getKingdom())) {
 			if(isOpen()) {
 				result = true;
 			} else {
@@ -1552,11 +1555,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public String getPlayerRoleName(OfflinePlayer offlinePlayer) {
 		String result = "";
 		if(isLord(offlinePlayer.getUniqueId())) {
-			result = MessagePath.LABEL_LORD.getMessage();
+			result = MessagePath.RELATIONSHIP_ROLE_LORD.getMessage();
 		} else if(isPlayerKnight(offlinePlayer)) {
-			result = MessagePath.LABEL_KNIGHT.getMessage();
+			result = MessagePath.RELATIONSHIP_ROLE_KNIGHT.getMessage();
 		} else if(isPlayerResident(offlinePlayer)) {
-			result = MessagePath.LABEL_RESIDENT.getMessage();
+			result = MessagePath.RELATIONSHIP_ROLE_RESIDENT.getMessage();
 		}
 		return result;
 	}
@@ -1830,5 +1833,46 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public KonquestTerritoryType getTerritoryType() {
 		return KonquestTerritoryType.TOWN;
 	}
-	
+
+	// Purchase Offers
+
+	public void addPurchaseOffer(UUID id, double amount) {
+		// The offer cannot be for a capital
+		if (this.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) return;
+		// The ID cannot be a kingdom member
+		if (this.getKingdom().isMember(id)) return;
+		// Amount must be non-negative
+		if (amount < 1) return;
+		// Override any existing offer from this ID
+		purchaseOffers.put(id, amount);
+	}
+
+	public List<UUID> getPurchaseOffers() {
+		return new ArrayList<>(purchaseOffers.keySet());
+	}
+
+	public int getNumPurchaseOffers() {
+		return purchaseOffers.size();
+	}
+
+	public boolean hasPurchaseOffers() {
+		return !purchaseOffers.isEmpty();
+	}
+
+	public double getPurchaseOfferAmount(UUID id) {
+		if (purchaseOffers.containsKey(id)) {
+			return purchaseOffers.get(id);
+		} else {
+			return -1;
+		}
+	}
+
+	public void removePurchaseOffer(UUID id) {
+		purchaseOffers.remove(id);
+	}
+
+	public void clearPurchaseOffers() {
+		purchaseOffers.clear();
+	}
+
 }

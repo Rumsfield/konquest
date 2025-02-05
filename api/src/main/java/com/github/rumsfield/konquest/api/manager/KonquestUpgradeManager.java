@@ -4,6 +4,7 @@ import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A manager for town upgrades in Konquest.
@@ -19,7 +20,14 @@ public interface KonquestUpgradeManager {
 	 * @return True when upgrades are enabled, else false
 	 */
     boolean isEnabled();
-	
+
+	/**
+	 * Provides a list of all upgrades.
+	 *
+	 * @return All upgrades
+	 */
+	List<KonquestUpgrade> getAllUpgrades();
+
 	/**
 	 * Provides a list of upgrades available for purchase for the given town.
 	 * Checks for valid cost and level requirements.

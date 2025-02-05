@@ -278,6 +278,13 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	}
 	
 	public void setIsAdminBypassActive(boolean val) {
+		if (val) {
+			// Turned on bypass
+			ChatUtil.sendConstantTitle(getBukkitPlayer(), "", ChatColor.GOLD+MessagePath.LABEL_BYPASS.getMessage());
+		} else {
+			// Turned off bypass
+			ChatUtil.resetTitle(getBukkitPlayer());
+		}
 		isAdminBypassActive = val;
 	}
 	

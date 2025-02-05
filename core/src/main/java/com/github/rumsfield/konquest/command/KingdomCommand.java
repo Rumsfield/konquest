@@ -1,16 +1,14 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCreateKingdomEvent;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerSettleEvent;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.*;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -27,7 +25,7 @@ public class KingdomCommand extends CommandBase {
 		// Define arguments
 		// None
 		setOptionalArgs(true);
-		// menu
+		// [menu]
 		addArgument(
 				newArg("menu",true,false)
 		);
@@ -80,14 +78,23 @@ public class KingdomCommand extends CommandBase {
 						// manage access open|closed
 						.sub( newArg("access",true,false)
 								.sub( newArg(accessArgNames,true,false) ) )
+						// manage purchase <town> <amount>
+						.sub( newArg("purchase",true,false)
+								.sub( newArg("town",false,false)
+										.sub( newArg("amount",false,false) ) ) )
 						// manage diplomacy <kingdom> [<relation>]
 						.sub( newArg("diplomacy",true,false)
 								.sub( newArg("kingdom",false,true)
 										.sub( newArg("relation",false,false) ) ) )
-						// manage requests [player] accept|deny
+						// manage requests [<player>] accept|deny
 						.sub( newArg("requests",true,true)
 								.sub( newArg("player",false,false)
 										.sub( newArg(requestsArgNames,true,false) ) ) )
+						// manage offers [<town>] [<player>] [accept|deny]
+						.sub( newArg("offers",true,true)
+								.sub( newArg("town",false,true)
+										.sub( newArg("player",false,false)
+												.sub( newArg(requestsArgNames,true,false) ) ) ) )
 						// manage member invite|kick|promote|demote|master <player>
 						.sub( newArg("member",true,false)
 								.sub( newArg(memberArgNames,true,false)
@@ -126,8 +133,7 @@ public class KingdomCommand extends CommandBase {
 			case "create":
 				// Create a new kingdom
 				// Check if players can create kingdoms from config
-				boolean isAdminOnly = konquest.getCore().getBoolean(CorePath.KINGDOMS_CREATE_ADMIN_ONLY.getPath());
-				if(isAdminOnly) {
+				if(konquest.getKingdomManager().isKingdomCreateAdminOnly()) {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 					return;
 				}
@@ -302,7 +308,7 @@ public class KingdomCommand extends CommandBase {
 			case "templates":
 				// Display templates menu
 				if(args.size() == 1) {
-					konquest.getDisplayManager().displayTemplateInfoMenu(player);
+					konquest.getDisplayManager().displayInfoTemplateListMenu(player);
 				} else {
 					sendInvalidArgMessage(bukkitPlayer);
 				}
@@ -499,6 +505,40 @@ public class KingdomCommand extends CommandBase {
 								sendInvalidArgMessage(bukkitPlayer);
 							}
 							break;
+						case "purchase":
+							// Make a purchase offer on a town in a different kingdom (officers only)
+							if (!kingdom.isOfficer(playerID)) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+								return;
+							}
+							// Check for enabled feature
+							if(!konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+								return;
+							}
+							if (args.size() == 4) {
+								String offerTownName = args.get(2);
+								String offerAmount = args.get(3);
+								// Check valid town name
+								if (!konquest.getKingdomManager().isTown(offerTownName)) {
+									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(offerTownName));
+									return;
+								}
+								KonTown town = konquest.getKingdomManager().getTown(offerTownName);
+								// Check for valid amount
+								int amount;
+								try {
+									amount = Integer.parseInt(offerAmount);
+								} catch(NumberFormatException e) {
+									sendInvalidArgMessage(bukkitPlayer);
+									return;
+								}
+								// Manager method includes messages
+								konquest.getKingdomManager().applyTownPurchaseOffer(town, player, amount);
+							} else {
+								sendInvalidArgMessage(bukkitPlayer);
+							}
+							break;
 						case "diplomacy":
 							// View or change kingdom diplomacy relations (officers only)
 							if (args.size() >= 3) {
@@ -572,6 +612,86 @@ public class KingdomCommand extends CommandBase {
 									return;
 								}
 								konquest.getKingdomManager().menuRespondKingdomRequest(player,requester,kingdom,response);
+							} else {
+								sendInvalidArgMessage(bukkitPlayer);
+							}
+							break;
+						case "offers":
+							// manage offers [<town>] [<player>] accept|deny
+							// View, accept or deny town purchase offers (officers only)
+							if(!kingdom.isOfficer(playerID)) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+								return;
+							}
+							// Check for enabled feature
+							if(!konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+								ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+								return;
+							}
+							if (args.size() == 2) {
+								// No town name given, list all towns with offers
+								ArrayList<String> offerTownNames = new ArrayList<>();
+								int numOffers;
+								for (KonTown town : konquest.getKingdomManager().getActiveTownPurchaseOffers(kingdom)) {
+									numOffers = town.getNumPurchaseOffers();
+									offerTownNames.add(town.getName()+" ("+numOffers+")");
+								}
+								String nameListStr = formatStringListLimited(offerTownNames, MAX_LIST_NAMES);
+								ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_TOWNS.getMessage());
+								ChatUtil.sendMessage(bukkitPlayer, nameListStr);
+							} else if (args.size() >= 3) {
+								// Get the town
+								String offerTownName = args.get(2);
+								// Check valid town name
+								if (!konquest.getKingdomManager().isTown(offerTownName)) {
+									ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(offerTownName));
+									return;
+								}
+								KonTown offerTown = konquest.getKingdomManager().getTown(offerTownName);
+								konquest.getKingdomManager().refreshPurchaseOffers(offerTown);
+								if (args.size() == 3) {
+									// No player name given, list all valid offers for this town
+									ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PLAYERS.getMessage(offerTown.getName()));
+									KonOfflinePlayer offerPlayer;
+									double offerAmount;
+									String offerLine;
+									for (UUID id : offerTown.getPurchaseOffers()) {
+										offerPlayer = konquest.getPlayerManager().getOfflinePlayerFromID(id);
+										offerAmount = offerTown.getPurchaseOfferAmount(id);
+										offerLine = ChatColor.AQUA+offerPlayer.getOfflineBukkitPlayer().getName() + " (" + offerPlayer.getKingdom().getName() + ") - " + KonquestPlugin.getCurrencyFormat(offerAmount);
+										ChatUtil.sendMessage(bukkitPlayer, offerLine);
+									}
+								} else if (args.size() == 5) {
+									// Respond to a player's offer
+									String offerPlayerName = args.get(3);
+									String offerDecision = args.get(4);
+									KonOfflinePlayer offerPlayer = konquest.getPlayerManager().getOfflinePlayerFromName(offerPlayerName);
+									if(offerPlayer == null) {
+										ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(offerPlayerName));
+										return;
+									}
+									// Check player has a valid offer
+									UUID offerID = offerPlayer.getOfflineBukkitPlayer().getUniqueId();
+									double offerAmount = offerTown.getPurchaseOfferAmount(offerID);
+									if (offerAmount < 0) {
+										ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_PLAYER.getMessage());
+										return;
+									}
+									// Get decision response
+									boolean response;
+									if (offerDecision.equalsIgnoreCase("accept")) {
+										response = true;
+									} else if (offerDecision.equalsIgnoreCase("deny")) {
+										response = false;
+									} else {
+										sendInvalidArgMessage(bukkitPlayer);
+										return;
+									}
+									// Manager method includes messages
+									konquest.getKingdomManager().respondTownPurchaseOffer(offerTown, player, offerID, response);
+								} else {
+									sendInvalidArgMessage(bukkitPlayer);
+								}
 							} else {
 								sendInvalidArgMessage(bukkitPlayer);
 							}
@@ -723,6 +843,10 @@ public class KingdomCommand extends CommandBase {
 					if (konquest.getKingdomManager().getIsCapitalSwapEnable()) {
 						tabList.add("capital");
 					}
+					if (konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+						tabList.add("purchase");
+						tabList.add("offers");
+					}
 					break;
 			}
 		} else if (numArgs == 3) {
@@ -762,6 +886,15 @@ public class KingdomCommand extends CommandBase {
 							tabList.add("open");
 							tabList.add("closed");
 							break;
+						case "purchase":
+							if (konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+								for (KonKingdom otherKingdom : konquest.getKingdomManager().getKingdoms()) {
+									if (!otherKingdom.equals(kingdom)) {
+										tabList.addAll(otherKingdom.getTownNames());
+									}
+								}
+							}
+							break;
 						case "diplomacy":
 							List<String> kingdomList = new ArrayList<>(konquest.getKingdomManager().getKingdomNames());
 							kingdomList.remove(player.getKingdom().getName());
@@ -770,6 +903,13 @@ public class KingdomCommand extends CommandBase {
 						case "requests":
 							for (OfflinePlayer requester : kingdom.getJoinRequests()) {
 								tabList.add(requester.getName());
+							}
+							break;
+						case "offers":
+							if (konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+								for (KonTown offerTown : konquest.getKingdomManager().getActiveTownPurchaseOffers(kingdom)) {
+									tabList.add(offerTown.getName());
+								}
 							}
 							break;
 						case "member":
@@ -785,6 +925,11 @@ public class KingdomCommand extends CommandBase {
 		} else if (numArgs == 4) {
 			if (args.get(0).equalsIgnoreCase("manage")) {
 				switch (args.get(1).toLowerCase()) {
+					case "purchase":
+						if (konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+							tabList.add("#");
+						}
+						break;
 					case "diplomacy":
 						String otherKingdomName = args.get(2);
 						if (konquest.getKingdomManager().isKingdom(otherKingdomName)) {
@@ -798,6 +943,16 @@ public class KingdomCommand extends CommandBase {
 					case "requests":
 						tabList.add("accept");
 						tabList.add("deny");
+						break;
+					case "offers":
+						if (konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+							String townName = args.get(2);
+							if (konquest.getKingdomManager().isTown(townName)) {
+								for (OfflinePlayer offerPlayer : konquest.getKingdomManager().getPlayerTownPurchaseOffers(konquest.getKingdomManager().getTown(townName))) {
+									tabList.add(offerPlayer.getName());
+								}
+							}
+						}
 						break;
 					case "member":
 						switch (args.get(2).toLowerCase()) {
@@ -843,6 +998,14 @@ public class KingdomCommand extends CommandBase {
 								break;
 						}
 						break;
+				}
+			}
+		} else if (numArgs == 5) {
+			if (args.get(0).equalsIgnoreCase("manage") &&
+					args.get(1).equalsIgnoreCase("offers")) {
+				if (konquest.getKingdomManager().getIsTownPurchaseEnable()) {
+					tabList.add("accept");
+					tabList.add("deny");
 				}
 			}
 		}

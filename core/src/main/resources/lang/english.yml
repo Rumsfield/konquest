@@ -9,1100 +9,1211 @@
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
+# //// LABEL \\\\
+# Simple words or phrases used throughout the plugin.
 label:
-  admin-kingdom: "Admin Kingdom"
-  allied-building: "Allied Building"
-  armor: "Armor"
-  armors: "Armors"
-  back: "Back"
-  barbarian: "Barbarian"
-  barbarians: "Barbarians"
-  blocks: "Blocks"
-  bypass: "BYPASS"
-  camp: "Camp"
-  capital: "Capital"
-  changing-capital: "Changing to Capital"
-  changing-town: "Changing to Town"
-  close: "Close"
-  cost: "Cost"
-  critical-hits: "Critical Hits"
-  diplomacy: "Diplomacy"
-  disabled: "Disabled"
-  friendly-redstone: "Friendly Redstone"
-  enemy-redstone: "Enemy Redstone"
-  false: "False"
-  favor: "Favor"
-  flags: "Flags"
-  golem-offense: "Iron Golem Offense"
-  health: "Health"
-  immunity: "Immunity"
-  increment-cost: "Increment Cost"
-  information: "Information"
-  invalid: "Invalid"
-  kingdom: "Kingdom"
-  kingdom-role: "Kingdom Role"
-  kingdoms: "Kingdoms"
-  knight: "Knight"
-  knights: "Knights"
-  land: "Land"
-  last-seen: "Last Seen %s"
-  leaderboard: "Leaderboard"
-  level: "Level"
-  loot-chests: "Loot Chests"
-  lord: "Lord"
-  master: "Master"
-  member: "Member"
-  members: "Members"
-  modified: "Modified"
-  monument: "Monument"
-  monument-template: "Monument Template"
-  name: "Name"
-  neutral: "Neutral"
-  neutrals: "Neutrals"
-  next: "Next"
-  no-lord: "No Lord"
-  officer: "Officer"
-  officers: "Officers"
-  online-players: "Online Players"
-  open: "Open"
-  options: "Options"
-  peaceful: "Peaceful"
-  player: "Player"
-  players: "Players"
-  plot: "Plot"
-  population: "Population"
-  properties: "Properties"
-  protected: "Protected"
-  residencies: "Residencies"
-  resident: "Resident"
-  residents: "Residents"
-  ruin: "Ruin"
-  sanctuary: "Sanctuary"
-  score: "Score"
-  shield: "Shield"
-  shields: "Shields"
-  smallest: "Smallest"
-  specialization: "Specialization"
-  stats: "Stats"
-  total-players: "Total Players"
-  total: "Total"
-  town: "Town"
-  towns: "Towns"
-  true: "True"
-  unavailable: "Unavailable"
-  upgrades: "Upgrades"
-  valid: "Valid"
-  world: "World"
-placeholder:
-  friendly: "Friendly"
-  enemy: "Enemy"
-  barbarian: "Barbarian"
-  ally: "Ally"
-  trader: "Trader"
-  peaceful: "Peaceful"
-  rank-master: "Master"
-  rank-officer: "Officer"
-  rank-member: "Member"
+  admin: Admin
+  admin-kingdom: Admin Kingdom
+  allied-building: Allied Building
+  amount: Amount
+  armor: Armor
+  back: Back
+  barbarians: Barbarians
+  blocks: Blocks
+  bypass: BYPASS
+  camps: Camps
+  camp-clan: Camp Clan
+  capitals: Capitals
+  captured: Captured
+  changing-capital: Changing to Capital
+  changing-town: Changing to Town
+  close: Close
+  cost: Cost
+  critical-hits: Critical Hits
+  current: Current
+  diplomacy: Diplomacy
+  disabled: Disabled
+  friendly-redstone: Friendly Redstone
+  enemy-redstone: Enemy Redstone
+  false: False
+  favor: Favor
+  flags: Flags
+  golem-offense: Iron Golem Offense
+  golem-spawns: Iron Golem Spawns
+  health: Health
+  home: Home
+  immunity: Immunity
+  increment-cost: Increment Cost
+  information: Information
+  invalid: Invalid
+  kingdom: Kingdom
+  kingdom-rank: Kingdom Rank
+  kingdoms: Kingdoms
+  knights: Knights
+  land: Land
+  last-seen: Last Seen %s
+  leaderboard: Leaderboard
+  level: Level
+  loot-chests: Loot Chests
+  map-color: Map Color
+  members: Members
+  modified: Modified
+  modifier: Modifier
+  monument-template: Monument Template
+  monument-templates: Monument Templates
+  neutrals: Neutrals
+  next: Next
+  no-lord: No Lord
+  no-permission: No Permission
+  officers: Officers
+  online-players: Online Players
+  open: Open
+  options: Options
+  owner: Owner
+  peaceful: Peaceful
+  player: Player
+  players: Players
+  plot: Plot
+  population: Population
+  properties: Properties
+  protected: Protected
+  residents: Residents
+  return: Return
+  ruins: Ruins
+  sanctuaries: Sanctuaries
+  score: Score
+  shield: Shield
+  smallest: Smallest
+  specialization: Specialization
+  total: Total
+  towns: Towns
+  town-role: Town Role
+  travel: Travel
+  true: True
+  unavailable: Unavailable
+  upgrades: Upgrades
+  valid: Valid
+  world: World
+# //// TERRITORY \\\\
+# Names of different territory types.
+territory:
+  wild: Wild
+  capital: Capital
+  town: Town
+  camp: Camp
+  ruin: Ruin
+  sanctuary: Sanctuary
+# //// DIPLOMACY \\\\
+# Names for diplomatic relationships between kingdoms.
+diplomacy:
+  war: War
+  peace: Peace
+  trade: Trade
+  alliance: Alliance
+  self: Your Kingdom
+# //// RELATIONSHIP \\\\
+# Names for relationships between players, their ranks within a kingdom, and their roles within a town.
+relationship:
+  friendly: Friendly
+  enemy: Enemy
+  barbarian: Barbarian
+  ally: Ally
+  trader: Trader
+  peaceful: Peaceful
+  rank-master: Master
+  rank-officer: Officer
+  rank-member: Member
+  role-lord: Lord
+  role-knight: Knight
+  role-resident: Resident
+# //// MAP \\\\
+# Labels used only in web browser maps like Dynmap.
+# These can have HTML formatting.
 map:
-  barbarian: "Barbarian"
-  barbarians: "Barbarians"
-  kingdom: "Kingdom"
-  capital: "Capital"
-  town: "Town"
-  towns: "Towns"
-  land: "Land"
-  players: "Players"
-  lord: "Lord"
-  population: "Population"
-  ruin: "Ruin"
-  critical-hits: "Critical Hits"
-  golem-spawns: "Golem Spawns"
-  sanctuary: "Sanctuary"
-  templates: "Monument Templates"
+  barbarian: Barbarian
+  barbarians: Barbarians
+  kingdom: Kingdom
+  capital: Capital
+  town: Town
+  towns: Towns
+  land: Land
+  players: Players
+  lord: Lord
+  population: Population
+  ruin: Ruin
+  critical-hits: Critical Hits
+  golem-spawns: Golem Spawns
+  sanctuary: Sanctuary
+  templates: Monument Templates
+# //// MENU \\\\
+# Text used in all inventory menus.
 menu:
+  hint:
+    disable: Click to disable
+    apply: Click to apply
+    view: Click to view
+    open: Click to open
+    charge: Click to charge
+    change: Click to change
+    travel: Click to travel
+    accept: Left-click to accept
+    decline: Right-click to decline
+    increase: Left-click to increase
+    decrease: Right-click to decrease
+    exit: Exit the menu
+  main:
+    title: Konquest Main Menu
+    title-dashboard: Konquest Dashboard
+    dashboard: Dashboard
+    help: Konquest Help Menu
+    info: Info Menu
+    quest: Quest Book
+    stats: Accomplishment Stats Book
+    prefix: Prefix Menu
+    score: Score Menu
+    kingdom: Kingdom Menu
+    town: Town Menu
+    travel: Travel Menu
+    map-auto: Map Auto Mode
+    kingdom-chat: Kingdom Chat
+    admin-bypass: Admin Bypass
+    border: Border Display
+    flying: Flying
+    hint-map-1: Left-click for regular map
+    hint-map-2: Right-click for far map
+    hint-favor: Click to show favor costs
+    hint-spy: Click to purchase a spy map
+    description-dashboard: Change your settings and use commands.
+    description-help: View tips on how to play, and lists of commands.
+    description-info: View information about all players, kingdoms, towns, and more.
+    description-quest: Open your quest book to see your progress toward rewards.
+    description-stats: Open your stats book to see your accomplishment stats and progress toward new prefix titles.
+    description-prefix: Modify your prefix title that is shown with your name in chat.
+    description-score: Display scores and leaderboards for players and kingdoms.
+    description-kingdom: Manage your kingdom, join other kingdoms, or become a barbarian.
+    description-town: Manage your towns and join other towns.
+    description-travel: Teleport to various destinations.
   stats:
-    title: "Accomplishment Stats"
-    intro-1: "Use \"/k stats\" or \"/k s\" to open this book again."
-    intro-2: "View your stats towards Accomplishments, which unlock new prefixes for you to use."
-    max: "Max Level"
-    category: "Accomplishment Category"
-    next: "Next Prefix"
-    unlock: "Unlocked Prefixes"
-    amount: "Stat Amount"
-    points: "Accomplishment Points"
+    title: Accomplishment Stats
+    intro-1: Use "/k stats" or "/k s" to open this book again.
+    intro-2: View your stats towards Accomplishments, which unlock new prefixes for you to use.
+    max: Max Level
+    category: Accomplishment Category
+    next: Next Prefix
+    unlock: Unlocked Prefixes
+    amount: Stat Amount
+    points: Accomplishment Points
   quest:
-    title: "Quest Log"
-    intro-1: "Use \"/k quest\" or \"/k q\" to open this book again."
-    intro-2: "Complete these quests to earn Favor, which is used to claim land and settle new towns."
-    reward: "Favor Reward"
+    title: Quest Log
+    intro-1: Use "/k quest" or "/k q" to open this book again.
+    intro-2: Complete these quests to earn Favor, which is used to claim land and settle new towns.
+    reward: Favor Reward
   upgrade:
-    title: "Available Town Upgrades"
-    fail-level: "Failed to add %s level %s, level is greater than maximum or too high from current level, %s."
-    fail-population: "Failed to add %s level %s, town population is too low, requires %s."
-    fail-cost: "Failed to add %s level %s, requires %s Favor."
-    fail-attack: "Failed to add any upgrades while town is under attack!"
-    add: "Added %s level %s to the Town of %s!"
+    title: Available Town Upgrades
+    fail-level: Failed to add %s level %s, level is greater than maximum or too high from current level, %s.
+    fail-population: Failed to add %s level %s, town population is too low, requires %s.
+    fail-cost: Failed to add %s level %s, requires %s Favor.
+    fail-attack: Failed to add any upgrades while town is under attack!
+    add: Added %s level %s to the Town of %s!
   help:
-    title: "Konquest Help"
-    admin: "Admin Help"
-    tips: "Konquest Tips"
-    community: "Community"
-    hint: "Click to join"
-    tip-1: "Barbarians are default players who have no kingdom. They can place beds to make camps, attack other barbarians, and destroy towns."
-    tip-2: "Use \"/k kingdom\" to open the kingdom menu and join kingdoms, or use \"/k kingdom create\" to make your own."
-    tip-3: "The diplomacy options for other kingdoms are: peace, trade, alliance, war. Enemy kingdoms at war can capture each other's towns."
-    tip-4: "Use \"/k settle\" to create new towns for your kingdom. Use \"/k map\" to see surrounding land and a tip on whether your location can be settled."
-    tip-5: "Open the general Town Menu with \"/k town\" to join and leave towns in your kingdom. Use \"/k town <name>\" for managing a town, like upgrades or residents."
-    tip-6: "Claim town land to protect containers and animals from enemies, increase your stats and score, and to prevent monsters from spawning."
-    tip-7: "Use \"/k town <name>\" and choose Plots to set up town plots where only specific residents can build. Change town options to let residents only build in their plots."
-    tip-8: "Build Iron Golems to protect your towns from enemy players. Seek out Ruins and defeat the Ruin Golems for a reward."
-    tip-9: "Use \"/k stats\" and \"/k score\" to view player statistics. Use \"/k prefix\" to set your own chat title. Unlock titles with increased stats."
+    title-start: Konquest Getting Started
+    title-commands: Konquest Commands
+    title-admin: Konquest Admin Commands
+    description-start: Find tips about how to play Konquest.
+    description-community: Access this server's online community.
+    description-main: Go to the Konquest Main Menu.
+    description-commands: View all chat commands.
+    description-admin: View all admin chat commands.
+    description-quest: Open your quest book.
+    start: Getting Started
+    community: Community
+    main: Main Menu
+    commands: Commands
+    admin: Admin Commands
+    quest: Quest Book
+    tip-1: Barbarians are default players who have no kingdom. They can place beds to make camps, attack other barbarians, and destroy towns.
+    tip-2: Use "/k kingdom" to open the kingdom menu and join kingdoms, or use "/k kingdom create" to make your own.
+    tip-3: The diplomacy options for other kingdoms are peace, trade, alliance, war. Enemy kingdoms at war can capture each other's towns.
+    tip-4: Use "/k settle" to create new towns for your kingdom. Use "/k map" to see surrounding land and a tip on whether your location can be settled.
+    tip-5: Open the Town Menu with "/k town" to join and leave towns in your kingdom, and to manage towns that you control.
+    tip-6: Claim town land with "/k claim" to protect containers and animals from enemies, increase your stats and score, and to prevent monsters from spawning.
+    tip-7: Set up town plots where only specific residents can build in the Town Menu. Change town options to let residents only build in their plots.
+    tip-8: Build Iron Golems to protect your towns from enemy players. Seek out Ruins and defeat the Ruin Golems for a reward.
+    tip-9: Use "/k stats" and "/k score" to view player statistics. Use "/k prefix" to set your own chat title. Unlock titles with increased stats.
   score:
-    kingdom-towns: "Kingdom Towns"
-    kingdom-land: "Kingdom Land"
-    kingdom-favor: "Kingdom Favor"
-    kingdom-population: "Kingdom Population"
-    town-1: "Player Lordships"
-    land-1: "Lord Town Land"
-    town-2: "Player Knighthoods"
-    land-2: "Knight Town Land"
-    town-3: "Player Residencies"
-    land-3: "Resident Town Land"
-    player-score: "Player Score"
-    hint: "Click to view"
+    kingdom-towns: Kingdom Towns
+    kingdom-land: Kingdom Land
+    kingdom-favor: Kingdom Favor
+    kingdom-population: Kingdom Population
+    town-1: Player Lordships
+    land-1: Lord Town Land
+    town-2: Player Knighthoods
+    land-2: Knight Town Land
+    town-3: Player Residencies
+    land-3: Resident Town Land
+    player-score: Player Score
+    kingdom-score: Kingdom Score
+    description-players: List all player scores and view details
+    description-kingdoms: List all kingdom scores and view details with leaderboards
+    leaderboard-empty: There are no players on this kingdom's score leaderboard
   map:
-    center: "Map Center"
-    proximity: "Proximity"
-    settle-hint: "Settle Here"
+    center: Map Center
+    proximity: Proximity
+    settle-hint: Settle Here
   prefix:
-    disable: "Off"
-    hint-disable: "Click to disable"
-    hint-apply: "Click to apply"
-    custom-pages: "Custom Prefixes"
-    no-allow: "Missing permission"
+    title-prefix: Prefix Titles
+    title-custom: Custom Prefixes
+    title-stats: Accomplishment Stats
+    current-prefix: Current Prefix
+    disable-prefix: Disable Prefix
+    description-prefix: Choose a new prefix title for your name
+    description-custom: Purchase a custom prefix for your name
+    description-stats: Show your stats used to unlock new prefix titles
   shield:
-    hint: "Click to charge"
-    fail-max: "Failed to charge, exceeds maximum of %s."
-    fail-add: "Failed to charge, cannot add to existing charge."
-    fail-attack: "Failed to charge while town is under attack!"
-    fail-cost: "Failed to charge, requires %s Favor."
-    activate-new: "Charged %s for %s."
-    activate-add: "Increased charge with %s by %s."
+    fail-max: Failed to charge, exceeds maximum of %s.
+    fail-add: Failed to charge, cannot add to existing charge.
+    fail-attack: Failed to charge while town is under attack!
+    fail-cost: Failed to charge, requires %s Favor.
+    activate-new: Charged %s for %s.
+    activate-add: Increased charge with %s by %s.
   options:
-    hint: "Click to change"
-    current: "Current: %s"
-    allied-building: "Allied players can build"
-    open: "All kingdom members can build and use chests"
-    plot: "Residents can only build and use chests in plots"
-    friendly-redstone: "Kingdom members can use redstone switches and doors"
-    redstone: "Enemies can use redstone switches and doors"
-    golem: "Iron Golems will attack all enemies who enter"
+    allied-building: Allied players can build
+    open: All kingdom members can build and use chests
+    plot: Residents can only build and use chests in plots
+    friendly-redstone: Kingdom members can use redstone switches and doors
+    redstone: Enemies can use redstone switches and doors
+    golem: Iron Golems will attack all enemies who enter
+  info:
+    camp-placed: Barbarian Camp is placed.
+    camp-missing: This player has no camp.
+    ruin-status: Capture Status
+    ruin-capture: This Ruin can be captured for a reward.
+    template-kingdoms: List all kingdoms that use this Monument Template.
+  travel:
+    description-capital: Go to your kingdom's capital.
+    description-home: Go to your home bed.
+    description-camp: Go to your barbarian camp.
+    description-wild: Go to a random location in the wild.
   plots:
-    edit-add-land: "Add Land"
-    edit-remove-land: "Remove Land"
-    edit-add-players: "Add Players"
-    edit-remove-players: "Remove Players"
-    edit-show-players: "Show Players"
-    capital-land: "Capital Land"
-    town-land: "Town Land"
-    town-monument: "Town Monument"
-    editing-plot: "Editing Plot"
-    click-delete: "Click to Delete Plot"
-    click-edit: "Click to Edit Plot"
-    click-remove-chunk: "Click to Remove Chunk"
-    click-remove-player: "Click to Remove Player"
-    click-create: "Click to Create Plot"
-    click-add-chunk: "Click to Add Chunk"
-    click-add-player: "Click to Add Player"
-    click-move-player: "Click to Move Player"
-    here: "You Are Here"
-    title-plots: "Town Plots"
-    title-create: "Create Plot"
-    title-delete: "Delete Plot"
-    title-edit: "Edit Plot"
-    title-edit-options: "Edit Options"
-    title-add-land: "Add Land"
-    title-add-players: "Add Players"
-    title-remove-land: "Remove Land"
-    title-remove-players: "Remove Players"
-    title-show-players: "Show Players"
-    button-create: "Create"
-    button-delete: "Delete"
-    button-edit: "Edit"
-    button-return: "Return"
-    button-finish: "Finish"
+    edit-add-land: Add Land
+    edit-remove-land: Remove Land
+    edit-add-players: Add Players
+    edit-remove-players: Remove Players
+    edit-show-players: Show Players
+    capital-land: Capital Land
+    town-land: Town Land
+    town-monument: Town Monument
+    editing-plot: Editing Plot
+    click-delete: Click to Delete Plot
+    click-edit: Click to Edit Plot
+    click-remove-chunk: Click to Remove Chunk
+    click-remove-player: Click to Remove Player
+    click-create: Click to Create Plot
+    click-add-chunk: Click to Add Chunk
+    click-add-player: Click to Add Player
+    click-move-player: Click to Move Player
+    here: You Are Here
+    title-plots: Town Plots
+    title-create: Create Plot
+    title-delete: Delete Plot
+    title-edit: Edit Plot
+    title-edit-options: Edit Options
+    title-add-land: Add Land
+    title-add-players: Add Players
+    title-remove-land: Remove Land
+    title-remove-players: Remove Players
+    title-show-players: Show Players
+    button-create: Create
+    button-delete: Delete
+    button-edit: Edit
+    button-return: Return
+    button-finish: Finish
   town:
-    join: "Join"
-    leave: "Leave"
-    list: "List"
-    invites: "Invites"
-    manage: "Manage"
-    requests: "Requests"
-    plots: "Plots"
-    shields: "Shields"
-    armor: "Armor"
-    promote: "Promote"
-    demote: "Demote"
-    transfer: "Transfer"
-    destroy: "Destroy"
-    upgrades: "Upgrades"
-    options: "Options"
-    special: "Specialization"
-    description-join: "Join a new town"
-    description-leave: "Leave an existing town"
-    description-list: "List all towns in your kingdom"
-    description-invites: "Show your town resident invites"
-    description-manage: "Manage the residents and options of your towns"
-    description-requests: "Show resident requests to join this town"
-    description-plots: "Manage town plots"
-    description-shields: "Apply town shields"
-    description-armor: "Apply town armor"
-    description-promote: "Promote residents to knights"
-    description-demote: "Demote knights to residents"
-    description-transfer: "Transfer lord to another resident"
-    description-destroy: "Destroy the town and its claimed land"
-    description-upgrades: "Apply town upgrades"
-    description-options: "Edit town options"
-    description-special: "Choose a profession for trade discounts"
-    hint-open: "Click to open"
-    hint-join: "Click to send a join request"
-    hint-join-now: "Click to instantly join"
-    hint-leave: "Click to leave"
-    hint-list: "Click to view"
-    hint-accept: "Left-click to accept"
-    hint-decline: "Right-click to decline"
-    hint-manage: "Click to manage"
-    hint-promote: "Click to promote to Knight"
-    hint-demote: "Click to demote to Resident"
-    hint-transfer: "Click to give Lord"
-    hint-destroy: "Click to delete the town"
-    hint-special: "Click to specialize"
-    lore-special: "Choose this profession for a discount with villagers in this town."
-    info-special: "Villagers with this profession give discounts in this town."
-    title-root: "Town Menu"
-    title-join: "Join a Town"
-    title-leave: "Leave a Town"
-    title-list: "Town List"
-    title-invites: "Resident Invites"
-    title-manage-town: "Managed Towns"
-    title-requests: "Resident Requests"
-    title-manage: "Town Management Menu"
-    title-destroy: "Destroy Town"
+    join: Join
+    leave: Leave
+    list: List
+    invites: Invites
+    manage: Manage
+    requests: Requests
+    plots: Plots
+    shields: Shields
+    armor: Armor
+    promote: Promote
+    demote: Demote
+    transfer: Transfer
+    destroy: Destroy
+    upgrades: Upgrades
+    options: Options
+    special: Specialization
+    description-join: Join a new town
+    description-leave: Leave an existing town
+    description-list: List all towns in your kingdom
+    description-invites: Show your town resident invites
+    description-manage: Manage the residents and options of your towns
+    description-requests: Show resident requests to join this town
+    description-plots: Manage town plots
+    description-shields: Apply town shields
+    description-armor: Apply town armor
+    description-promote: Promote residents to knights
+    description-demote: Demote knights to residents
+    description-transfer: Transfer lord to another resident
+    description-destroy: Destroy the town and its claimed land
+    description-upgrades: Apply town upgrades
+    description-options: Edit town options
+    description-special: Choose a profession for trade discounts
+    hint-join: Click to send a join request
+    hint-join-now: Click to instantly join
+    hint-leave: Click to leave
+    hint-manage: Click to manage
+    hint-promote: Click to promote to Knight
+    hint-demote: Click to demote to Resident
+    hint-transfer: Click to give Lord
+    hint-destroy: Click to destroy
+    hint-special: Click to specialize
+    lore-special: Choose this profession for a discount with villagers in this town.
+    info-special: Villagers with this profession give discounts in this town.
+    title-join: Join a Town
+    title-leave: Leave a Town
+    title-list: Town List
+    title-invites: Resident Invites
+    title-manage-town: Managed Towns
+    title-requests: Resident Requests
+    title-manage: Town Management Menu
+    title-destroy: Destroy Town
   kingdom:
-    join: "Join"
-    exile: "Exile"
-    invites: "Invites"
-    list: "List"
-    relation: "Relationships"
-    requests: "Requests"
-    promote: "Promote"
-    demote: "Demote"
-    transfer: "Transfer"
-    template: "Templates"
-    disband: "Disband"
-    capital: "Capital"
-    description-join: "Request to join a kingdom, or create your own with /k kingdom create"
-    description-exile: "Leave your current kingdom and become a barbarian"
-    description-invites: "View your kingdom invites"
-    description-list: "View all kingdoms"
-    description-relation: "Modify relationships with other kingdoms"
-    description-requests: "View kingdom membership requests"
-    description-promote: "Promote members to officers"
-    description-demote: "Demote officers to members"
-    description-transfer: "Transfer master to another member"
-    description-template: "Change kingdom monument template"
-    description-disband: "Disband and delete the kingdom"
-    description-capital: "Move the Capital to a different town"
-    hint-open: "Click to open"
-    hint-exile: "Click to become a barbarian"
-    hint-exit: "Exit the menu"
-    hint-disband: "Click to delete your kingdom"
-    hint-template: "Click to change templates"
-    hint-join: "Click to send a join request"
-    hint-join-now: "Click to instantly join"
-    hint-accept: "Left-click to accept"
-    hint-decline: "Right-click to decline"
-    hint-list: "Click to view info"
-    hint-relation: "Click to choose diplomacy"
-    hint-diplomacy: "Click to enact"
-    hint-promote: "Click to promote to Officer"
-    hint-demote: "Click to demote to Member"
-    hint-transfer: "Click to give Master"
-    hint-capital: "Click to change to the Capital"
-    they-requested: "They Requested"
-    we-requested: "We Requested"
-    diplomacy-peace-war-instant: "Instantly declare peace"
-    diplomacy-peace-war-request: "Request for peace"
-    diplomacy-peace-trade: "End trade and declare peace"
-    diplomacy-peace-alliance: "End alliance and declare peace"
-    diplomacy-trade-peace: "Request for trade"
-    diplomacy-trade-alliance: "End alliance and declare trade"
-    diplomacy-war-instant: "Instantly declare war"
-    diplomacy-war-request: "Request for war"
-    diplomacy-alliance: "Request for alliance"
-    diplomacy-peace-info: "Default. May allow PvP."
-    diplomacy-trade-info: "No PvP. Villager trade discounts. Use chest shops."
-    diplomacy-alliance-info: "No PvP. Villager trade discounts. Use chest shops. Defensive pact. Travel to towns and capital."
-    diplomacy-war-info: "PvP. Attack and capture towns and capital."
-    title-root: "Kingdom Menu"
-    title-join: "Join a Kingdom"
-    title-confirm: "Are you sure?"
-    title-invites: "Kingdom Invites"
-    title-list: "Kingdom List"
-    title-relations: "Relationships"
-    title-diplomacy: "Diplomacy"
-    title-requests: "Join Requests"
-    title-promotion: "Promotions"
-    title-demotion: "Demotions"
-    title-transfer: "Kingdom Master Transfer"
-    title-template: "Monument Templates"
-    title-disband: "Disband Kingdom"
-    title-capital: "Move Capital"
+    join: Join
+    create: Create
+    exile: Exile
+    invites: Invites
+    list: List
+    relation: Relationships
+    requests: Requests
+    purchase: Purchase Towns
+    offers: Town Offers
+    promote: Promote
+    demote: Demote
+    transfer: Transfer
+    template: Templates
+    disband: Disband
+    capital: Capital
+    description-join: Request to join a kingdom, or create your own with /k kingdom create
+    description-create: Create a new Kingdom Capital at your current location
+    description-exile: Leave your current kingdom and become a barbarian
+    description-invites: View your kingdom invites
+    description-list: View all kingdoms
+    description-relation: Modify relationships with other kingdoms
+    description-requests: View kingdom membership requests
+    description-purchase: Purchase towns from other kingdoms by making an offer
+    description-offers: View offers by other kingdoms to purchase your towns
+    description-offer-accept: Give the Town of %s to the Kingdom of %s, and %s receives %s Favor from %s.
+    description-promote: Promote members to officers
+    description-demote: Demote officers to members
+    description-transfer: Transfer master to another member
+    description-template: Change kingdom monument template
+    description-disband: Disband and delete the kingdom
+    description-capital: Move the Capital to a different town
+    hint-exile: Click to become a barbarian
+    hint-disband: Click to delete your kingdom
+    hint-template: Click to change templates
+    hint-join: Click to send a join request
+    hint-join-now: Click to instantly join
+    hint-relation: Click to choose diplomacy
+    hint-diplomacy: Click to enact
+    hint-purchase: Click to send purchase offer
+    hint-promote: Click to promote to Officer
+    hint-demote: Click to demote to Member
+    hint-transfer: Click to give Master
+    hint-capital: Click to change to the Capital
+    they-requested: They Requested
+    we-requested: We Requested
+    diplomacy-peace-war-instant: Instantly declare peace
+    diplomacy-peace-war-request: Request for peace
+    diplomacy-peace-trade: End trade and declare peace
+    diplomacy-peace-alliance: End alliance and declare peace
+    diplomacy-trade-peace: Request for trade
+    diplomacy-trade-alliance: End alliance and declare trade
+    diplomacy-war-instant: Instantly declare war
+    diplomacy-war-request: Request for war
+    diplomacy-alliance: Request for alliance
+    diplomacy-peace-info: Default. May allow PvP.
+    diplomacy-trade-info: No PvP. Villager trade discounts. Use chest shops.
+    diplomacy-alliance-info: No PvP. Villager trade discounts. Use chest shops. Defensive pact. Travel to towns and capital.
+    diplomacy-war-info: PvP. Attack and capture towns and capital.
+    purchase-offers: Purchase Offers
+    purchase-your-offer: Your Offer
+    purchase-their-offer: Their Offer
+    title-join: Join a Kingdom
+    title-confirm: Are you sure?
+    title-invites: Kingdom Invites
+    title-list: Kingdom List
+    title-relations: Relationships
+    title-diplomacy: Diplomacy
+    title-requests: Join Requests
+    title-purchase: Purchase Towns
+    title-amount: Purchase Amount
+    title-offers: Town Offers
+    title-promotion: Promotions
+    title-demotion: Demotions
+    title-transfer: Kingdom Master Transfer
+    title-template: Monument Templates
+    title-disband: Disband Kingdom
+    title-capital: Move Capital
+# //// GENERIC \\\\
+# Messages used throughout the plugin.
 generic:
   notice:
-    enable-auto: "Enabled. Use this command again to disable."
-    disable-auto: "Disabled."
-    reduce-favor: "Favor reduced by %s, total: %s"
-    reward-favor: "Favor rewarded: %s, total: %s"
-    reward-exp: "EXP rewarded: %s"
-    discount-favor: "%s percent discount, you saved %s Favor."
-    click-air: "Click on Air to cancel."
-    clicked-air: "Clicked in Air, cancelled region creation."
-    success: "Success!"
-    small-kingdom: "Your Kingdom is currently the smallest, enjoy a %s percent experience boost!"
-    wild: "The Wild"
-    accomplishment: "You've made an Accomplishment!"
-    prefix-unlock: "Accomplishment prefix unlocked"
-    prefix-lost: "Lost accomplishment prefix"
-    quest: "Quest complete"
-    loot: "New town monument loot is available."
-    absent: "You have been absent for too long and have been kicked from all towns."
-    force-barbarian: "You are now a barbarian!"
+    enable-auto: Enabled. Use this command again to disable.
+    disable-auto: Disabled.
+    reduce-favor: Favor reduced %s, total %s
+    reward-favor: Favor rewarded %s, total %s
+    reward-exp: EXP rewarded %s
+    discount-favor: '%s percent discount, you saved %s Favor.'
+    click-air: Click on Air to cancel.
+    clicked-air: Clicked in Air, cancelled region creation.
+    success: Success!
+    small-kingdom: Your Kingdom is currently the smallest, enjoy a %s percent experience boost!
+    wild: The Wild
+    accomplishment: You've made an Accomplishment!
+    prefix-unlock: Accomplishment prefix unlocked
+    prefix-lost: Lost accomplishment prefix
+    quest: Quest complete
+    loot: New town monument loot is available.
+    absent: You have been absent for too long and have been kicked from all towns.
+    force-barbarian: You are now a barbarian!
   error:
-    deny-barbarian: "Barbarians cannot do this."
-    internal: "Internal error, contact an admin."
-    internal-message: "Internal error: %s"
-    invalid-parameters: "The command had incorrect arguments. Use /k help."
-    invalid-parameters-admin: "The admin command had incorrect arguments. Use /k admin help."
-    invalid-world: "The command cannot be used in this world."
-    no-permission: "You do not have permission to do that."
-    no-allow: "You are not allowed to do that."
-    no-player: "You must be a player to do this!"
-    unknown-name: "Failed to find unknown name, check spelling: %s"
-    bad-name: "Could not find %s in your Kingdom."
-    format-name: "Name must only contain letters and/or numbers."
-    length-name: "Name can not be greater than 20 characters."
-    taken-name: "That name is already taken."
-    no-favor: "Not enough Favor, need %s"
-    invalid-player: "That player is not valid."
-    enemy-player: "That player is an enemy."
-    enemy-town: "That is an enemy town."
-    disabled: "This feature is currently disabled, talk to an admin."
-    region: "Cannot do this while setting other regions."
-    failed: "Failed :("
+    deny-barbarian: Barbarians cannot do this.
+    internal: Internal error, contact an admin.
+    internal-message: Internal error - %s
+    invalid-parameters: The command had incorrect arguments. Use /k help.
+    invalid-parameters-admin: The admin command had incorrect arguments. Use /k admin help.
+    invalid-world: The command cannot be used in this world.
+    no-permission: You do not have permission to do that.
+    no-allow: You are not allowed to do that.
+    no-player: You must be a player to do this!
+    unknown-name: Failed to find unknown name, check spelling %s
+    bad-name: Could not find %s in your Kingdom.
+    format-name: Name must only contain letters and/or numbers.
+    length-name: Name can not be greater than 20 characters.
+    taken-name: That name is already taken.
+    no-favor: Not enough Favor, need %s
+    invalid-player: That player is not valid.
+    enemy-player: That player is an enemy.
+    enemy-town: That is an enemy town.
+    disabled: This feature is currently disabled, talk to an admin.
+    region: Cannot do this while setting other regions.
+    failed: Failed :(
+# //// PROTECTION \\\\
+# Messages about protecting blocks and land from players.
 protection:
   notice:
-    ignore: "Use \"/k admin bypass\" to ignore protections."
-    peaceful-town: "The Town of %s is peaceful and cannot be attacked."
-    peaceful-player: "Your Kingdom is peaceful, and you cannot attack towns."
-    peaceful-victim: "You cannot attack players in peaceful kingdoms."
-    peaceful-attacker: "Your Kingdom is peaceful, and you cannot attack players."
-    camp-destroy: "Destroyed %s!"
-    camp-destroy-owner: "Your camp has been destroyed!"
-    camp-create: "Successfully set up your Camp."
-    camp-clan-add: "%s has been added to your camp clan."
-    camp-clan-remove: "%s has been removed from your camp clan."
-    critical: "Critical Hit! %s Critical Blocks remain"
-    tagged: "Tagged"
-    tag-message: "You have been tagged in combat."
-    untagged: "Tag Expired"
-    untag-message: "You are no longer in combat."
-    loot-later: "Come back later for more loot!"
-    loot-capture: "Loot will reset once this Ruin has finished being captured."
-    raid: "Enemy spotted in %s, use \"/k travel %s\" to defend!"
-    raid-alert: "Raid Alert"
-    raid-capture-1: "%s is being conquered! Use \"/k travel %s\" to defend and receive %s Favor!"
-    raid-capture-2: "%s is at half strength! Use \"/k travel %s\" to defend and receive %s Favor!"
-    raid-capture-3: "%s is in critical condition! Use \"/k travel %s\" to defend and receive %s Favor!"
-    raid-discord-channel: "The enemy is capturing the town of %s, join the server now to defend!"
-    raid-discord-direct: "Enemy players are capturing the town of %s in your kingdom, %s! Join the server now to defend."
-    raze: "The Town of %s has been destroyed by the Barbarian horde!"
-    destroy: "You have destroyed %s for the glory of the Barbarian horde!"
-    conquer: "The Town of %s has been conquered!"
-    capture: "You have conquered %s for the conquest of %s!"
-    kingdom-warmup: "The Kingdom of %s will be protected in %s minutes."
-    kingdom-conquer: "The Kingdom of %s has been conquered by %s!"
-    kingdom-raze: "The Kingdom of %s has been destroyed by the Barbarian horde!"
-    town-warmup: "These towns in the Kingdom of %s will be protected in %s minutes: %s"
-    ruin: "You have captured the Ruin %s."
-    safe: "The Town of %s is safe, for now..."
-    attacked: "Under Attack"
-    template-modify: "Monument Template %s is being modified and is temporarily unavailable."
-    template-ready: "Monument Template %s is now available."
+    ignore: Use "/k admin bypass" to ignore protections.
+    peaceful-town: The Town of %s is peaceful and cannot be attacked.
+    peaceful-player: Your Kingdom is peaceful, and you cannot attack towns.
+    peaceful-victim: You cannot attack players in peaceful kingdoms.
+    peaceful-attacker: Your Kingdom is peaceful, and you cannot attack players.
+    camp-destroy: Destroyed %s!
+    camp-destroy-owner: Your camp has been destroyed!
+    camp-create: Successfully set up your Camp.
+    camp-clan-add: '%s has been added to your camp clan.'
+    camp-clan-remove: '%s has been removed from your camp clan.'
+    critical: Critical Hit! %s Critical Blocks remain
+    tagged: Tagged
+    tag-message: You have been tagged in combat.
+    untagged: Tag Expired
+    untag-message: You are no longer in combat.
+    loot-later: Come back later for more loot!
+    loot-capture: Loot will reset once this Ruin has finished being captured.
+    raid: Enemy spotted in %s, use "/k travel %s" to defend!
+    raid-alert: Raid Alert
+    raid-capture-1: '%s is being conquered! Use "/k travel %s" to defend and receive %s Favor!'
+    raid-capture-2: '%s is at half strength! Use "/k travel %s" to defend and receive %s Favor!'
+    raid-capture-3: '%s is in critical condition! Use "/k travel %s" to defend and receive %s Favor!'
+    raid-discord-channel: The enemy is capturing the town of %s, join the server now to defend!
+    raid-discord-direct: Enemy players are capturing the town of %s in your kingdom, %s! Join the server now to defend.
+    raze: The Town of %s has been destroyed by the Barbarian horde!
+    destroy: You have destroyed %s for the glory of the Barbarian horde!
+    conquer: The Town of %s has been conquered!
+    capture: You have conquered %s for the conquest of %s!
+    purchase: The Town of %s has been purchased by the Kingdom of %s!
+    kingdom-warmup: The Kingdom of %s will be protected in %s minutes.
+    kingdom-conquer: The Kingdom of %s has been conquered by %s!
+    kingdom-raze: The Kingdom of %s has been destroyed by the Barbarian horde!
+    town-warmup: These towns in the Kingdom of %s will be protected in %s minutes - %s
+    ruin: You have captured the Ruin %s.
+    safe: The Town of %s is safe, for now...
+    attacked: Under Attack
+    template-modify: Monument Template %s is being modified and is temporarily unavailable.
+    template-ready: Monument Template %s is now available.
   error:
-    blocked: "Blocked"
-    not-resident: "You must be a resident of %s to do this."
-    not-plot: "You must be a plot member to do this."
-    only-plot: "You cannot do this outside of a town plot."
-    online: "The Kingdom of %s doesn't have enough online players, cannot attack the Town of %s."
-    protected-attack: "Your Kingdom doesn't have enough online players, cannot attack the Town of %s."
-    upgrade: "%s is upgraded with %s and cannot be attacked without %s residents online."
-    camp: "Cannot attack %s, the camp owner is offline."
-    camp-bed: "Cannot place additional beds within this Camp."
-    camp-update: "Updated your Camp's bed location."
-    camp-create: "Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed."
-    camp-fail-overlap: "Camping failed: New claims overlap with existing territory."
-    camp-fail-barbarian: "Camping failed: You are not a Barbarian."
-    camp-fail-offline: "Camping failed: All surrounding camp owners are offline."
-    capture: "This territory cannot be captured for another %s."
-    golem: "You cannot hurt friendly Iron Golems in the Town of %s."
-    tag-blocked: "This command is blocked while in combat."
-    portal-exit: "Your exit portal is inside of protected territory, move your portal!"
-    capital-immune: "This capital is immune to attacks while %s towns remain in the Kingdom of %s."
-    no-allied-build: "This town's options do not allow players from allied kingdoms to build."
+    blocked: Blocked
+    not-resident: You must be a resident of %s to do this.
+    not-plot: You must be a plot member to do this.
+    only-plot: You cannot do this outside of a town plot.
+    online: The Kingdom of %s doesn't have enough online players, cannot attack the Town of %s.
+    protected-attack: Your Kingdom doesn't have enough online players, cannot attack the Town of %s.
+    upgrade: '%s is upgraded with %s and cannot be attacked without %s residents online.'
+    camp: Cannot attack %s, the camp owner is offline.
+    camp-bed: Cannot place additional beds within this Camp.
+    camp-update: Updated your Camp's bed location.
+    camp-create: Cannot create more than one Camp. Destroy the bed in your current Camp before placing a new bed.
+    camp-fail-overlap: Camping failed, New claims overlap with existing territory.
+    camp-fail-barbarian: Camping failed, You are not a Barbarian.
+    camp-fail-offline: Camping failed, All surrounding camp owners are offline.
+    capture: This territory cannot be captured for another %s.
+    golem: You cannot hurt friendly Iron Golems in the Town of %s.
+    tag-blocked: This command is blocked while in combat.
+    portal-exit: Your exit portal is inside of protected territory, move your portal!
+    capital-immune: This capital is immune to attacks while %s towns remain in the Kingdom of %s.
+    no-allied-build: This town's options do not allow players from allied kingdoms to build.
+    template-modify: This monument template is currently being modified and will be available soon.
+# //// COMMAND \\\\
+# Messages used for all commands.
 command:
   admin:
     camp:
       notice:
-        create: "Successfully created a camp for player %s."
-        destroy: "Successfully removed the camp for player %s."
+        create: Successfully created a camp for player %s.
+        destroy: Successfully removed the camp for player %s.
       error:
-        create-exist: "Player already has a camp, remove it first before creating a new one."
-        destroy-exist: "Player does not have a camp."
+        create-exist: Player already has a camp, remove it first before creating a new one.
+        destroy-exist: Player does not have a camp.
     flag:
       notice:
-        all-properties: "All Properties"
-        single-property: "Single Property"
-        set: "Set property %s of %s to new value %s."
-        reset: "Reset all properties to default values in properties.yml"
+        all-properties: All Properties
+        single-property: Single Property
+        set: Set property %s of %s to new value %s.
+        reset: Reset all properties to default values in properties.yml
       error:
-        invalid: "The property flag %s does not apply to %s."
+        invalid: The property flag %s does not apply to %s.
     help:
       notice:
-        detail: "For more command details use /k admin help <command>"
-        page: "To view more pages use /k admin help <page>"
-        page-command: "To view more pages use /k admin help %s <page>"
+        detail: For more command details use /k admin help <command>
+        page: To view more pages use /k admin help <page>
+        page-command: To view more pages use /k admin help %s <page>
     kingdom:
       broadcast:
-        create: "The Admin Kingdom of %s has been created!"
+        create: The Admin Kingdom of %s has been created!
       notice:
-        admin-set: "The Kingdom of %s is an admin kingdom."
-        admin-clear: "The Kingdom of %s is a player kingdom."
-        diplomacy: "The Kingdoms of %s and %s have a diplomacy relationship of %s."
+        admin-set: The Kingdom of %s is an admin kingdom.
+        admin-clear: The Kingdom of %s is a player kingdom.
+        diplomacy: The Kingdoms of %s and %s have a diplomacy relationship of %s.
       error:
-        no-templates: "There are no monument templates. Create one in a sanctuary with \"/k admin monument create (name)\""
+        no-templates: There are no monument templates. Create one in a sanctuary with "/k admin monument create (name)"
     monument:
       notice:
-        create-1: "Now creating new Monument Template, click on the first corner block of the region."
-        create-2: "Click on the second corner block of the region, when all particles are green."
-        create-3: "Click on the travel point block."
-        success: "Successfully created new Monument Template %s."
-        remove: "Removed Monument Template %s."
-        rename: "Renamed Monument Template %s to %s."
-        show: "Showing existing Monument Template %s in Sanctuary %s."
-        sanctuary: "Create Sanctuary territory with \"/k admin sanctuary create (name)\" before creating Monument Templates."
+        create-1: Now creating new Monument Template, click on the first corner block of the region.
+        create-2: Click on the second corner block of the region, when all particles are green.
+        create-3: Click on the travel point block.
+        success: Successfully created new Monument Template %s.
+        remove: Removed Monument Template %s.
+        rename: Renamed Monument Template %s to %s.
+        show: Showing existing Monument Template %s in Sanctuary %s.
+        sanctuary: Create Sanctuary territory with "/k admin sanctuary create (name)" before creating Monument Templates.
       error:
-        value: "Cost value is not a number."
-        fail-base: "Failed to create Monument Template %s, base must be 16x16 blocks but got %s by %s."
-        fail-critical: "Failed to create Monument Template %s, it must contain at least %s %s blocks."
-        fail-travel: "Failed to create Monument Template %s, travel point must be inside of the region."
-        fail-region: "Failed to create Monument Template %s, region corners must be within Sanctuary territory."
-        fail-reset: "Failed to reset Monument Template %s, restored to previous state."
+        value: Cost value is not a number.
+        fail-base: Failed to create Monument Template %s, base must be 16x16 blocks but got %s by %s.
+        fail-critical: Failed to create Monument Template %s, it must contain at least %s %s blocks.
+        fail-travel: Failed to create Monument Template %s, travel point must be inside of the region.
+        fail-region: Failed to create Monument Template %s, region corners must be within Sanctuary territory.
+        fail-reset: Failed to reset Monument Template %s, restored to previous state.
     reload:
       notice:
-        message: "Reloaded Konquest configuration files."
+        message: Reloaded Konquest configuration files.
     ruin:
       notice:
-        create: "Successfully created new Ruin: %s"
-        remove: "Successfully removed Ruin: %s"
-        rename: "Successfully changed Ruin name from %s to %s."
-        reset: "Successfully reset critical blocks and golem spawn in Ruin %s."
-        criticals: "Removed all previous critical blocks from %s, click on blocks to add."
-        spawns: "Removed all previous spawn blocks from %s, click on blocks to add."
-        add: "Block added to Ruin %s."
+        create: Successfully created new Ruin %s
+        remove: Successfully removed Ruin %s
+        rename: Successfully changed Ruin name from %s to %s.
+        reset: Successfully reset critical blocks and golem spawn in Ruin %s.
+        criticals: Removed all previous critical blocks from %s, click on blocks to add.
+        spawns: Removed all previous spawn blocks from %s, click on blocks to add.
+        add: Block added to Ruin %s.
       error:
-        create: "Could not create Ruin %s, bad name or territory overlap."
-        remove: "Failed to remove unknown Ruin %s."
-        rename: "Failed to rename Ruin %s to %s."
-        reset: "Failed to reset unknown Ruin %s."
-        match: "Clicked block does not match type: %s"
-        invalid: "Could not add this block to a valid Ruin."
+        create: Could not create Ruin %s, bad name or territory overlap.
+        remove: Failed to remove unknown Ruin %s.
+        rename: Failed to rename Ruin %s to %s.
+        reset: Failed to reset unknown Ruin %s.
+        match: Clicked block does not match type %s
+        invalid: Could not add this block to a valid Ruin.
     sanctuary:
       notice:
-        create: "Successfully created new Sanctuary %s, add more land with \"/k admin claim\"."
-        remove: "Successfully removed Sanctuary %s"
-        rename: "Successfully changed Sanctuary name from %s to %s."
+        create: Successfully created new Sanctuary %s, add more land with "/k admin claim".
+        remove: Successfully removed Sanctuary %s
+        rename: Successfully changed Sanctuary name from %s to %s.
       error:
-        create: "Could not create Sanctuary %s, bad name or territory overlap."
-        remove: "Failed to remove unknown Sanctuary %s."
-        rename: "Failed to rename Sanctuary %s to %s."
+        create: Could not create Sanctuary %s, bad name or territory overlap.
+        remove: Failed to remove unknown Sanctuary %s.
+        rename: Failed to rename Sanctuary %s to %s.
     save:
       notice:
-        message: "Saved all data to files."
+        message: Saved all data to files.
     settravel:
       notice:
-        success: "Successfully set new travel point in %s."
+        success: Successfully set new travel point in %s.
       error:
-        fail: "Failed to set travel point in unknown territory."
+        fail: Failed to set travel point in unknown territory.
     stat:
       notice:
-        show: "Stat %s for player %s: %s"
-        set: "Set stat %s for player %s to %s."
-        add: "Added %s to stat %s for player %s: %s"
-        clear: "Cleared stat %s to zero for player %s."
+        show: Stat %s for player %s is %s
+        set: Set stat %s for player %s to %s.
+        add: Added %s to stat %s for player %s, new value is %s
+        clear: Cleared stat %s to zero for player %s.
       error:
-        name: "Invalid stat %s, could not match to existing stats."
-        value: "Invalid stat value: %s"
+        name: Invalid stat %s, could not match to existing stats.
+        value: Invalid stat value %s
   border:
     notice:
-      enable: "Displaying particle borders"
-      disable: "Hiding particle borders"
+      enable: Displaying particle borders
+      disable: Hiding particle borders
   chat:
     notice:
-      enable: "Kingdom chat"
-      disable: "Global chat"
+      enable: Kingdom chat
+      disable: Global chat
   claim:
     notice:
-      success: "Successfully claimed %s chunks of land for %s."
-      fail-auto: "Could not claim, disabled auto claim."
-      pass-auto: "Claimed"
+      success: Successfully claimed %s chunks of land for %s.
+      fail-auto: Could not claim, disabled auto claim.
+      pass-auto: Claimed
     error:
-      radius: "Radius must be greater than or equal to %s and less than or equal to %s."
-      missing: "Must claim near existing territory."
-      proximity: "Too close to another territory."
-      fail-adjacent: "Failed to claim, no adjacent territory."
-      fail-far: "Failed to claim, too far from territory center."
-      fail-claimed: "Failed to claim, already claimed."
+      radius: Radius must be greater than or equal to %s and less than or equal to %s.
+      missing: Must claim near existing territory.
+      proximity: Too close to another territory.
+      fail-adjacent: Failed to claim, no adjacent territory.
+      fail-far: Failed to claim, too far from territory center.
+      fail-claimed: Failed to claim, already claimed.
   favor:
     notice:
-      message: "You have %s Favor, costs are..."
-      cost-spy: "Spy"
-      cost-travel: "Travel"
-      cost-claim: "Claim"
-      cost-town-settle: "Town Settle"
-      cost-town-rename: "Town Rename"
-      cost-kingdom-create: "Kingdom Create"
-      cost-kingdom-rename: "Kingdom Rename"
-      cost-capital-swap: "Capital Change"
+      message: You have %s Favor, costs are...
+      cost-spy: Spy
+      cost-travel: Travel
+      cost-claim: Claim
+      cost-town-settle: Town Settle
+      cost-town-rename: Town Rename
+      cost-kingdom-create: Kingdom Create
+      cost-kingdom-rename: Kingdom Rename
+      cost-capital-swap: Capital Change
   help:
     notice:
-      header: "Help Page %s"
-      detail: "For more command details use /k help <command>"
-      page: "To view more pages use /k help <page>"
-      page-command: "To view more pages use /k help %s <page>"
-      command: "All major command uses:"
+      header: Help Page %s
+      detail: For more command details use /k help <command>
+      page: To view more pages use /k help <page>
+      page-command: To view more pages use /k help %s <page>
+      command: All major command uses
     error:
-      page: "The page value must be a number."
-  info:
-    notice:
-      kingdom-header: "Kingdom of %s"
-      town-header: "Town of %s"
-      camp-placed: "Barbarian Camp is placed."
-      camp-missing: "This player has no camp."
-      ruin-status: "Capture Status"
-      ruin-capture: "This Ruin can be captured for a reward."
+      page: The page value must be a number.
   kingdom:
     broadcast:
-      create: "%s has created the Kingdom of %s"
-      join: "%s joined the Kingdom of %s"
-      rename: "The Kingdom of %s has been renamed to %s"
-      peace: "The Kingdoms of %s and %s have made peace."
-      peace-request: "The Kingdom of %s requests to make peace. Use \"/k kingdom\" to change relationships."
-      trade: "The Kingdoms of %s and %s are now trade partners."
-      trade-request: "The Kingdom of %s requests to trade. Use \"/k kingdom\" to change relationships."
-      no-trade: "The Kingdoms of %s and %s are no longer trading."
-      ally: "The Kingdoms of %s and %s have formed an alliance."
-      ally-request: "The Kingdom of %s requests an alliance. Use \"/k kingdom\" to change relationships."
-      no-ally: "The Kingdoms of %s and %s are no longer allies."
-      war: "The Kingdoms of %s and %s are at war!"
-      war-request: "The Kingdom of %s requests to go to war. Use \"/k kingdom\" to change relationships."
-      transfer: "%s is now the Kingdom Master of %s."
-      promote: "%s has been promoted to Kingdom Officer of %s."
-      demote: "%s has been demoted to Kingdom Member of %s."
-      disband: "The Kingdom of %s has been disbanded!"
-      destroy: "The Town of %s has been destroyed!"
-      capital-swap: "The Kingdom Capital of %s has moved to the Town of %s."
-      capital-warmup: "The Kingdom Capital of %s will move to the Town of %s in %s."
-      capital-cancel: "Enemy attacks have stopped the Kingdom Capital of %s from moving to the Town of %s!"
+      create: '%s has created the Kingdom of %s'
+      join: '%s joined the Kingdom of %s'
+      rename: The Kingdom of %s has been renamed to %s
+      peace: The Kingdoms of %s and %s have made peace.
+      peace-request: The Kingdom of %s requests to make peace. Use "/k kingdom" to change relationships.
+      trade: The Kingdoms of %s and %s are now trade partners.
+      trade-request: The Kingdom of %s requests to trade. Use "/k kingdom" to change relationships.
+      no-trade: The Kingdoms of %s and %s are no longer trading.
+      ally: The Kingdoms of %s and %s have formed an alliance.
+      ally-request: The Kingdom of %s requests an alliance. Use "/k kingdom" to change relationships.
+      no-ally: The Kingdoms of %s and %s are no longer allies.
+      war: The Kingdoms of %s and %s are at war!
+      war-request: The Kingdom of %s requests to go to war. Use "/k kingdom" to change relationships.
+      transfer: '%s is now the Kingdom Master of %s.'
+      promote: '%s has been promoted to Kingdom Officer of %s.'
+      demote: '%s has been demoted to Kingdom Member of %s.'
+      disband: The Kingdom of %s has been disbanded!
+      destroy: The Town of %s has been destroyed!
+      capital-swap: The Kingdom Capital of %s has moved to the Town of %s.
+      capital-warmup: The Kingdom Capital of %s will move to the Town of %s in %s.
+      capital-cancel: Enemy attacks have stopped the Kingdom Capital of %s from moving to the Town of %s!
     notice:
-      request-sent: "Sent member request to join %s."
-      request-received: "New kingdom join request, type \"/k kingdom\" to review."
-      request-declined: "Denied kingdom join request for player %s."
-      request-pending: "Players requested to join your kingdom. Use \"/k kingdom\", then choose Requests to respond."
-      request-list: "These players have requested to join your kingdom:"
-      invite-sent: "Invited %s to join the kingdom."
-      invite-received: "Received kingdom invite, type \"/k kingdom\" to respond."
-      invite-declined: "Declined invitation to join %s."
-      invite-pending: "You have pending invites to join kingdoms. Use \"/k kingdom\", then choose Invites to respond."
-      invite-list: "These kingdoms have invited you to join:"
-      exile: "You are now exiled from %s as a barbarian."
-      exile-stats: "Removed all stats from exile!"
-      exile-favor: "Removed all favor from exile!"
-      remove-member: "You are no longer a member of the Kingdom of %s."
-      kick: "Kicked player %s from the kingdom."
-      rename: "Successfully changed kingdom name to %s."
-      transfer-master: "You made %s the new kingdom master of %s."
-      discount: "The Kingdom of %s gives you a %s percent discount with this merchant."
-      open: "Kingdom is now open to join."
-      closed: "Kingdom is now closed for invites only."
-      template-current: "The Kingdom Monument Template is %s."
-      template: "Updated the Kingdom Monument Template to %s."
-      pay: "Received kingdom payment."
-      diplomacy-current: "Your kingdom's diplomacy relationship to the Kingdom of %s is %s."
-      diplomacy-sent: "Sent diplomacy request to the Kingdom of %s."
-      diplomacy-pending: "Your kingdom has pending diplomacy requests. Use \"/k kingdom\", then choose Relationships to respond."
-      web-color-show: "The Kingdom of %s has a web map color of: %s"
-      web-color-set: "Set the web map color of %s to: %s"
+      request-sent: Sent member request to join %s.
+      request-received: New kingdom join request, type "/k kingdom" to review.
+      request-declined: Denied kingdom join request for player %s.
+      request-pending: Players requested to join your kingdom. Use "/k kingdom", then choose Requests to respond.
+      request-list: These players have requested to join your kingdom...
+      invite-sent: Invited %s to join the kingdom.
+      invite-received: Received kingdom invite, type "/k kingdom" to respond.
+      invite-declined: Declined invitation to join %s.
+      invite-pending: You have pending invites to join kingdoms. Use "/k kingdom", then choose Invites to respond.
+      invite-list: These kingdoms have invited you to join...
+      exile: You are now exiled from %s as a barbarian.
+      exile-stats: Removed all stats from exile!
+      exile-favor: Removed all favor from exile!
+      remove-member: You are no longer a member of the Kingdom of %s.
+      kick: Kicked player %s from the kingdom.
+      rename: Successfully changed kingdom name to %s.
+      transfer-master: You made %s the new kingdom master of %s.
+      discount: The Kingdom of %s gives you a %s percent discount with this merchant.
+      open: Kingdom is now open to join.
+      closed: Kingdom is now closed for invites only.
+      template-current: The Kingdom Monument Template is %s.
+      template: Updated the Kingdom Monument Template to %s.
+      pay: Received kingdom payment.
+      diplomacy-current: Your kingdom's diplomacy relationship to the Kingdom of %s is %s.
+      diplomacy-sent: Sent diplomacy request to the Kingdom of %s.
+      diplomacy-pending: Your kingdom has pending diplomacy requests. Use "/k kingdom", then choose Relationships to respond.
+      web-color-show: The Kingdom of %s has a web map color of %s
+      web-color-set: Set the web map color of %s to %s
+      offer-purchase: You sent an offer to purchase the Town of %s from the Kingdom of %s for %s.
+      offer-pending: Your kingdom has pending town purchase offers. Use "/k kingdom", then choose Town Offers to respond.
+      offer-towns: These towns in your kingdom have offers to be purchased...
+      offer-players: These players have offered to purchase the town of %s...
+      offer-declined: Declined the offer by player %s to purchase the town of %s.
     error:
-      barbarian-create: "You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu."
-      invalid-template: "%s is an invalid monument template. Check spelling or choose another."
-      missing-template: "You must specify a template name. View templates with \"/k kingdom templates\""
-      missing-name: "You must specify a kingdom name."
-      invite-member: "%s is already a kingdom member."
-      invite-exists: "%s has already been invited to join the kingdom."
-      invite-open: "Cannot invite players to an open kingdom."
-      request-exists: "You have already requested to join %s."
-      request-deny: "Request to join the Kingdom of %s has been denied."
-      join-member: "You are already a kingdom member."
-      join-limit: "The Kingdom of %s has too many players!"
-      join-master: "Kingdom masters cannot join other kingdoms."
-      join-switch: "Players cannot join rival kingdoms."
-      join-cooldown: "Wait before joining another kingdom: %s"
-      kick-master: "Cannot kick the kingdom master."
-      kick-barbarian: "The player is already a barbarian."
-      exile-cooldown: "Wait before exile to barbarian: %s"
-      merchant: "Cannot trade with merchants in the Kingdom of %s, need Trade or Allied diplomacy."
-      diplomacy-exists: "A request to change diplomacy already exists."
-      diplomacy-peaceful: "Cannot change the diplomacy relationships of peaceful kingdoms."
-      diplomacy-invalid: "This diplomacy relationship is not available, or already active."
-      template-attack: "Cannot change monument template while the Kingdom Capital is under attack."
-      template-chosen: "This monument template has already been chosen for the Kingdom."
-      web-color-invalid: "Invalid color, must match a color name or hex code starting with #"
-      capital-swap-attack: "Cannot change the Kingdom Capital while under attack."
-      capital-swap-war: "Cannot change the Kingdom Capital while your kingdom is at war."
+      barbarian-create: You must be a barbarian to create a kingdom. Use the Exile option in the kingdom menu.
+      invalid-template: '%s is an invalid monument template. Check spelling or choose another.'
+      missing-template: You must specify a template name. View templates with "/k kingdom templates"
+      missing-name: You must specify a kingdom name.
+      invite-member: '%s is already a kingdom member.'
+      invite-exists: '%s has already been invited to join the kingdom.'
+      invite-open: Cannot invite players to an open kingdom.
+      request-exists: You have already requested to join %s.
+      request-deny: Request to join the Kingdom of %s has been denied.
+      join-member: You are already a kingdom member.
+      join-limit: The Kingdom of %s has too many players!
+      join-master: Kingdom masters cannot join other kingdoms.
+      join-switch: Players cannot join rival kingdoms.
+      join-cooldown: Wait before joining another kingdom %s
+      kick-master: Cannot kick the kingdom master.
+      kick-barbarian: The player is already a barbarian.
+      exile-cooldown: Wait before exile to barbarian %s
+      merchant: Cannot trade with merchants in the Kingdom of %s, need Trade or Allied diplomacy.
+      diplomacy-exists: A request to change diplomacy already exists.
+      diplomacy-peaceful: Cannot change the diplomacy relationships of peaceful kingdoms.
+      diplomacy-invalid: This diplomacy relationship is not available, or already active.
+      template-attack: Cannot change monument template while the Kingdom Capital is under attack.
+      template-chosen: This monument template has already been chosen for the Kingdom.
+      web-color-invalid: Invalid color, must match a color name or hex code starting with \#
+      capital-swap-attack: Cannot change the Kingdom Capital while under attack.
+      capital-swap-war: Cannot change the Kingdom Capital while your kingdom is at war.
   list:
     notice:
-      header: "%s List"
+      header: '%s List'
   prefix:
     notice:
-      disable: "Turned off your prefix title."
-      new: "Your prefix is now %s"
+      disable: Turned off your prefix title.
+      new: Your prefix is now %s
     error:
-      disable: "Your prefix title is already off."
-      new: "The prefix %s is not unlocked!"
-      default: "Your prefix has been reverted to default."
-      always-on: "Your prefix title cannot be disabled."
+      disable: Your prefix title is already off.
+      new: The prefix %s is not unlocked!
+      default: Your prefix has been reverted to default.
+      always-on: Your prefix title cannot be disabled.
   score:
     notice:
-      all-header: "All Kingdom scores"
-      score: "Your score: %s, Kingdom of %s score: %s"
-      player: "%s's score: %s, Kingdom of %s score: %s"
+      all-header: All Kingdom scores
+      score: Your score %s, Kingdom of %s score %s
+      player: "%s's score %s, Kingdom of %s score %s"
+      kingdom: Kingdom of %s score %s
     error:
-      peaceful: "The Kingdom of %s is peaceful, and cannot be scored."
-      barbarian: "%s is a Barbarian, and cannot be scored."
+      peaceful: The Kingdom of %s is peaceful, and cannot be scored.
+      barbarian: '%s is a Barbarian, and cannot be scored.'
+      kingdom: This Kingdom cannot be scored.
   settle:
     broadcast:
-      settle: "%s has settled the Town of %s for Kingdom %s"
+      settle: '%s has settled the Town of %s for Kingdom %s'
     notice:
-      success: "Successfully settled new Town: %s"
-      map-hint: "Use \"/k map\" for helpful info."
+      success: Successfully settled new Town %s
+      map-hint: Use "/k map" for helpful info.
     error:
-      missing-name: "Must specify a town name."
-      space-name: "Bad town name, cannot use spaces."
-      fail-name: "Invalid Town name, already taken or has spaces."
-      fail-overlap: "Town overlaps with a nearby territory."
-      fail-placement: "Could not find a good Monument placement."
-      fail-template: "Invalid or unavailable Monument Template."
-      fail-proximity: "Town is too close to another territory. Currently %s chunks away, must be at least %s."
-      fail-max: "Town is too far away from other territories. Currently %s chunks away, must be at most %s."
-      fail-flat: "Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!"
-      fail-height: "Bad elevation, try settling somewhere higher or lower."
-      fail-air: "Too much air below the ground. Try settling somewhere else, or fill all air below you."
-      fail-water: "Too much water below the ground. Try settling somewhere else, or remove all water below you."
-      fail-container: "Too many containers below the ground. Try settling somewhere else, or remove all containers below you."
-      fail-init: "Town could not claim initial chunks."
-      fail-limit-all: "Cannot settle more towns than the global maximum limit of %s. There are currently %s towns in all worlds."
-      fail-limit-world: "Cannot settle more towns than the per-world maximum limit of %s. There are currently %s towns in this world."
-      officer-only: "Only the kingdom master and officers can settle towns. Ask to be promoted!"
+      missing-name: Must specify a town name.
+      space-name: Bad town name, cannot use spaces.
+      fail-name: Invalid Town name, already taken or has spaces.
+      fail-overlap: Town overlaps with a nearby territory.
+      fail-placement: Could not find a good Monument placement.
+      fail-template: Invalid or unavailable Monument Template.
+      fail-proximity: Town is too close to another territory. Currently %s chunks away, must be at least %s.
+      fail-max: Town is too far away from other territories. Currently %s chunks away, must be at most %s.
+      fail-flat: Your chunk area is not flat enough. Press F3+G to view chunk boundaries. Cut down trees and flatten the ground!
+      fail-height: Bad elevation, try settling somewhere higher or lower.
+      fail-air: Too much air below the ground. Try settling somewhere else, or fill all air below you.
+      fail-water: Too much water below the ground. Try settling somewhere else, or remove all water below you.
+      fail-container: Too many containers below the ground. Try settling somewhere else, or remove all containers below you.
+      fail-init: Town could not claim initial chunks.
+      fail-limit-all: Cannot settle more towns than the global maximum limit of %s. There are currently %s towns in all worlds.
+      fail-limit-world: Cannot settle more towns than the per-world maximum limit of %s. There are currently %s towns in this world.
+      officer-only: Only the kingdom master and officers can settle towns. Ask to be promoted!
   spy:
     notice:
-      nearby: "nearby"
-      regional: "regional"
-      faraway: "faraway"
-      very-distant: "very distant"
-      success: "A spy has recovered this map of a %s enemy town!"
+      nearby: nearby
+      regional: regional
+      faraway: faraway
+      very-distant: very distant
+      success: A spy has recovered this map of a %s enemy town!
     error:
-      inventory: "Not enough inventory space, make some room."
-      town: "Could not find an enemy town."
+      inventory: Not enough inventory space, make some room.
+      town: Could not find an enemy town.
   town:
     notice:
-      open: "Opened %s for access by all kingdom members."
-      close: "Closed %s, only residents may build and access containers."
-      plot-enable: "%s now allows residents to only build within plots."
-      plot-disable: "%s now allows residents to build in town land and within plots."
-      allied-building-enable: "%s now allows allies to build."
-      allied-building-disable: "%s now prevents allies from building."
-      friendly-redstone-enable: "%s now allows kingdom members to use redstone switches and doors."
-      friendly-redstone-disable: "%s now prevents kingdom members from using redstone switches and doors."
-      redstone-enable: "%s now allows enemies to use redstone switches and doors."
-      redstone-disable: "%s now prevents enemies from using redstone switches and doors."
-      golem-enable: "Iron Golems in %s will attack all enemies within town land."
-      golem-disable: "Iron Golems in %s will only defend the town monument from enemies."
-      add-resident: "Added resident %s to town %s."
-      kick-resident: "Kicked resident %s from town %s."
-      lord-success: "Gave Lordship of %s to %s."
-      lord-claim: "%s has claimed Lordship of %s!"
-      knight-set: "%s has been Knighted in %s."
-      knight-clear: "%s is no longer a Knight in %s."
-      rename: "Lord %s has renamed the Town of %s to %s."
-      no-lord: "%s is abandoned! Use \"/k town lord %s\" to claim Lordship."
-      shield-list: "%s remaining shields for the town of %s."
-      armor-list: "%s remaining armor blocks for the town of %s."
-      specialize-list: "%s Town specialization is %s."
-      specialize: "Successfully changed %s Town specialization to %s."
-      new-resident: "%s has joined as a town resident of %s."
-      leave-resident: "%s has left the town of %s."
-      request-sent: "Sent resident request to join %s."
-      request-received: "New town join request, type \"/k town\" to review."
-      request-declined: "Denied town join request for player %s."
-      request-pending: "Players want to become residents of your towns. Use \"/k town\" command to respond."
-      request-town-list: "These towns have new residents requesting to join:"
-      request-player-list: "These players have requested to join the Town of %s:"
-      invite-sent: "Invited %s to join the town of %s."
-      invite-received: "Received town invite, type \"/k town\" to respond."
-      invite-declined: "Declined invitation to join %s."
-      invite-pending: "You have pending invites to join towns. Use \"/k town\" command to respond."
-      invite-list: "These towns have invited you to join:"
+      open: Opened %s for access by all kingdom members.
+      close: Closed %s, only residents may build and access containers.
+      plot-enable: '%s now allows residents to only build within plots.'
+      plot-disable: '%s now allows residents to build in town land and within plots.'
+      allied-building-enable: '%s now allows allies to build.'
+      allied-building-disable: '%s now prevents allies from building.'
+      friendly-redstone-enable: '%s now allows kingdom members to use redstone switches and doors.'
+      friendly-redstone-disable: '%s now prevents kingdom members from using redstone switches and doors.'
+      redstone-enable: '%s now allows enemies to use redstone switches and doors.'
+      redstone-disable: '%s now prevents enemies from using redstone switches and doors.'
+      golem-enable: Iron Golems in %s will attack all enemies within town land.
+      golem-disable: Iron Golems in %s will only defend the town monument from enemies.
+      add-resident: Added resident %s to town %s.
+      kick-resident: Kicked resident %s from town %s.
+      lord-success: Gave Lordship of %s to %s.
+      lord-claim: '%s has claimed Lordship of %s!'
+      knight-set: '%s has been Knighted in %s.'
+      knight-clear: '%s is no longer a Knight in %s.'
+      rename: Lord %s has renamed the Town of %s to %s.
+      no-lord: '%s is abandoned! Use "/k town lord %s" to claim Lordship.'
+      shield-list: '%s remaining shields for the town of %s.'
+      armor-list: '%s remaining armor blocks for the town of %s.'
+      specialize-list: '%s Town specialization is %s.'
+      specialize: Successfully changed %s Town specialization to %s.
+      new-resident: '%s has joined as a town resident of %s.'
+      leave-resident: '%s has left the town of %s.'
+      request-sent: Sent resident request to join %s.
+      request-received: New town join request, type "/k town" to review.
+      request-declined: Denied town join request for player %s.
+      request-pending: Players want to become residents of your towns. Use "/k town" command to respond.
+      request-town-list: These towns have new residents requesting to join...
+      request-player-list: These players have requested to join the Town of %s...
+      invite-sent: Invited %s to join the town of %s.
+      invite-received: Received town invite, type "/k town" to respond.
+      invite-declined: Declined invitation to join %s.
+      invite-pending: You have pending invites to join towns. Use "/k town" command to respond.
+      invite-list: These towns have invited you to join...
     error:
-      kick-fail: "%s is not a resident of %s."
-      knight-resident: "Knights must be added as residents first."
-      invite-member: "%s is already a town resident."
-      invite-exists: "%s has already been invited to join the town."
-      invite-open: "Cannot invite players to an open town."
-      request-exists: "You have already requested to join %s."
-      request-deny: "Request to join the Town of %s has been denied."
-      join-member: "You are already a town resident."
-      join-limit: "The Town of %s has too many residents!"
-      kicked: "You have been kicked from the town of %s."
-      promote-knight: "%s is already a Knight."
-      demote-resident: "%s is already a resident."
-      upgrade-unavailable: "Upgrade %s is unavailable for the town of %s."
-      upgrade-level: "Upgrade level must be between %s and %s."
+      kick-fail: '%s is not a resident of %s.'
+      knight-resident: Knights must be added as residents first.
+      invite-member: '%s is already a town resident.'
+      invite-exists: '%s has already been invited to join the town.'
+      invite-open: Cannot invite players to an open town.
+      request-exists: You have already requested to join %s.
+      request-deny: Request to join the Town of %s has been denied.
+      join-member: You are already a town resident.
+      join-limit: The Town of %s has too many residents!
+      kicked: You have been kicked from the town of %s.
+      promote-knight: '%s is already a Knight.'
+      demote-resident: '%s is already a resident.'
+      upgrade-unavailable: Upgrade %s is unavailable for the town of %s.
+      upgrade-level: Upgrade level must be between %s and %s.
   travel:
     notice:
-      town-travel: "%s has traveled to %s."
-      wild-search: "Searching for a random Wild location..."
-      wild-travel: "Traveled to a random location in the Wild."
-      warmup: "Travel starts in %s seconds."
+      town-travel: '%s has traveled to %s.'
+      wild-search: Searching for a random Wild location...
+      wild-travel: Traveled to a random location in the Wild.
+      warmup: Travel starts in %s seconds.
     error:
-      wild-timeout: "Failed to find a suitable location in the Wild."
-      enemy-territory: "You can not travel within enemy territory!"
-      no-home: "You do not have a home!"
-      no-camp: "You do not have a camp!"
-      no-town: "That town does not exist in your Kingdom."
-      cooldown: "You must wait %s before traveling to %s."
-      canceled: "Your travel was canceled by movement."
-      damaged: "Your travel was canceled by damage."
-      disabled: "Travel to that territory is disabled."
+      wild-timeout: Failed to find a suitable location in the Wild.
+      enemy-territory: You can not travel within enemy territory!
+      no-home: You do not have a home!
+      no-camp: You do not have a camp!
+      no-town: That town does not exist in your Kingdom.
+      cooldown: You must wait %s before traveling to %s.
+      canceled: Your travel was canceled by movement.
+      damaged: Your travel was canceled by damage.
+      disabled: Travel to that territory is disabled.
   unclaim:
     notice:
-      success: "Successfully unclaimed %s chunks of land from %s."
-      fail-auto: "Could not unclaim, disabled auto unclaim."
-      pass-auto: "Unclaimed"
+      success: Successfully unclaimed %s chunks of land from %s.
+      fail-auto: Could not unclaim, disabled auto unclaim.
+      pass-auto: Unclaimed
     error:
-      radius: "Radius must be greater than or equal to %s and less than or equal to %s."
-      fail-town: "Must unclaim from towns only."
-      fail-lord: "Failed to unclaim, you must be the town lord."
-      fail-unclaimed: "Failed to unclaim, you must be standing in claimed territory."
-      fail-center: "Failed to unclaim, cannot remove territory center."
+      radius: Radius must be greater than or equal to %s and less than or equal to %s.
+      fail-town: Must unclaim from towns only.
+      fail-lord: Failed to unclaim, you must be the town lord.
+      fail-unclaimed: Failed to unclaim, you must be standing in claimed territory.
+      fail-center: Failed to unclaim, cannot remove territory center.
+# //// SHOP \\\\
+# Messages used for chest shop integration.
 shop:
   error:
-    use-disabled: "Cannot use shops here!"
-    use-relation: "Cannot trade with this shop, the town's kingdom must be friendly, allied or in a trade agreement."
-    create-town: "Can only create shops in friendly towns."
-    create-camp: "Can only create shops in your own camp."
-    create-monument: "Cannot create a shop inside of monuments!"
-    create-fail: "Cannot create a shop here!"
-    create-wild: "Cannot create shops in the wild!"
+    use-disabled: Cannot use shops here!
+    use-relation: Cannot trade with this shop, the town's kingdom must be friendly, allied or in a trade agreement.
+    create-town: Can only create shops in friendly towns.
+    create-camp: Can only create shops in your own camp.
+    create-monument: Cannot create a shop inside of monuments!
+    create-fail: Cannot create a shop here!
+    create-wild: Cannot create shops in the wild!
+# //// REGION \\\\
+# Messages used for land region integration.
 region:
   error:
-    claim-deny: "A nearby region denies claiming this land."
-    unclaim-deny: "A nearby region denies unclaiming this land."
-    travel-enter-deny: "A region at the destination denies traveling into it."
-    travel-exit-deny: "A region at your current location denies traveling out of it."
+    claim-deny: A nearby region denies claiming this land.
+    unclaim-deny: A nearby region denies unclaiming this land.
+    travel-enter-deny: A region at the destination denies traveling into it.
+    travel-exit-deny: A region at your current location denies traveling out of it.
+# //// DISCORD-SRV \\\\
+# Messages used for DiscordSRV integration.
+discord-srv:
+  discord: Discord
+  no-link: You are not linked to Discord. Type /discord link
+  no-user: Couldn't find the Discord user you're linked to.
+  linked-user: You're linked to %s in Discord.
+# //// DIRECTIVE \\\\
+# Labels and descriptions for the quest directives.
 directive:
-  create-kingdom: "Foundations"
-  create-kingdom-info: "Create your own Kingdom."
-  settle-town: "Fresh Start"
-  settle-town-info: "Settle a Town for your Kingdom."
-  claim-land: "Path to Nobility"
-  claim-land-info: "Claim land for any Town in your Kingdom."
-  build-town: "Masonry"
-  build-town-info: "Build structures for any Town in your Kingdom."
-  craft-armor: "Knighthood"
-  craft-armor-info: "Craft a set of iron armor to protect yourself."
-  create-golem: "Stoic Protector"
-  create-golem-info: "Create an Iron Golem to protect any Town in your Kingdom."
-  enchant-item: "Divine Tools"
-  enchant-item-info: "Apply any enchantment to tools/weapons."
-  attack-town: "Act of Aggression"
-  attack-town-info: "Attack any Town in an enemy Kingdom by breaking blocks."
-  capture-town: "Military Action"
-  capture-town-info: "Capture any Town in an enemy Kingdom by destroying the critical blocks within the Town Monument."
-  kill-enemy: "Best Enemies"
-  kill-enemy-info: "Kill a player from an enemy Kingdom."
+  create-kingdom: Foundations
+  create-kingdom-info: Create your own Kingdom.
+  settle-town: Fresh Start
+  settle-town-info: Settle a Town for your Kingdom.
+  claim-land: Path to Nobility
+  claim-land-info: Claim land for any Town in your Kingdom.
+  build-town: Masonry
+  build-town-info: Build structures for any Town in your Kingdom.
+  craft-armor: Knighthood
+  craft-armor-info: Craft a set of iron armor to protect yourself.
+  create-golem: Stoic Protector
+  create-golem-info: Create an Iron Golem to protect any Town in your Kingdom.
+  enchant-item: Divine Tools
+  enchant-item-info: Apply any enchantment to tools/weapons.
+  attack-town: Act of Aggression
+  attack-town-info: Attack any Town in an enemy Kingdom by breaking blocks.
+  capture-town: Military Action
+  capture-town-info: Capture any Town in an enemy Kingdom by destroying the critical blocks within the Town Monument.
+  kill-enemy: Best Enemies
+  kill-enemy-info: Kill a player from an enemy Kingdom.
+# //// PREFIX \\\\
+# Names for all accomplishment prefix titles and categories.
 prefix:
   category:
-    clergy: "Clergy"
-    nobility: "Nobility"
-    tradesman: "Tradesman"
-    military: "Military"
-    farming: "Farming"
-    cooking: "Cooking"
-    fishing: "Fishing"
-    joking: "Joking"
-    royalty: "Royalty"
+    clergy: Clergy
+    nobility: Nobility
+    tradesman: Tradesman
+    military: Military
+    farming: Farming
+    cooking: Cooking
+    fishing: Fishing
+    joking: Joking
+    royalty: Royalty
   title:
-    king: "King"
-    queen: "Queen"
-    prince: "Prince"
-    princess: "Princess"
-    noble: "Noble"
-    cardinal: "Cardinal"
-    bishop: "Bishop"
-    priest: "Priest"
-    cleric: "Cleric"
-    chaplain: "Chaplain"
-    scribe: "Scribe"
-    viceroy: "Viceroy"
-    duke: "Duke"
-    count: "Count"
-    earl: "Earl"
-    baron: "Baron"
-    lord: "Lord"
-    vassal: "Vassal"
-    peasant: "Peasant"
-    master: "Master"
-    artisan: "Artisan"
-    journeyman: "Journeyman"
-    craftsman: "Craftsman"
-    merchant: "Merchant"
-    peddler: "Peddler"
-    general: "General"
-    major: "Major"
-    captain: "Captain"
-    sergeant: "Sergeant"
-    knight: "Sir"
-    squire: "Squire"
-    cowboy: "Cowboy"
-    breeder: "Breeder"
-    rancher: "Rancher"
-    farmer: "Farmer"
-    picker: "Picker"
-    sprout: "Sprout"
-    jester: "Jester"
-    fool: "Fool"
-    dancer: "Dancer"
-    bard: "Bard"
-    fisherman: "Fisherman"
-    caster: "Caster"
-    chum: "Chum"
-    chef: "Chef"
-    cook: "Cook"
-    baker: "Baker"
+    king: King
+    queen: Queen
+    prince: Prince
+    princess: Princess
+    noble: Noble
+    cardinal: Cardinal
+    bishop: Bishop
+    priest: Priest
+    cleric: Cleric
+    chaplain: Chaplain
+    scribe: Scribe
+    viceroy: Viceroy
+    duke: Duke
+    count: Count
+    earl: Earl
+    baron: Baron
+    lord: Lord
+    vassal: Vassal
+    peasant: Peasant
+    master: Master
+    artisan: Artisan
+    journeyman: Journeyman
+    craftsman: Craftsman
+    merchant: Merchant
+    peddler: Peddler
+    general: General
+    major: Major
+    captain: Captain
+    sergeant: Sergeant
+    knight: Sir
+    squire: Squire
+    cowboy: Cowboy
+    breeder: Breeder
+    rancher: Rancher
+    farmer: Farmer
+    picker: Picker
+    sprout: Sprout
+    jester: Jester
+    fool: Fool
+    dancer: Dancer
+    bard: Bard
+    fisherman: Fisherman
+    caster: Caster
+    chum: Chum
+    chef: Chef
+    cook: Cook
+    baker: Baker
+# //// STAT \\\\
+# Names and descriptions for all accomplishment stats.
 stat:
-  enchantments: "Enchantments"
-  enchantments-info: "Enchantments applied to items"
-  potions: "Potions"
-  potions-info: "Potions used or thrown"
-  mobs: "Mobs"
-  mobs-info: "Hostile mobs killed"
-  settled: "Settled"
-  settled-info: "Towns settled"
-  claimed: "Claimed"
-  claimed-info: "Land claimed"
-  lords: "Lords"
-  lords-info: "Town lordships"
-  knights: "Knights"
-  knights-info: "Town knighthoods"
-  residents: "Residents"
-  residents-info: "Town residencies"
-  ingots: "Ingots"
-  ingots-info: "Ingots smelted"
-  diamonds: "Diamonds"
-  diamonds-info: "Diamond ores mined"
-  crafted: "Crafted"
-  crafted-info: "Tools, weapons and armor crafting skill"
-  favor: "Favor"
-  favor-info: "Favor spent"
-  kills: "Kills"
-  kills-info: "Players killed"
-  damage: "Damage"
-  damage-info: "Player damage given"
-  golems: "Golems"
-  golems-info: "Enemy Iron Golems killed"
-  captures: "Captures"
-  captures-info: "Enemy towns captured"
-  criticals: "Criticals"
-  criticals-info: "Enemy town critical hits"
-  seeds: "Seeds"
-  seeds-info: "Seeds planted"
-  breed: "Breed"
-  breed-info: "Mobs romanced"
-  till: "Till"
-  till-info: "Farm land fertalized"
-  harvest: "Harvest"
-  harvest-info: "Crops harvested"
-  food: "Food"
-  food-info: "Food items made"
-  music: "Music"
-  music-info: "Music discs played"
-  egg: "Egg"
-  egg-info: "Players egged"
-  fish: "Fish"
-  fish-info: "Fishing skill"
-  kingdoms: "Kingdoms"
-  kingdoms-info: "New kingdoms created"
-  conquests: "Conquests"
-  conquests-info: "Enemy kingdoms conquered"
+  enchantments: Enchantments
+  enchantments-info: Enchantments applied to items
+  potions: Potions
+  potions-info: Potions used or thrown
+  mobs: Mobs
+  mobs-info: Hostile mobs killed
+  settled: Settled
+  settled-info: Towns settled
+  claimed: Claimed
+  claimed-info: Land claimed
+  lords: Lords
+  lords-info: Town lordships
+  knights: Knights
+  knights-info: Town knighthoods
+  residents: Residents
+  residents-info: Town residencies
+  ingots: Ingots
+  ingots-info: Ingots smelted
+  diamonds: Diamonds
+  diamonds-info: Diamond ores mined
+  crafted: Crafted
+  crafted-info: Tools, weapons and armor crafting skill
+  favor: Favor
+  favor-info: Favor spent
+  kills: Kills
+  kills-info: Players killed
+  damage: Damage
+  damage-info: Player damage given
+  golems: Golems
+  golems-info: Enemy Iron Golems killed
+  captures: Captures
+  captures-info: Enemy towns captured
+  criticals: Criticals
+  criticals-info: Enemy town critical hits
+  seeds: Seeds
+  seeds-info: Seeds planted
+  breed: Breed
+  breed-info: Mobs romanced
+  till: Till
+  till-info: Farm land fertalized
+  harvest: Harvest
+  harvest-info: Crops harvested
+  food: Food
+  food-info: Food items made
+  music: Music
+  music-info: Music discs played
+  egg: Egg
+  egg-info: Players egged
+  fish: Fish
+  fish-info: Fishing skill
+  kingdoms: Kingdoms
+  kingdoms-info: New kingdoms created
+  conquests: Conquests
+  conquests-info: Enemy kingdoms conquered
+# //// UPGRADE \\\\
+# Names and descriptions for all town upgrades.
 upgrade:
-  disabled: "This town does not have enough population for the full upgrade level."
+  disabled: This town does not have enough population for the full upgrade level.
   loot:
-    name: "Monument Loot"
-    level-1: "Adds 1 more loot item per chest"
-    level-2: "Adds 2 more loot items per chest"
-    level-3: "Adds 3 more loot items per chest"
+    name: Monument Loot
+    level-1: Adds 1 more loot item per chest
+    level-2: Adds 2 more loot items per chest
+    level-3: Adds 3 more loot items per chest
   drops:
-    name: "Animal Drops"
-    level-1: "Animal mobs drop 1 more item"
+    name: Animal Drops
+    level-1: Animal mobs drop 1 more item
   fatigue:
-    name: "Enemy Fatigue"
-    level-1: "Enemies get mining fatigue 2"
+    name: Enemy Fatigue
+    level-1: Enemies get mining fatigue 2
   counter:
-    name: "Counter-Intelligence"
-    level-1: "Prevent spy maps from locating this town"
-    level-2: "Prevent compasses from pointing to this town"
+    name: Counter-Intelligence
+    level-1: Prevent spy maps from locating this town
+    level-2: Prevent compasses from pointing to this town
   health:
-    name: "Health Buff"
-    level-1: "Adds 1 heart to friendly health bars"
-    level-2: "Adds 2 hearts to friendly health bars"
-    level-3: "Adds 3 hearts to friendly health bars"
+    name: Health Buff
+    level-1: Adds 1 heart to friendly health bars
+    level-2: Adds 2 hearts to friendly health bars
+    level-3: Adds 3 hearts to friendly health bars
   damage:
-    name: "Prevent Damage"
-    level-1: "Prevents all fire spread"
-    level-2: "Prevents all explosions"
+    name: Prevent Damage
+    level-1: Prevents all fire spread
+    level-2: Prevents all explosions
   watch:
-    name: "Town Watch"
-    level-1: "Prevents enemy raids unless at least 1 resident is online"
-    level-2: "Prevents enemy raids unless at least 2 residents are online"
-    level-3: "Prevents enemy raids unless at least 3 residents are online"
+    name: Town Watch
+    level-1: Prevents enemy raids unless at least 1 resident is online
+    level-2: Prevents enemy raids unless at least 2 residents are online
+    level-3: Prevents enemy raids unless at least 3 residents are online
   enchant:
-    name: "Better Enchantments"
-    level-1: "Raises enchantment offers by 1 level"
+    name: Better Enchantments
+    level-1: Raises enchantment offers by 1 level
+# //// DESCRIPTION \\\\
+# Descriptions for all plugin commands.
 description:
-  help: "Display the help message."
-  info: "Display info about different things."
-  list: "List different Territories."
-  favor: "Display your currency as Favor."
-  map: "Display a map of claimed chunks."
-  chat: "Switch between global and kingdom-only chat."
-  spy: "Reveal the location of an enemy town."
-  settle: "Settle a new Town."
-  claim: "Claim a chunk of land."
-  unclaim: "Unclaim a chunk of land."
-  travel: "Teleport to other Territories."
-  kingdom: "Create or manage kingdoms."
-  town: "Manage Towns you belong to."
-  quest: "Display your quest log."
-  stats: "Display your Accomplishment stats."
-  prefix: "Set your prefix title."
-  score: "Display a Player's current score."
-  fly: "Fly within friendly land."
-  border: "Toggle particle borders of territories and plots."
-  admin: "For Admins only."
-  admin-help: "Display the admin help message."
-  admin-bypass: "Toggle Admin bypass mode."
-  admin-claim: "Claim land chunks."
-  admin-unclaim: "Return a chunk to the Wild."
-  admin-kingdom: "Manage a Kingdom."
-  admin-town: "Manage a Town or Capital."
-  admin-camp: "Manage a Barbarian Camp."
-  admin-capture: "Capture a town for any Kingdom."
-  admin-monument: "Manage a Monument Template."
-  admin-list: "Display all Kingdoms and Territories."
-  admin-ruin: "Manage a Ruin territory."
-  admin-sanctuary: "Manage a Sanctuary territory."
-  admin-save: "Saves plugin data files."
-  admin-settravel: "Sets the travel point for the territory you're in."
-  admin-travel: "Teleport to the specified kingdom or town."
-  admin-reload: "Reloads configuration files."
-  admin-flag: "Set kingdom property flags."
-  admin-stat: "Manage player stats."
-territory:
-  wild: "Wild"
-  capital: "Capital"
-  town: "Town"
-  camp: "Camp"
-  ruin: "Ruin"
-  sanctuary: "Sanctuary"
-  other: "Other"
-diplomacy:
-  war: "War"
-  peace: "Peace"
-  trade: "Trade"
-  alliance: "Alliance"
-  self: "Your Kingdom"
+  help: Display the help message.
+  menu: Open the Konquest Main Menu.
+  info: Display info about different things.
+  list: List different Territories.
+  favor: Display your currency as Favor.
+  map: Display a map of claimed chunks.
+  chat: Switch between global and kingdom-only chat.
+  spy: Reveal the location of an enemy town.
+  settle: Settle a new Town.
+  claim: Claim a chunk of land.
+  unclaim: Unclaim a chunk of land.
+  travel: Teleport to other Territories.
+  kingdom: Create or manage kingdoms.
+  town: Manage Towns you belong to.
+  quest: Display your quest log.
+  stats: Display your Accomplishment stats.
+  prefix: Set your prefix title.
+  score: Display a Player's current score.
+  fly: Fly within friendly land.
+  border: Toggle particle borders of territories and plots.
+  admin: For Admins only.
+  admin-help: Display the admin help message.
+  admin-bypass: Toggle Admin bypass mode.
+  admin-claim: Claim land chunks.
+  admin-unclaim: Return a chunk to the Wild.
+  admin-kingdom: Manage a Kingdom.
+  admin-town: Manage a Town or Capital.
+  admin-camp: Manage a Barbarian Camp.
+  admin-capture: Capture a town for any Kingdom.
+  admin-monument: Manage a Monument Template.
+  admin-ruin: Manage a Ruin territory.
+  admin-sanctuary: Manage a Sanctuary territory.
+  admin-save: Saves plugin data files.
+  admin-settravel: Sets the travel point for the territory you're in.
+  admin-travel: Teleport to the specified kingdom or town.
+  admin-reload: Reloads configuration files.
+  admin-flag: Set property flags for kingdoms and territories.
+  admin-stat: Manage player stats.
+# //// PROPERTIES \\\\
+# Names and descriptions for all property flags in kingdoms and territories.
 properties:
-  travel-name: "Travel"
-  travel: "Allow travel to this territory"
-  pvp-name: "PvP"
-  pvp: "Allow player damage"
-  pve-name: "PvE"
-  pve: "Allow entity damage"
-  build-name: "Build"
-  build: "Allow block edits"
-  use-name: "Use"
-  use: "Allow using blocks"
-  chest-name: "Chest"
-  chest: "Allow using containers"
-  mobs-name: "Mobs"
-  mobs: "Allow mobs to spawn"
-  portals-name: "Portals"
-  portals: "Allow players to use portals"
-  enter-name: "Enter"
-  enter: "Allow players to enter"
-  exit-name: "Exit"
-  exit: "Allow players to exit"
-  capture-name: "Capture"
-  capture: "Allow this town to be captured"
-  claim-name: "Claim"
-  claim: "Allow players to claim land"
-  unclaim-name: "Unclaim"
-  unclaim: "Allow players to unclaim land"
-  upgrade-name: "Upgrade"
-  upgrade: "Allow players to upgrade this town"
-  plots-name: "Plots"
-  plots: "Allow players to set town plots"
-  peaceful-name: "Peaceful"
-  peaceful: "Make a kingdom only peaceful"
-  golems-name: "Golems"
-  golems: "Enable iron golems to attack enemies"
-  join-name: "Join"
-  join: "Allow players to join"
-  leave-name: "Leave"
-  leave: "Allow players to leave"
-  promote-name: "Promote"
-  promote: "Allow promotion of players"
-  demote-name: "Demote"
-  demote: "Allow demotion of players"
-  transfer-name: "Transfer"
-  transfer: "Allow ownership transfer"
-  shop-name: "Shop"
-  shop: "Allow players to create shops"
-  arena-name: "Arena"
-  arena: "Allow any players to fight each other"
-discord-srv:
-  discord: "Discord"
-  no-link: "You are not linked to Discord. Type /discord link"
-  no-user: "Couldn't find the Discord user you're linked to."
-  linked-user: "You're linked to %s in Discord."
+  travel-name: Travel
+  travel: Allow travel to this territory
+  pvp-name: PvP
+  pvp: Allow player damage
+  pve-name: PvE
+  pve: Allow entity damage
+  build-name: Build
+  build: Allow block edits
+  use-name: Use
+  use: Allow using blocks
+  chest-name: Chest
+  chest: Allow using containers
+  mobs-name: Mobs
+  mobs: Allow mobs to spawn
+  portals-name: Portals
+  portals: Allow players to use portals
+  enter-name: Enter
+  enter: Allow players to enter
+  exit-name: Exit
+  exit: Allow players to exit
+  capture-name: Capture
+  capture: Allow this town to be captured
+  claim-name: Claim
+  claim: Allow players to claim land
+  unclaim-name: Unclaim
+  unclaim: Allow players to unclaim land
+  upgrade-name: Upgrade
+  upgrade: Allow players to upgrade this town
+  plots-name: Plots
+  plots: Allow players to set town plots
+  peaceful-name: Peaceful
+  peaceful: Make a kingdom only peaceful
+  golems-name: Golems
+  golems: Enable iron golems to attack enemies
+  join-name: Join
+  join: Allow players to join
+  leave-name: Leave
+  leave: Allow players to leave
+  promote-name: Promote
+  promote: Allow promotion of players
+  demote-name: Demote
+  demote: Allow demotion of players
+  transfer-name: Transfer
+  transfer: Allow ownership transfer
+  shop-name: Shop
+  shop: Allow players to create shops
+  arena-name: Arena
+  arena: Allow any players to fight each other

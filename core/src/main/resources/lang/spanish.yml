@@ -9,23 +9,28 @@
 # 
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
+# //// LABEL \\\\
+# Palabras o frases simples utilizadas en todo el complemento.
 label:
+  admin: Administrador
   admin-kingdom: Reino Administrativo
   allied-building: Construccion Aliada
+  amount: Cantidad
   armor: Armadura
-  armors: Armaduras
   back: Atras
-  barbarian: Barbaro
   barbarians: Barbaros
   blocks: Bloques
   bypass: BYPASS
-  camp: Campamento
-  capital: Capital
+  camps: Campamentos
+  camp-clan: Clan del Campamento
+  capitals: Capitales
+  captured: Capturado
   changing-capital: Cambiar a Capital
   changing-town: Cambiar al Pueblo
   close: Cerrar
   cost: Costo
   critical-hits: Golpes Criticos
+  current: Actual
   diplomacy: Diplomacia
   disabled: Deshabilitado
   friendly-redstone: Redstone Amigable
@@ -33,39 +38,38 @@ label:
   'false': 'Falso'
   favor: Favor
   flags: Banderas
-  golem-offense: Ofensiva de Golem de Hierro
+  golem-offense: Ofensiva de Gólem de Hierro
+  golem-spawns: Aparece el Gólem de Hierro
   health: Salud
+  home: Hogar
   immunity: Inmunidad
   increment-cost: Incremento de Costo
   information: Informacion
   invalid: Invalido
   kingdom: Reino
-  kingdom-role: Rol del Reino
+  kingdom-rank: Rango del Reino
   kingdoms: Reinos
-  knight: Caballero
   knights: Caballeros
   land: Tierra
   last-seen: Ultima Vez Visto %s
   leaderboard: Tabla de Liderazgo
   level: Nivel
   loot-chests: Cofres de Botin
-  lord: Senor
-  master: Maestro
-  member: Miembro
+  map-color: Color del Mapa
   members: Miembros
   modified: Modificado
-  monument: Monumento
+  modifier: Modificador
   monument-template: Plantilla de Monumento
-  name: Nombre
-  neutral: Neutral
+  monument-templates: Plantillas de Monumentos
   neutrals: Neutrales
   next: Siguiente
   no-lord: Sin Senor
-  officer: Oficial
+  no-permission: Sin Permiso
   officers: Oficiales
   online-players: Jugadores en Linea
   open: Abrir
   options: Opciones
+  owner: Dueño
   peaceful: Pacifico
   player: Jugador
   players: Jugadores
@@ -73,27 +77,43 @@ label:
   population: Poblacion
   properties: Propiedades
   protected: Protegido
-  residencies: Residencias
-  resident: Residente
   residents: Residentes
-  ruin: Ruina
-  sanctuary: Santuario
+  return: Devolver
+  ruins: Ruinas
+  sanctuaries: Santuarios
   score: Puntuacion
   shield: Escudo
-  shields: Escudos
   smallest: Mas Pequeno
   specialization: Especializacion
-  stats: Estadisticas
-  total-players: Total de Jugadores
   total: Total
-  town: Pueblo
   towns: Pueblos
+  town-role: Papel del Pueblo
+  travel: Viajar
   'true': 'Verdadero'
   unavailable: No Disponible
   upgrades: Mejoras
   valid: Valido
   world: Mundo
-placeholder:
+# //// TERRITORY \\\\
+# Nombres de diferentes tipos de territorio.
+territory:
+  wild: Salvaje
+  capital: Capital
+  town: Pueblo
+  camp: Campamento
+  ruin: Ruina
+  sanctuary: Santuario
+# //// DIPLOMACY \\\\
+# Nombres para las relaciones diplomáticas entre reinos.
+diplomacy:
+  war: Guerra
+  peace: Paz
+  trade: Comercio
+  alliance: Alianza
+  self: Tu Reino
+# //// RELATIONSHIP \\\\
+# Nombres para las relaciones entre jugadores, sus rangos dentro de un reino y sus roles dentro de una ciudad.
+relationship:
   friendly: Amistoso
   enemy: Enemigo
   barbarian: Barbaro
@@ -103,6 +123,12 @@ placeholder:
   rank-master: Maestro
   rank-officer: Oficial
   rank-member: Miembro
+  role-lord: Señor
+  role-knight: Caballero
+  role-resident: Residente
+# //// MAP \\\\
+# Etiquetas utilizadas únicamente en mapas de navegadores web como Dynmap.
+# Estos pueden tener formato HTML.
 map:
   barbarian: Barbaro
   barbarians: Barbaros
@@ -119,7 +145,54 @@ map:
   golem-spawns: Aparicion de Golems
   sanctuary: Santuario
   templates: Plantillas de Monumento
+# //// MENU \\\\
+# Texto utilizado en todos los menús de inventario.
 menu:
+  hint:
+    disable: Haz clic para deshabilitar
+    apply: Haz clic para aplicar
+    view: Haz clic para ver
+    open: Haz clic para abrir
+    charge: Haz clic para cargar
+    change: Haz clic para cambiar
+    travel: Haz clic para viajar
+    accept: Haz clic izquierdo para aceptar
+    decline: Haz clic derecho para rechazar
+    increase: Haz clic izquierdo para aumentar
+    decrease: Haz clic derecho para disminuir
+    exit: Salga del menú
+  main:
+    title: Menú principal de Konquest
+    title-dashboard: Panel de Konquest
+    dashboard: Panel de Control
+    help: Menú de Ayuda de Konquest
+    info: Menú de Información
+    quest: Libro de Misiones
+    stats: Libro de Estadísticas de Logros
+    prefix: Menú de Prefijos
+    score: Menú de Puntuación
+    kingdom: Menú del Reino
+    town: Menú del Pueblo
+    travel: Menú de Viajes
+    map-auto: Modo Automático del Mapa
+    kingdom-chat: Chat del Reino
+    admin-bypass: Omisión de Administrador
+    border: Visualización del Borde
+    flying: Volar
+    hint-map-1: Haz clic izquierdo para ver el mapa normal
+    hint-map-2: Haz clic derecho para ver el mapa lejano
+    hint-favor: Haz clic para mostrar los costos de los favores
+    hint-spy: Haz clic para comprar un mapa espía
+    description-dashboard: Cambia tu configuración y usa comandos.
+    description-help: Ve consejos sobre cómo jugar y listas de comandos.
+    description-info: Ve información sobre todos los jugadores, reinos, ciudades y más.
+    description-quest: Abre tu libro de misiones para ver tu progreso hacia las recompensas.
+    description-stats: Abre tu libro de estadísticas para ver tus estadísticas de logros y tu progreso hacia nuevos títulos de prefijo.
+    description-prefix: Modifica el título de prefijo que se muestra con tu nombre en el chat.
+    description-score: Muestra las puntuaciones y las tablas de clasificación de jugadores y reinos.
+    description-kingdom: Administra tu reino, únete a otros reinos o conviértete en un bárbaro.
+    description-town: Administra tus ciudades y únete a otras ciudades.
+    description-travel: Teletransportate a varios destinos.
   stats:
     title: Estadisticas de Logros
     intro-1: Usa "/k stats" o "/k s" para abrir este libro de nuevo.
@@ -143,18 +216,28 @@ menu:
     fail-attack: ¡No se pudieron agregar mejoras mientras el pueblo estaba bajo ataque!
     add: Agregado %s nivel %s al Pueblo de %s!
   help:
-    title: Ayuda de Konquest
-    admin: Ayuda de Admin
-    tips: Consejos de Konquest
+    title-start: Introducción a Konquest
+    title-commands: Comandos de Konquest
+    title-admin: Comandos de Administración de Konquest
+    description-start: Encuentra consejos sobre cómo jugar a Konquest.
+    description-community: Accede a la comunidad en línea de este servidor.
+    description-main: Ve al menú principal de Konquest.
+    description-commands: Ver todos los comandos de chat.
+    description-admin: Ver todos los comandos de chat de administración.
+    description-quest: Abre tu libro de misiones.
+    start: Introducción
     community: Comunidad
-    hint: Haz clic para unirte
+    main: Menú Principal
+    commands: Comandos
+    admin: Comandos de Administración
+    quest: Libro de Misiones
     tip-1: Los barbaros son jugadores predeterminados que no tienen reino. Pueden colocar camas para hacer campamentos, atacar a otros barbaros y destruir pueblos.
     tip-2: Usa "/k kingdom" para abrir el menu del reino y unirte a reinos, o usa "/k kingdom create" para crear el tuyo propio.
     tip-3: 'Las opciones de diplomacia para otros reinos son: paz, comercio, alianza, guerra. Los reinos enemigos en guerra pueden capturar los pueblos de cada uno.'
     tip-4: Usa "/k settle" para crear nuevos pueblos para tu reino. Usa "/k map" para ver la tierra circundante y un consejo sobre si tu ubicacion puede ser colonizada.
     tip-5: Abre el Menu General de Pueblo con "/k town" para unirte y salir de pueblos en tu reino. Usa "/k town <nombre>" para administrar un pueblo, como mejoras o residentes.
-    tip-6: Reclama la tierra del pueblo para proteger contenedores y animales de enemigos, aumenta tus estadisticas y puntuacion, y para prevenir la aparicion de monstruos.
-    tip-7: Usa "/k town <nombre>" y elige Parcelas para configurar parcelas del pueblo donde solo residentes especificos pueden construir. Cambia las opciones del pueblo para permitir a los residentes solo construir en sus parcelas.
+    tip-6: Reclama la tierra del pueblo para proteger contenedores y animales de enemigos, aumenta tus estadísticas y puntuación, y para prevenir la aparición de monstruos.
+    tip-7: Usa "/k town <nombre>" y elige Parcelas para configurar parcelas del pueblo donde solo residentes específicos pueden construir. Cambia las opciones del pueblo para permitir a los residentes solo construir en sus parcelas.
     tip-8: Construye Golems de Hierro para proteger tus pueblos de jugadores enemigos. Busca Ruinas y derrota a los Golems de Ruina por una recompensa.
     tip-9: Usa "/k stats" y "/k score" para ver estadisticas de jugadores. Usa "/k prefix" para establecer tu propio titulo de chat. Desbloquea titulos con estadisticas aumentadas.
   score:
@@ -169,19 +252,24 @@ menu:
     town-3: Residencias de Jugadores
     land-3: Tierra de Pueblo del Residente
     player-score: Puntuacion del Jugador
-    hint: Haz clic para ver
+    kingdom-score: Puntuación del reino
+    description-players: Lista de todas las puntuaciones de los jugadores y visualización de los detalles
+    description-kingdoms: Lista de todas las puntuaciones del reino y visualización de los detalles con las tablas de clasificación
+    leaderboard-empty: No hay jugadores en la tabla de clasificación de puntuaciones de este reino
   map:
     center: Centro del Mapa
     proximity: Proximidad
     settle-hint: Coloniza Aqui
   prefix:
-    disable: 'Off'
-    hint-disable: Haz clic para deshabilitar
-    hint-apply: Haz clic para aplicar
-    custom-pages: Prefijos Personalizados
-    no-allow: Permiso faltante
+    title-prefix: Títulos de Prefijo
+    title-custom: Prefijos Personalizados
+    title-stats: Estadísticas de Logros
+    current-prefix: Prefijo Actual
+    disable-prefix: Deshabilitar Prefijo
+    description-prefix: Elige un nuevo título de prefijo para tu nombre
+    description-custom: Compra un prefijo personalizado para tu nombre
+    description-stats: Muestra tus estadísticas utilizadas para desbloquear nuevos títulos de prefijo
   shield:
-    hint: Haz clic para cargar
     fail-max: Fallo al cargar, supera el maximo de %s.
     fail-add: Fallo al cargar, no se puede agregar a la carga existente.
     fail-attack: Fallo al cargar mientras el pueblo esta bajo ataque!
@@ -189,14 +277,23 @@ menu:
     activate-new: Cargado %s por %s.
     activate-add: Aumentada la carga con %s por %s.
   options:
-    hint: Haz clic para cambiar
-    current: 'Actual: %s'
     allied-building: Los jugadores aliados pueden construir
     open: Todos los miembros del reino pueden construir y usar cofres
     plot: Los residentes solo pueden construir y usar cofres en parcelas
     friendly-redstone: Los miembros del reino pueden usar interruptores y puertas de redstone
     redstone: Los enemigos pueden usar interruptores y puertas de redstone
     golem: Los Golems de Hierro atacaran a todos los enemigos que entren
+  info:
+    camp-placed: Se ha colocado un campamento bárbaro.
+    camp-missing: Este jugador no tiene campamento.
+    ruin-status: Estado de Captura
+    ruin-capture: Esta ruina se puede capturar a cambio de una recompensa.
+    template-kingdoms: Lista de todos los reinos que usan esta plantilla de monumento.
+  travel:
+    description-capital: Ve a la capital de tu reino.
+    description-home: Ve a tu cama natal.
+    description-camp: Ve a tu campamento bárbaro.
+    description-wild: Ve a una ubicación aleatoria en la naturaleza.
   plots:
     edit-add-land: Agregar Tierra
     edit-remove-land: Remover Tierra
@@ -264,13 +361,9 @@ menu:
     description-upgrades: Aplica mejoras del pueblo
     description-options: Editar opciones del pueblo
     description-special: Elige una profesion para descuentos comerciales
-    hint-open: Haz clic para abrir
     hint-join: Haz clic para enviar una solicitud de union
     hint-join-now: Haz clic para unirte al instante
     hint-leave: Haz clic para salir
-    hint-list: Haz clic para ver
-    hint-accept: Haz clic izquierdo para aceptar
-    hint-decline: Haz clic derecho para rechazar
     hint-manage: Haz clic para administrar
     hint-promote: Haz clic para promover a Caballero
     hint-demote: Haz clic para degradar a Residente
@@ -279,7 +372,6 @@ menu:
     hint-special: Haz clic para especializarte
     lore-special: Elige esta profesion para obtener un descuento con los aldeanos en este pueblo.
     info-special: Los aldeanos con esta profesión dan descuentos en este pueblo.
-    title-root: Menu del Pueblo
     title-join: Unirse a un Pueblo
     title-leave: Salir de un Pueblo
     title-list: Lista de Pueblos
@@ -290,11 +382,14 @@ menu:
     title-destroy: Destruir el pueblo
   kingdom:
     join: Unirse
+    create: Crear
     exile: Exilio
     invites: Invitaciones
     list: Lista
     relation: Relaciones
     requests: Solicitudes
+    purchase: Compra de ciudades
+    offers: Ofertas de la ciudad
     promote: Promover
     demote: Degradar
     transfer: Transferir
@@ -302,29 +397,29 @@ menu:
     disband: Disolver
     capital: Capital
     description-join: Solicita unirte a un reino, o crea el tuyo propio con /k kingdom create
+    description-create: Crea una nueva capital del reino en tu ubicación actual
     description-exile: Deja tu reino actual y conviertete en barbaro
     description-invites: Visualiza tus invitaciones de reino
     description-list: Visualiza todos los reinos
     description-relation: Modifica las relaciones con otros reinos
     description-requests: Visualiza solicitudes de membresia de reino
+    description-purchase: Compra ciudades de otros reinos haciendo una oferta
+    description-offers: Ver ofertas de otros reinos para comprar tus ciudades
+    description-offer-accept: Entregue la ciudad de %s al reino de %s y %s recibirá %s favores de %s.
     description-promote: Promueve a miembros a oficiales
     description-demote: Degradar a oficiales a miembros
     description-transfer: Transferir el maestro a otro miembro
     description-template: Cambiar la plantilla del monumento del reino
     description-disband: Disolver y eliminar el reino
     description-capital: Mover la capital a un pueblo diferente
-    hint-open: Haz clic para abrir
     hint-exile: Haz clic para convertirte en barbaro
-    hint-exit: Salir del menu
     hint-disband: Haz clic para eliminar tu reino
     hint-template: Haz clic para cambiar plantillas
     hint-join: Haz clic para enviar una solicitud de union
     hint-join-now: Haz clic para unirte al instante
-    hint-accept: Haz clic izquierdo para aceptar
-    hint-decline: Haz clic derecho para rechazar
-    hint-list: Haz clic para ver informacion
     hint-relation: Haz clic para elegir diplomacia
     hint-diplomacy: Haz clic para promulgar
+    hint-purchase: Haz clic para enviar oferta de compra
     hint-promote: Haz clic para promover a Oficial
     hint-demote: Haz clic para degradar a Miembro
     hint-transfer: Haz clic para dar Maestro
@@ -344,7 +439,9 @@ menu:
     diplomacy-trade-info: Sin PvP. Descuentos de comercio con aldeanos. Usa tiendas de cofres.
     diplomacy-alliance-info: Sin PvP. Descuentos de comercio con aldeanos. Usa tiendas de cofres. Pacto defensivo. Viajar a pueblos y capital.
     diplomacy-war-info: PvP. Atacar y capturar pueblos y capital.
-    title-root: Menu del Reino
+    purchase-offers: Ofertas de compra
+    purchase-your-offer: Su oferta
+    purchase-their-offer: Su oferta
     title-join: Unirse a un Reino
     title-confirm: Estas seguro?
     title-invites: Invitaciones del Reino
@@ -352,12 +449,17 @@ menu:
     title-relations: Relaciones
     title-diplomacy: Diplomacia
     title-requests: Solicitudes de Union
+    title-purchase: Compra de ciudades
+    title-amount: Monto de la compra
+    title-offers: Ofertas de la ciudad
     title-promotion: Promociones
     title-demotion: Degradaciones
     title-transfer: Transferencia del Maestro del Reino
     title-template: Plantillas de Monumentos
     title-disband: Disolver Reino
     title-capital: Mover Capital
+# //// GENERIC \\\\
+# Mensajes utilizados en todo el complemento.
 generic:
   notice:
     enable-auto: Activado. Usa este comando de nuevo para desactivar.
@@ -400,6 +502,8 @@ generic:
     disabled: Esta caracteristica esta actualmente deshabilitada, habla con un administrador.
     region: No se puede hacer esto mientras se configuran otras regiones.
     failed: ¡Fallo :(
+# //// PROTECTION \\\\
+# Mensajes sobre la protección de bloques y tierras por parte de los jugadores.
 protection:
   notice:
     ignore: Usa "/k admin bypass" para ignorar protecciones.
@@ -430,6 +534,7 @@ protection:
     destroy: Has destruido %s por la gloria de la horda Barbaro!
     conquer: El Pueblo de %s ha sido conquistado!
     capture: Has conquistado %s para la conquista de %s!
+    purchase: ¡El Pueblo de %s ha sido comprada por el Reino de %s!
     kingdom-warmup: El Reino de %s estara protegido en %s minutos.
     kingdom-conquer: El Reino de %s ha sido conquistado por %s!
     kingdom-raze: El Reino de %s ha sido destruido por la horda Barbaro!
@@ -460,6 +565,9 @@ protection:
     portal-exit: Tu portal de salida esta dentro de un territorio protegido, mueve tu portal!
     capital-immune: Esta capital es inmune a ataques mientras %s pueblos permanezcan en el Reino de %s.
     no-allied-build: Las opciones de este pueblo no permiten que jugadores de reinos aliados construyan.
+    template-modify: Esta plantilla de monumento se está modificando actualmente y estará disponible pronto.
+# //// COMMAND \\\\
+# Mensajes utilizados para todos los comandos.
 command:
   admin:
     camp:
@@ -593,14 +701,6 @@ command:
       command: 'Todos los usos principales de los comandos:'
     error:
       page: El valor de la página debe ser un número.
-  info:
-    notice:
-      kingdom-header: Reino de %s
-      town-header: Pueblo de %s
-      camp-placed: Campamento Bárbaro colocado.
-      camp-missing: Este jugador no tiene campamento.
-      ruin-status: Estado de Captura
-      ruin-capture: Esta Ruína puede ser capturada por una recompensa.
   kingdom:
     broadcast:
       create: '%s ha creado el Reino de %s'
@@ -653,6 +753,11 @@ command:
       diplomacy-pending: Tu reino tiene solicitudes de diplomacia pendientes. Usa "/k kingdom", luego elige Relaciones para responder.
       web-color-show: 'El Reino de %s tiene un color de mapa web de: %s'
       web-color-set: 'Establecer el color de mapa web de %s a: %s'
+      offer-purchase: Enviaste una oferta para comprar la ciudad de %s al Reino de %s por %s.
+      offer-pending: Tu reino tiene ofertas de compra de ciudades pendientes. Usa "/k kingdom" y, a continuación, elige Ofertas de ciudades para responder.
+      offer-towns: Estas ciudades de tu reino tienen ofertas para ser compradas...
+      offer-players: Estos jugadores han ofrecido comprar la ciudad de %s...
+      offer-declined: Rechazó la oferta del jugador %s para comprar la ciudad de %s.
     error:
       barbarian-create: Debes ser un bárbaro para crear un reino. Usa la opción de Exilio en el menú del reino.
       invalid-template: '%s es una plantilla de monumento inválida. Verifica la ortografía o elige otra.'
@@ -697,9 +802,11 @@ command:
       all-header: Todos los puntajes del reino
       score: 'Tu puntaje: %s, puntaje del Reino de %s: %s'
       player: 'Puntaje de %s: %s, puntaje del Reino de %s: %s'
+      kingdom: Reino de %s puntuación %s
     error:
       peaceful: El Reino de %s es pacífico y no puede ser puntuado.
       barbarian: '%s es un Bárbaro y no puede ser puntuado.'
+      kingdom: Este reino no se puede puntuar.
   settle:
     broadcast:
       settle: '%s ha fundado el Pueblo de %s para el Reino %s'
@@ -815,6 +922,8 @@ command:
       fail-lord: Fallo al desreclamar, debes ser el señor del pueblo.
       fail-unclaimed: Fallo al desreclamar, debes estar en territorio reclamado.
       fail-center: Fallo al desreclamar, no se puede remover el centro del territorio.
+# //// SHOP \\\\
+# Mensajes utilizados para la integración de la tienda de cofres.
 shop:
   error:
     use-disabled: ¡No se pueden usar tiendas aquí!
@@ -824,12 +933,23 @@ shop:
     create-monument: ¡No se puede crear una tienda dentro de monumentos!
     create-fail: ¡No se puede crear una tienda aquí!
     create-wild: ¡No se pueden crear tiendas en La Commonwelth!
+# //// REGION \\\\
+# Mensajes utilizados para la integración de regiones terrestres.
 region:
   error:
     claim-deny: Una región cercana niega reclamar esta tierra.
     unclaim-deny: Una región cercana niega desreclamar esta tierra.
     travel-enter-deny: Una región en el destino niega viajar hacia ella.
     travel-exit-deny: Una región en tu ubicación actual niega viajar fuera de ella.
+# //// DISCORD-SRV \\\\
+# Mensajes utilizados para la integración de DiscordSRV.
+discord-srv:
+  discord: Discord
+  no-link: No estás vinculado a Discord. Escribe /discord link
+  no-user: No se pudo encontrar el usuario de Discord con el que estás vinculado.
+  linked-user: Estás vinculado a %s en Discord.
+# //// DIRECTIVE \\\\
+# Etiquetas y descripciones para las directivas de la misión.
 directive:
   create-kingdom: Fundaciones
   create-kingdom-info: Crea tu propio Reino.
@@ -851,6 +971,8 @@ directive:
   capture-town-info: Captura cualquier Pueblo en un Reino enemigo destruyendo los bloques críticos dentro del Monumento del Pueblo.
   kill-enemy: Mejores Enemigos
   kill-enemy-info: Mata a un jugador de un Reino enemigo.
+# //// PREFIX \\\\
+# Nombres para todos los títulos y categorías de prefijos de logros.
 prefix:
   category:
     clergy: Clero
@@ -910,6 +1032,8 @@ prefix:
     chef: Chef
     cook: Cocinero
     baker: Panadero
+# //// STAT \\\\
+# Nombres y descripciones de todas las estadísticas de logros.
 stat:
   enchantments: Encantamientos
   enchantments-info: Encantamientos aplicados a objetos
@@ -965,6 +1089,8 @@ stat:
   kingdoms-info: Reinos nuevos creados
   conquests: Conquistas
   conquests-info: Reinos enemigos conquistados
+# //// UPGRADE \\\\
+# Nombres y descripciones de todas las mejoras de la ciudad.
 upgrade:
   disabled: Esto pueblo no tiene suficiente población para el nivel de mejora completo.
   loot:
@@ -999,8 +1125,11 @@ upgrade:
   enchant:
     name: Mejores Encantamientos
     level-1: Eleva las ofertas de encantamientos en 1 nivel
+# //// DESCRIPTION \\\\
+# Descripciones de todos los comandos del complemento.
 description:
   help: Mostrar el mensaje de ayuda.
+  menu: Abra el menú principal de Konquest.
   info: Mostrar información sobre diferentes cosas.
   list: Listar diferentes Territorios.
   favor: Mostrar tu moneda como Favor.
@@ -1029,29 +1158,16 @@ description:
   admin-camp: Gestionar un Campamento Bárbaro.
   admin-capture: Capturar un pueblo para cualquier Reino.
   admin-monument: Gestionar una Plantilla de Monumento.
-  admin-list: Mostrar todos los Reinos y Territorios.
   admin-ruin: Gestionar un territorio de Ruína.
   admin-sanctuary: Gestionar un territorio de Santuario.
   admin-save: Guarda los archivos de datos de Reinos y Jugadores.
   admin-settravel: Establece el punto de viaje para el territorio en el que estás.
   admin-travel: Teletransportarte al reino o pueblo especificado.
   admin-reload: Recargar archivos de configuración.
-  admin-flag: Establece banderas de propiedad del reino.
+  admin-flag: Establecer banderas de propiedad para reinos y territorios.
   admin-stat: Gestionar estadísticas de jugadores.
-territory:
-  wild: Salvaje
-  capital: Capital
-  town: Pueblo
-  camp: Campamento
-  ruin: Ruina
-  sanctuary: Santuario
-  other: Otro
-diplomacy:
-  war: Guerra
-  peace: Paz
-  trade: Comercio
-  alliance: Alianza
-  self: Tu Reino
+# //// PROPERTIES \\\\
+# Nombres y descripciones de todas las banderas de propiedad en reinos y territorios.
 properties:
   travel-name: Viaje
   travel: Permitir viaje a este territorio
@@ -1101,8 +1217,3 @@ properties:
   shop: Permitir que los jugadores creen tiendas
   arena-name: Arena
   arena: Permitir que cualquier jugador luche entre sí
-discord-srv:
-  discord: Discord
-  no-link: No estás vinculado a Discord. Escribe /discord link
-  no-user: No se pudo encontrar el usuario de Discord con el que estás vinculado.
-  linked-user: Estás vinculado a %s en Discord.

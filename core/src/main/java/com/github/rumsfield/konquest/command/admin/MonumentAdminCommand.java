@@ -199,7 +199,7 @@ public class MonumentAdminCommand extends CommandBase {
 			String critBlocks = String.format("%d", template.getNumCriticals());
 			String lootChests = String.format("%d", template.getNumLootChests());
 			ChatUtil.sendNotice(sender, MessagePath.LABEL_MONUMENT_TEMPLATE.getMessage()+" "+tempName);
-			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_SANCTUARY.getMessage()+": "+valueColor+sanctuaryName);
+			ChatUtil.sendMessage(sender, loreColor+MessagePath.TERRITORY_SANCTUARY.getMessage()+": "+valueColor+sanctuaryName);
 			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_COST.getMessage()+": "+valueColor+cost);
 			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_VALID.getMessage()+": "+valueColor+isValid);
 			ChatUtil.sendMessage(sender, loreColor+MessagePath.LABEL_MODIFIED.getMessage()+": "+valueColor+isBlanking);

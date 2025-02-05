@@ -162,7 +162,7 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
 	        case "prefix":
 	        	result = placeholderManager.getPrefix(player);
 	        	break;
-			/* %konquest_rank% - player's kingdom role */
+			/* %konquest_rank% - player's kingdom rank */
 			case "rank":
 				result = placeholderManager.getRank(player);
 				break;

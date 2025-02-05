@@ -94,6 +94,18 @@ public abstract class CommandBase {
         return usageStrings;
     }
 
+    public List<String> getArgumentUsage(String subArg) {
+        List<String> usageStrings = new ArrayList<>();
+        for (CommandArgument cmdArg : arguments) {
+            if (cmdArg.matchesName(subArg)) {
+                for (String argUsage : cmdArg.getUsageStrings(hasOptionalArgs)) {
+                    usageStrings.add(getBaseUsage()+" "+ChatColor.AQUA+formatUsageString(argUsage));
+                }
+            }
+        }
+        return usageStrings;
+    }
+
     private String formatUsageString(String inArgs) {
         return inArgs
                 .replaceAll("<", ChatColor.GRAY+"<"+ChatColor.AQUA)
@@ -133,7 +145,7 @@ public abstract class CommandBase {
 
     public String formatStringListLimited(List<String> entries, int limit) {
         StringBuilder entryListBuilder = new StringBuilder();
-        String nameColor = ""+ChatColor.GOLD;
+        String nameColor = ""+ChatColor.AQUA;
         String sepColor = ""+ChatColor.GRAY;
         for (int i = 0; i < entries.size(); i++) {
             if (i < limit) {

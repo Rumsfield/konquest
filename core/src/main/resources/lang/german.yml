@@ -1,0 +1,1219 @@
+# Language File
+# German
+# To use this file, set core.yml language: german
+# 
+# "%s" are substitutes for words or numbers by the plugin.
+# If a line has "%s", keep it. You cannot add or remove any "%s".
+# Use online YAML parsing tools to check for valid syntax:
+# https://yaml-online-parser.appspot.com/
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+# //// LABEL \\\\
+# Einfache Wörter oder Ausdrücke, die im gesamten Plugin verwendet werden.
+label:
+  admin: Admin
+  admin-kingdom: Admin-Königreich
+  allied-building: Alliiertes Gebäude
+  amount: Menge
+  armor: Rüstung
+  back: Zurück
+  barbarians: Barbaren
+  blocks: Blöcke
+  bypass: BYPASS
+  camps: Lager
+  camp-clan: Lager-Clan
+  capitals: Hauptstädte
+  captured: Erobert
+  changing-capital: Wechsel zu Hauptstadt
+  changing-town: Wechsel zu Stadt
+  close: Schließen
+  cost: Kosten
+  critical-hits: Kritische Treffer
+  current: Aktuell
+  diplomacy: Diplomatie
+  disabled: Deaktiviert
+  friendly-redstone: Freundlicher Redstone
+  enemy-redstone: Feindlicher Redstone
+  false: Falsch
+  favor: Gunst
+  flags: Flaggen
+  golem-offense: Angriff des Eisernen Golems
+  golem-spawns: Eiserne Golem-Spawns
+  health: Gesundheit
+  home: Zuhause
+  immunity: Immunität
+  increment-cost: Kosten erhöhen
+  information: Informationen
+  invalid: Ungültig
+  kingdom: Königreich
+  kingdom-rank: Rang des Königreichs
+  kingdoms: Königreiche
+  knights: Ritter
+  land: Land
+  last-seen: Zuletzt gesehen %s
+  leaderboard: Bestenliste
+  level: Level
+  loot-chests: Beutetruhen
+  map-color: Kartenfarbe
+  members: Mitglieder
+  modified: Geändert
+  modifier: Modifikator
+  monument-template: Monumentvorlage
+  monument-templates: Monumentvorlagen
+  neutrals: Neutrale
+  next: Nächste
+  no-lord: Kein Lord
+  no-permission: Keine Berechtigung
+  officers: Offiziere
+  online-players: Online-Spieler
+  open: Offen
+  options: Optionen
+  owner: Besitzer
+  peaceful: Friedlich
+  player: Spieler
+  players: Spieler
+  plot: Grundstück
+  population: Bevölkerung
+  properties: Eigenschaften
+  protected: Geschützt
+  residents: Bewohner
+  return: Zurück
+  ruins: Ruinen
+  sanctuaries: Heiligtümer
+  score: Score
+  shield: Schild
+  smallest: Kleinste
+  specialization: Spezialisierung
+  total: Gesamt
+  towns: Städte
+  town-role: Stadtrolle
+  travel: Reisen
+  true: Wahr
+  unavailable: Nicht verfügbar
+  upgrades: Upgrades
+  valid: Gültig
+  world: Welt
+# //// TERRITORY \\\\
+# Namen verschiedener Gebietstypen.
+territory:
+  wild: Wild
+  capital: Hauptstadt
+  town: Stadt
+  camp: Lager
+  ruin: Ruine
+  sanctuary: Heiligtum
+# //// DIPLOMACY \\\\
+# Namen für diplomatische Beziehungen zwischen Königreichen.
+diplomacy:
+  war: Krieg
+  peace: Frieden
+  trade: Handel
+  alliance: Allianz
+  self: Ihr Königreich
+# //// RELATIONSHIP \\\\
+# Namen für Beziehungen zwischen Spielern, ihre Ränge innerhalb eines Königreichs und ihre Rollen innerhalb einer Stadt.
+relationship:
+  friendly: Freundlich
+  enemy: Feind
+  barbarian: Barbar
+  ally: Verbündeter
+  trader: Händler
+  peaceful: Friedlich
+  rank-master: Meister
+  rank-officer: Offizier
+  rank-member: Mitglied
+  role-lord: Lord
+  role-knight: Ritter
+  role-resident: Einwohner
+# //// MAP \\\\
+# Beschriftungen werden nur in Webbrowser-Karten wie Dynmap verwendet.
+# Diese können HTML-Formatierung haben.
+map:
+  barbarian: Barbar
+  barbarians: Barbaren
+  kingdom: Königreich
+  capital: Hauptstadt
+  town: Stadt
+  towns: Städte
+  land: Land
+  players: Spieler
+  lord: Lord
+  population: Bevölkerung
+  ruin: Ruine
+  critical-hits: Kritische Treffer
+  golem-spawns: Golem-Spawns
+  sanctuary: Heiligtum
+  templates: Monument-Vorlagen
+# //// MENU \\\\
+# Text, der in allen Inventarmenüs verwendet wird.
+menu:
+  hint:
+    disable: Zum Deaktivieren klicken
+    apply: Zum Anwenden klicken
+    view: Zum Anzeigen klicken
+    open: Zum Öffnen klicken
+    charge: Zum Aufladen klicken
+    change: Zum Ändern klicken
+    travel: Zum Reisen klicken
+    accept: Zum Akzeptieren linksklicken
+    decline: Zum Ablehnen Rechtsklick
+    increase: Zum Vergrößern linksklicken
+    decrease: Zum Verkleinern mit der rechten Maustaste klicken
+    exit: Menü verlassen
+  main:
+    title: Konquest-Hauptmenü
+    title-dashboard: Konquest-Dashboard
+    dashboard: Dashboard
+    help: Konquest-Hilfemenü
+    info: Infomenü
+    quest: Questbuch
+    stats: Buch mit Leistungsstatistiken
+    prefix: Präfixmenü
+    score: Punktemenü
+    kingdom: Königreichmenü
+    town: Stadtmenü
+    travel: Reisemenü
+    map-auto: Automatischer Kartenmodus
+    kingdom-chat: Königreich-Chat
+    admin-bypass: Admin-Bypass
+    border: Rahmenanzeige
+    flying: Fliegen
+    hint-map-1: Linksklick für normale Karte
+    hint-map-2: Rechtsklick für entfernte Karte
+    hint-favor: Klicken, um Gunstkosten anzuzeigen
+    hint-spy: Klicken, um eine Spionagekarte zu kaufen
+    description-dashboard: Ändern Sie Ihre Einstellungen und verwenden Sie Befehle.
+    description-help: Sehen Sie sich Spieltipps und Befehlslisten an.
+    description-info: Sehen Sie sich Informationen zu allen Spielern, Königreichen, Städten und mehr an.
+    description-quest: Öffnen Sie Ihr Questbuch, um Ihren Fortschritt in Richtung Belohnungen anzuzeigen.
+    description-stats: Öffnen Sie Ihr Statistikbuch, um Ihre Erfolgsstatistiken und Fortschritte in Richtung neuer Präfixtitel anzuzeigen.
+    description-prefix: Ändern Sie Ihren Präfixtitel, der mit Ihrem Namen im Chat angezeigt wird.
+    description-score: Zeigen Sie Punktestände und Bestenlisten für Spieler und Königreiche an.
+    description-kingdom: Verwalten Sie Ihr Königreich, schließen Sie sich anderen Königreichen an oder werden Sie ein Barbar.
+    description-town: Verwalten Sie Ihre Städte und schließen Sie sich anderen Städten an.
+    description-travel: Teleportiere dich zu verschiedenen Zielen.
+  stats:
+    title: Leistungsstatistiken
+    intro-1: Verwende "/k stats" oder "/k s", um dieses Buch erneut zu öffnen.
+    intro-2: Sieh dir deine Statistiken zu Leistungen an, die neue Präfixe freischalten, die du verwenden kannst.
+    max: Maximales Level
+    category: Leistungskategorie
+    next: Nächstes Präfix
+    unlock: Freigeschaltete Präfixe
+    amount: Statistikbetrag
+    points: Leistungspunkte
+  quest:
+    title: Questprotokoll
+    intro-1: Verwende "/k quest" oder "/k q", um dieses Buch erneut zu öffnen.
+    intro-2: Schließe diese Quests ab, um Gunst zu verdienen, die verwendet wird, um Land zu beanspruchen und neue Städte zu gründen.
+    reward: Gunstbelohnung
+  upgrade:
+    title: Verfügbare Stadt-Upgrades
+    fail-level: '%s Level %s konnte nicht hinzugefügt werden, Level ist größer als das Maximum oder zu hoch vom aktuellen Level, %s.'
+    fail-population: '%s Level %s konnte nicht hinzugefügt werden, die Bevölkerung der Stadt ist zu niedrig, erfordert %s.'
+    fail-cost: '%s Level %s konnte nicht hinzugefügt werden, erfordert %s Gunst.'
+    fail-attack: Während die Stadt angegriffen wird, konnten keine Upgrades hinzugefügt werden!
+    add: '%s Level %s zur Stadt %s hinzugefügt!'
+  help:
+    title-start: Konquest – Erste Schritte
+    title-commands: Konquest-Befehle
+    title-admin: Konquest-Admin-Befehle
+    description-start: Tipps zum Spielen von Konquest finden.
+    description-community: Zugriff auf die Online-Community dieses Servers.
+    description-main: Zum Konquest-Hauptmenü gehen.
+    description-commands: Alle Chat-Befehle anzeigen.
+    description-admin: Alle Admin-Chat-Befehle anzeigen.
+    description-quest: Öffnen Sie Ihr Questbuch.
+    start: Erste Schritte
+    community: Community
+    main: Hauptmenü
+    commands: Befehle
+    admin: Admin-Befehle
+    quest: Questbuch
+    tip-1: Barbaren sind Standardspieler, die kein Königreich haben. Sie können Betten aufstellen, um Lager zu errichten, andere Barbaren angreifen und Städte zerstören.
+    tip-2: Verwenden Sie "/k kingdom", um das Königreichmenü zu öffnen und Königreichen beizutreten, oder verwenden Sie "/k kingdom create", um Ihr eigenes zu erstellen.
+    tip-3: Die Diplomatieoptionen für andere Königreiche sind Frieden, Handel, Allianz, Krieg. Feindliche Königreiche im Krieg können die Städte der anderen erobern.
+    tip-4: Verwenden Sie "/k settle", um neue Städte für Ihr Königreich zu erstellen. Verwenden Sie "/k map", um das umliegende Land anzuzeigen und einen Hinweis darauf zu erhalten, ob Ihr Standort besiedelt werden kann.
+    tip-5: Öffnen Sie das Stadtmenü mit "/k town", um Ihrem Königreich Städte beizutreten und diese zu verlassen und um Städte zu verwalten, die Sie kontrollieren.
+    tip-6: Beanspruchen Sie Stadtland mit "/k claim", um Container und Tiere vor Feinden zu schützen, Ihre Statistiken und Punktzahl zu verbessern und das Auftauchen von Monstern zu verhindern.
+    tip-7: Richten Sie im Stadtmenü Stadtgrundstücke ein, auf denen nur bestimmte Bewohner bauen können. Ändern Sie die Stadtoptionen, damit Bewohner nur auf ihren Grundstücken bauen können.
+    tip-8: Bauen Sie Eisengolems, um Ihre Städte vor feindlichen Spielern zu schützen. Suchen Sie Ruinen auf und besiegen Sie die Ruinengolems, um eine Belohnung zu erhalten.
+    tip-9: Verwenden Sie "/k stats" und "/k score", um Spielerstatistiken anzuzeigen. Verwenden Sie "/k prefix", um Ihren eigenen Chattitel festzulegen. Schalten Sie Titel mit verbesserten Statistiken frei.
+  score:
+    kingdom-towns: Königreichsstädte
+    kingdom-land: Königreichsland
+    kingdom-favor: Königreichsgunst
+    kingdom-population: Königreichsbevölkerung
+    town-1: Spielerherrschaften
+    land-1: Lord-Städte
+    town-2: Spielerritterschaften
+    land-2: Ritterstädte
+    town-3: Spielerresidenzen
+    land-3: Einwohnerstädte
+    player-score: Spielerpunktzahl
+    kingdom-score: Königreichspunktzahl
+    description-players: Listet alle Spielerpunktzahlen auf und zeigt Details an
+    description-kingdoms: Listet alle Königreichspunktzahlen auf und zeigt Details mit Bestenlisten an
+    leaderboard-empty: Es gibt keine Spieler auf der Punktebestenliste dieses Königreichs
+  map:
+    center: Kartenzentrum
+    proximity: Nähe
+    settle-hint: Siedeln Sie sich hier an
+  prefix:
+    title-prefix: Präfixtitel
+    title-custom: Benutzerdefinierte Präfixe
+    title-stats: Leistungsstatistiken
+    current-prefix: Aktuelles Präfix
+    disable-prefix: Präfix deaktivieren
+    description-prefix: Wählen Sie einen neuen Präfixtitel für Ihr Name
+    description-custom: Kaufen Sie ein benutzerdefiniertes Präfix für Ihren Namen
+    description-stats: Zeigen Sie Ihre Statistiken an, die zum Freischalten neuer Präfixtitel verwendet werden
+  shield:
+    fail-max: Aufladen fehlgeschlagen, Maximum von %s überschritten.
+    fail-add: Aufladen fehlgeschlagen, kann nicht zur vorhandenen Ladung hinzugefügt werden.
+    fail-attack: Aufladen fehlgeschlagen, während Stadt angegriffen wird!
+    fail-cost: Aufladen fehlgeschlagen, erfordert %s Gunst.
+    activate-new: '%s für %s aufgeladen.'
+    activate-add: Ladung mit %s um %s erhöht.
+  options:
+    allied-building: Verbündete Spieler können bauen
+    open: Alle Königreichsmitglieder können Truhen bauen und verwenden
+    plot: Bewohner können Truhen nur in Plots bauen und verwenden
+    friendly-redstone: Königreichsmitglieder können Redstone-Schalter und -Türen verwenden
+    redstone: Feinde können Redstone-Schalter und -Türen verwenden
+    golem: Eiserne Golems greifen alle Feinde an, die eintreten
+  info:
+    camp-placed: Barbarenlager wurde platziert.
+    camp-missing: Dieser Spieler hat kein Lager.
+    ruin-status: Eroberungsstatus
+    ruin-capture: Diese Ruine kann gegen eine Belohnung erobert werden.
+    template-kingdoms: Listet alle Königreiche auf, die diese Monumentvorlage verwenden.
+  travel:
+    description-capital: Gehe zum Hauptquartier deines KönigreichsHauptstadt.
+    description-home: Gehe zu deinem Heimatbett.
+    description-camp: Gehe zu deinem Barbarenlager.
+    description-wild: Gehe zu einem zufälligen Ort in der Wildnis.
+  plots:
+    edit-add-land: Land hinzufügen
+    edit-remove-land: Land entfernen
+    edit-add-players: Spieler hinzufügen
+    edit-remove-players: Spieler entfernen
+    edit-show-players: Spieler anzeigen
+    capital-land: Hauptstadtland
+    town-land: Stadtland
+    town-monument: Stadtdenkmal
+    editing-plot: Plot bearbeiten
+    click-delete: Klicken, um Plot zu löschen
+    click-edit: Klicken, um Plot zu bearbeiten
+    click-remove-chunk: Klicken, um Chunk zu entfernen
+    click-remove-player: Klicken, um Spieler zu entfernen
+    click-create: Klicken, um Plot zu erstellen
+    click-add-chunk: Klicken, um Chunk hinzuzufügen
+    click-add-player: Klicken, um Spieler hinzuzufügen
+    click-move-player: Klicken, um Spieler zu verschieben
+    here: Sie sind hier
+    title-plots: Stadtgrundstücke
+    title-create: Plot erstellen
+    title-delete: Plot löschen
+    title-edit: Plot bearbeiten
+    title-edit-options: Optionen bearbeiten
+    title-add-land: Hinzufügen Land
+    title-add-players: Spieler hinzufügen
+    title-remove-land: Land entfernen
+    title-remove-players: Spieler entfernen
+    title-show-players: Spieler anzeigen
+    button-create: Erstellen
+    button-delete: Löschen
+    button-edit: Bearbeiten
+    button-return: Zurück
+    button-finish: Beenden
+  town:
+    join: Beitreten
+    leave: Verlassen
+    list: Liste
+    invites: Einladungen
+    manage: Verwalten
+    requests: Anfragen
+    plots: Grundstücke
+    shields: Schilde
+    armor: Rüstung
+    promote: Befördern
+    demote: Degradieren
+    transfer: Übertragen
+    destroy: Zerstören
+    upgrades: Upgrades
+    options: Optionen
+    special: Spezialisierung
+    description-join: Einer neuen Stadt beitreten
+    description-leave: Eine bestehende Stadt verlassen
+    description-list: Alle Städte in Ihrem Königreich auflisten
+    description-invites: Einladungen Ihrer Stadtbewohner anzeigen
+    description-manage: Die Bewohner und Optionen Ihrer Städte verwalten
+    description-requests: Anfragen von Bewohnern anzeigen, dieser Stadt beizutreten
+    description-plots: Stadtgrundstücke verwalten
+    description-shields: Stadtschilde anbringen
+    description-armor: Stadtrüstung anbringen
+    description-promote: Bewohner zu Rittern befördern
+    description-demote: Ritter zu Bewohnern degradieren
+    description-transfer: Lord an einen anderen Bewohner übertragen
+    description-destroy: Stadt und das beanspruchte Land zerstören
+    description-upgrades: Stadt-Upgrades anwenden
+    description-options: Stadtoptionen bearbeiten
+    description-special: Beruf für Handelsrabatte auswählen
+    hint-join: Klicken, um eine Beitrittsanfrage zu senden
+    hint-join-now: Klicken, um sofort beizutreten
+    hint-leave: Klicken, um zu gehen
+    hint-manage: Klicken, um zu verwalten
+    hint-promote: Klicken, um zum Ritter zu befördern
+    hint-demote: Klicken, um zum Bewohner degradiert zu werden
+    hint-transfer: Klicken, um Lord zu geben
+    hint-destroy: Klicken, um zu zerstören
+    hint-special: Klicken, um zu spezialisieren
+    lore-special: Wählen Sie diesen Beruf für einen Rabatt bei den Dorfbewohnern dieser Stadt.
+    info-special: Dorfbewohner mit diesem Beruf gewähren in dieser Stadt Rabatte.
+    title-join: Einer Stadt beitreten
+    title-leave: Eine Stadt verlassen
+    title-list: Städteliste
+    title-invites: Einladungen von Bewohnern
+    title-manage-town: Verwaltete Städte
+    title-requests: Bewohneranfragen
+    title-manage: Stadtverwaltungsmenü
+    title-destroy: Stadt zerstören
+  kingdom:
+    join: Beitreten
+    create: Erstellen
+    exile: Exil
+    invites: Einladungen
+    list: Liste
+    relation: Beziehungen
+    requests: Anfragen
+    purchase: Städte kaufen
+    offers: Stadtangebote
+    promote: Befördern
+    demote: Degradieren
+    transfer: Übertragen
+    template: Vorlagen
+    disband: Auflösen
+    capital: Hauptstadt
+    description-join: Beitritt zu einem Königreich beantragen oder mit /k Kingdom Create ein eigenes erstellen
+    description-create: Eine neue Königreichshauptstadt an Ihrem aktuellen Standort erstellen
+    description-exile: Ihr aktuelles Königreich verlassen und ein Barbar werden
+    description-invites: Ihre Königreichseinladungen anzeigen
+    description-list: Alle Königreiche anzeigen
+    description-relation: Beziehungen zu anderen Königreichen ändern
+    description-requests: Königreichsmitgliedschaftsanfragen anzeigen
+    description-purchase: Kaufen Sie Städte von anderen Königreichen, indem Sie ein Angebot machen
+    description-offers: Angebote anderer Königreiche zum Kauf Ihrer Städte ansehen
+    description-offer-accept: Geben Sie die Stadt %s dem Königreich %s, und %s erhält %s Gunst von %s.
+    description-promote: Mitglieder zu Offizieren befördern
+    description-demote: Offiziere zu Mitgliedern degradieren
+    description-transfer: Meister an ein anderes Mitglied übertragen
+    description-template: Denkmalvorlage des Königreichs ändern
+    description-disband: Königreich auflösen und löschen
+    description-capital: Hauptstadt in eine andere Stadt verschieben
+    hint-exile: Klicken, um Barbar zu werden
+    hint-disband: Klicken, um Ihr Königreich zu löschen
+    hint-template: Klicken, um Vorlagen zu ändern
+    hint-join: Klicken, um eine Beitrittsanfrage zu senden
+    hint-join-now: Klicken, um sofort beizutreten
+    hint-relation: Klicken, um Diplomatie auszuwählen
+    hint-diplomacy: Klicken, um zu aktivieren
+    hint-purchase: Klicken Sie hier, um ein Kaufangebot zu senden
+    hint-promote: Klicken, um zum Offizier zu befördern
+    hint-demote: Klicken, um zum Mitglied degradiert zu werden
+    hint-transfer: Klicken, um Meister zu geben
+    hint-capital: Klicken, um zur Hauptstadt zu wechseln
+    they-requested: Sie haben angefragt
+    we-requested: Wir fordernsted
+    diplomacy-peace-war-instant: Sofort Frieden erklären
+    diplomacy-peace-war-request: Friedensanfrage
+    diplomacy-peace-trade: Handel beenden und Frieden erklären
+    diplomacy-peace-alliance: Allianz beenden und Frieden erklären
+    diplomacy-trade-peace: Handelsanfrage
+    diplomacy-trade-alliance: Allianz beenden und Handel erklären
+    diplomacy-war-instant: Sofort Krieg erklären
+    diplomacy-war-request: Kriegsanfrage
+    diplomacy-alliance: Allianzanfrage
+    diplomacy-peace-info: Standard. Kann PvP zulassen.
+    diplomacy-trade-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen.
+    diplomacy-alliance-info: Kein PvP. Handelsrabatte für Dorfbewohner. Truhenläden nutzen. Verteidigungspakt. Zu Städten und Hauptstädten reisen.
+    diplomacy-war-info: PvP. Städte und Hauptstädte angreifen und erobern.
+    purchase-offers: Kaufangebote
+    purchase-your-offer: Ihr Angebot
+    purchase-their-offer: Ihr Angebot
+    title-join: Einem Königreich beitreten
+    title-confirm: Sind Sie sicher?
+    title-invites: Königreich-Einladungen
+    title-list: Königreich-Liste
+    title-relations: Beziehungen
+    title-diplomacy: Diplomatie
+    title-requests: Beitrittsanfragen
+    title-purchase: Städte kaufen
+    title-amount: Kaufbetrag
+    title-offers: Stadtangebote
+    title-promotion: Beförderungen
+    title-demotion: Degradierungen
+    title-transfer: Übertragung des Königreichsmeisters
+    title-template: Monument-Vorlagen
+    title-disband: Königreich auflösen
+    title-capital: Hauptstadt verschieben
+# //// GENERIC \\\\
+# Im gesamten Plugin verwendete Nachrichten.
+generic:
+  notice:
+    enable-auto: Aktiviert. Verwenden Sie diesen Befehl erneut, um zu deaktivieren.
+    disable-auto: Deaktiviert.
+    reduce-favor: Gunst um %s reduziert, insgesamt %s
+    reward-favor: Gunst belohnt um %s, insgesamt %s
+    reward-exp: EXP belohnt um %s
+    discount-favor: '%s Prozent Rabatt, Sie haben %s Gunst gespart.'
+    click-air: Klicken Sie auf Air, um abzubrechen.
+    clicked-air: In Air geklickt, Regionserstellung abgebrochen.
+    success: Erfolg!
+    small-kingdom: Dein Königreich ist derzeit das kleinste, genieße einen Erfahrungsschub von %s Prozent!
+    wild: Die Wildnis
+    accomplishment: Du hast eine Errungenschaft vollbracht!
+    prefix-unlock: Errungenschaftspräfix freigeschaltet
+    prefix-lost: Errungenschaftspräfix verloren
+    quest: Quest abgeschlossen
+    loot: Neue Beute für Stadtdenkmäler verfügbar.
+    absent: Du warst zu lange abwesend und wurdest aus allen Städten geworfen.
+    force-barbarian: Du bist jetzt ein Barbar!
+  error:
+    deny-barbarian: Barbaren können das nicht.
+    internal: Interner Fehler, kontaktiere einen Administrator.
+    internal-message: Interner Fehler – %s
+    invalid-parameters: Der Befehl hatte falsche Argumente. Verwende /k-Hilfe.
+    invalid-parameters-admin: Der Administratorbefehl hatte falsche Argumente. Verwende /k-Administratorhilfe.
+    invalid-world: Der Befehl kann in dieser Welt nicht verwendet werden.
+    no-permission: Du hast keine Berechtigung, das zu tun.
+    no-allow: Du darfst das nicht tun.
+    no-player: Sie müssen ein Spieler sein, um dies zu tun!
+    unknown-name: Unbekannter Name konnte nicht gefunden werden, überprüfen Sie die Rechtschreibung %s
+    bad-name: '%s konnte in Ihrem Königreich nicht gefunden werden.'
+    format-name: Name darf nur Buchstaben und/oder Zahlen enthalten.
+    length-name: Name darf nicht länger als 20 Zeichen sein.
+    taken-name: Dieser Name ist bereits vergeben.
+    no-favor: Nicht genug Gunst, benötigt %s
+    invalid-player: Dieser Spieler ist ungültig.
+    enemy-player: Dieser Spieler ist ein Feind.
+    enemy-town: Das ist eine feindliche Stadt.
+    disabled: Diese Funktion ist derzeit deaktiviert, sprechen Sie mit einem Administrator.
+    region: Dies kann nicht getan werden, während andere Regionen festgelegt werden.
+    failed: Fehlgeschlagen :(
+# //// PROTECTION \\\\
+# Nachrichten zum Schutz von Blöcken und Land vor Spielern.
+protection:
+  notice:
+    ignore: Verwenden Sie "/k Admin-Bypass", um Schutzmaßnahmen zu ignorieren.
+    peaceful-town: Die Stadt %s ist friedlich und kann nicht angegriffen werden.
+    peaceful-player: Ihr Königreich ist friedlich und Sie können keine Städte angreifen.
+    peaceful-victim: Sie können keine Spieler in friedlichen Königreichen angreifen.
+    peaceful-attacker: Ihr Königreich ist friedlich und Sie können keine Spieler angreifen.
+    camp-destroy: '%s zerstört!'
+    camp-destroy-owner: Ihr Lager wurde zerstört!
+    camp-create: Ihr Lager wurde erfolgreich eingerichtet.
+    camp-clan-add: '%s wurde Ihrem Lager-Clan hinzugefügt.'
+    camp-clan-remove: '%s wurde aus Ihrem Lager-Clan entfernt.'
+    critical: Kritischer Treffer! %s kritische Blöcke bleiben erhalten.
+    tagged: Markiert
+    tag-message: Sie wurden im Kampf markiert.
+    untagged: Markiert Abgelaufen
+    untag-message: Du bist nicht mehr im Kampf.
+    loot-later: Komm später wieder, um mehr Beute zu machen!
+    loot-capture: Die Beute wird zurückgesetzt, sobald diese Ruine vollständig erobert wurde.
+    raid: Feind in %s gesichtet, benutze "/k travel %s", um zu verteidigen!
+    raid-alert: Raid-Alarm
+    raid-capture-1: '%s wird erobert! Verwende "/k travel %s", um zu verteidigen und %s Gunst zu erhalten!'
+    raid-capture-2: '%s hat nur noch die halbe Stärke! Verwende "/k travel %s", um zu verteidigen und %s Gunst zu erhalten!'
+    raid-capture-3: '%s ist in einem kritischen Zustand! Verwende "/k travel %s", um zu verteidigen und %s Gunst zu erhalten!'
+    raid-discord-channel: Der Feind erobert die Stadt %s, trete jetzt dem Server bei, um zu verteidigen!
+    raid-discord-direct: Feindliche Spieler erobern die Stadt %s in deinem Königreich, %s! Treten Sie jetzt dem Server bei, um zu verteidigen.
+    raze: Die Stadt %s wurde von der Barbarenhorde zerstört!
+    destroy: Sie haben %s für den Ruhm der Barbarenhorde zerstört!
+    conquer: Die Stadt %s wurde erobert!
+    capture: Sie haben %s für die Eroberung von %s erobert!
+    purchase: Die Stadt %s wurde vom Königreich %s gekauft!
+    kingdom-warmup: Das Königreich %s wird in %s Minuten geschützt.
+    kingdom-conquer: Das Königreich %s wurde von %s erobert!
+    kingdom-raze: Das Königreich %s wurde von der Barbarenhorde zerstört!
+    town-warmup: Diese Städte im Königreich %s werden in %s Minuten geschützt - %s
+    ruin: Sie haben die Ruine %s erobert.
+    safe: Die Stadt %s ist sicher, vorerst...
+    attacked: Wird angegriffen
+    template-modify: Denkmalvorlage %s wird geändert und ist vorübergehend nicht verfügbar.
+    template-ready: Denkmalvorlage %s ist jetzt verfügbar.
+  error:
+    blocked: Blockiert
+    not-resident: Sie müssen ein Einwohner von %s sein, um dies zu tun.
+    not-plot: Sie müssen ein Plot-Mitglied sein, um dies zu tun.
+    only-plot: Sie können dies nicht außerhalb eines Stadtgrundstücks tun.
+    online: Das Königreich %s hat nicht genügend Spieler online, kann die Stadt %s nicht angreifen.
+    protected-attack: Ihr Königreich hat nicht genügend Spieler online, kann die Stadt %s nicht angreifen.
+    upgrade: '%s wird mit %s aktualisiert und kann nicht angegriffen werden, ohne dass %s Einwohner online sind.'
+    camp: Kann %s nicht angreifen, der Lagerbesitzer ist offline.
+    camp-bed: Kann keine zusätzlichen Betten in diesem Lager platzieren.
+    camp-update: Die Bettenposition Ihres Lagers wurde aktualisiert.
+    camp-create: Kann nicht mehr als ein Lager erstellen. Zerstören Sie das Bett in Ihrem aktuellen Lager, bevor Sie ein neues Bett platzieren.
+    camp-fail-overlap: Camping fehlgeschlagen, neue Ansprüche überlappen sich mit vorhandenem Gebiet.
+    camp-fail-barbarian: Camping fehlgeschlagen, Sie sind kein Barbar.
+    camp-fail-offline: Camping fehlgeschlagen, alle umliegenden Lagerbesitzer sind offline.
+    capture: Dieses Gebiet kann für weitere %s nicht erobert werden.
+    golem: Sie können befreundete Eisengolems in der Stadt %s nicht verletzen.
+    tag-blocked: Dieser Befehl ist während des Kampfes blockiert.
+    portal-exit: Ihr Ausgangsportal befindet sich innerhalb eines geschützten Gebiets. Bewegen Sie Ihr Portal!
+    capital-immune: Diese Hauptstadt ist immun gegen Angriffe, solange sich %s Städte im Königreich %s befinden.
+    no-allied-build: Die Optionen dieser Stadt erlauben es Spielern aus verbündeten Königreichen nicht, zu bauen.
+    template-modify: Diese Denkmalvorlage wird derzeit geändert und wird bald verfügbar sein.
+# //// COMMAND \\\\
+# Für alle Befehle verwendete Nachrichten.
+command:
+  admin:
+    camp:
+      notice:
+        create: Ein Lager für Spieler %s wurde erfolgreich erstellt.
+        destroy: Das Lager für Spieler %s wurde erfolgreich entfernt.
+      error:
+        create-exist: Der Spieler hat bereits ein Lager. Entfernen Sie es zuerst, bevor Sie ein neues erstellen.
+        destroy-exist: Der Spieler hat kein Lager.
+    flag:
+      notice:
+        all-properties: Alle Eigenschaften
+        single-property: Einzelne Eigenschaft
+        set: Setzt Eigenschaft %s von %s auf neuen Wert %s.
+        reset: Setzt alle Eigenschaften auf Standardwerte in Properties.yml zurück.
+      error:
+        invalid: Die Eigenschaftsflagge %s gilt nicht für %s.
+    help:
+      notice:
+        detail: Für weitere Befehlsdetails verwenden Sie /k Admin Help <Befehl>.
+        page: Um weitere Seiten anzuzeigen, verwenden Sie /k Admin Help <Seite>.
+        page-command: Um weitere Seiten anzuzeigen, verwenden Sie /k Admin Help %s <Seite>.
+    kingdom:
+      broadcast:
+        create: Das Admin-Königreich %s wurde erstellt!
+      notice:
+        admin-set: Das Königreich %s ist ein Admin-Königreich.
+        admin-clear: Das Königreich %s ist ein Spielerkönigreich.
+        diplomacy: Die Königreiche %s und %s haben eine diplomatische Beziehung von %s.
+      error:
+        no-templates: Es gibt keine Denkmalvorlagen. Erstellen Sie eines in einem Heiligtum mit "/k admin monument create (name)"
+    monument:
+      notice:
+        create-1: Klicken Sie jetzt beim Erstellen einer neuen Monumentvorlage auf den ersten Eckblock der Region.
+        create-2: Klicken Sie auf den zweiten Eckblock der Region, wenn alle Partikel grün sind.
+        create-3: Klicken Sie auf den Reisepunktblock.
+        success: Neue Monumentvorlage %s erfolgreich erstellt.
+        remove: Monumentvorlage %s entfernt.
+        rename: Monumentvorlage %s in %s umbenannt.
+        show: Vorhandene Monumentvorlage %s wird im Heiligtum %s angezeigt.
+        sanctuary: Erstellen Sie ein Heiligtumsgebiet mit "/k admin sanctuary create (name)", bevor Sie Monumentvorlagen erstellen.
+      error:
+        value: Kostenwert ist keine Zahl.
+        fail-base: Erstellen der Monumentvorlage %s fehlgeschlagen, Basis muss 16x16 Blöcke umfassen, aber %s von %s erhalten.
+        fail-critical: Erstellen der Monumentvorlage %s fehlgeschlagen, sie muss mindestens %s %s Blöcke enthalten.
+        fail-travel: Erstellen der Monumentvorlage %s fehlgeschlagen, Reisepunkt muss innerhalb der Region liegen.
+        fail-region: Erstellen der Monumentvorlage %s fehlgeschlagen, Ecken der Region müssen innerhalb des Schutzgebiets liegen.
+        fail-reset: Zurücksetzen der Monumentvorlage %s fehlgeschlagen, vorheriger Zustand wiederhergestellt.
+    reload:
+      notice:
+        message: Konquest-Konfigurationsdateien neu geladen.
+    ruin:
+      notice:
+        create: Neue Ruine %s erfolgreich erstellt
+        remove: Erfolgreich neuRuine %s verschoben
+        rename: Ruinenname erfolgreich von %s in %s geändert.
+        reset: Kritische Blöcke und Golem-Spawn in Ruine %s erfolgreich zurückgesetzt.
+        criticals: Alle vorherigen kritischen Blöcke aus %s entfernt, zum Hinzufügen auf Blöcke klicken.
+        spawns: Alle vorherigen Spawn-Blöcke aus %s entfernt, zum Hinzufügen auf Blöcke klicken.
+        add: Block zu Ruine %s hinzugefügt.
+      error:
+        create: Ruine %s konnte nicht erstellt werden, falscher Name oder Gebietsüberschneidung.
+        remove: Unbekannte Ruine %s konnte nicht entfernt werden.
+        rename: Ruine %s konnte nicht in %s umbenannt werden.
+        reset: Unbekannte Ruine %s konnte nicht zurückgesetzt werden.
+        match: Angeklickter Block entspricht nicht dem Typ %s
+        invalid: Dieser Block konnte nicht zu einer gültigen Ruine hinzugefügt werden.
+    sanctuary:
+      notice:
+        create: Neues Schutzgebiet %s erfolgreich erstellt, mehr Land mit "/k admin claim" hinzufügen.
+        remove: Schutzgebiet %s erfolgreich entfernt
+        rename: Schutzgebietsname erfolgreich von %s in %s geändert.
+      error:
+        create: Schutzgebiet %s konnte nicht erstellt werden, falscher Name oder Gebietsüberschneidung.
+        remove: Unbekanntes Schutzgebiet %s konnte nicht entfernt werden.
+        rename: Schutzgebiet %s konnte nicht in %s umbenannt werden.
+    save:
+      notice:
+        message: Alle Daten in Dateien gespeichert.
+    settravel:
+      notice:
+        success: Neuer Reisepunkt in %s erfolgreich festgelegt.
+      error:
+        fail: Reisepunkt in unbekanntem Gebiet konnte nicht festgelegt werden.
+    stat:
+      notice:
+        show: Stat %s für Spieler %s ist %s
+        set: Stat %s für Spieler %s auf %s festgelegt.
+        add: '%s zu Stat %s für Spieler %s hinzugefügt, neuer Wert ist %s'
+        clear: Stat %s für Spieler %s auf Null gelöscht.
+      error:
+        name: Ungültiger Stat %s, konnte nicht mit vorhandenen Stats abgeglichen werden.
+        value: Ungültiger Statistikwert %s
+  border:
+    notice:
+      enable: Partikelränder anzeigen
+      disable: Partikelränder ausblenden
+  chat:
+    notice:
+      enable: Königreich-Chat
+      disable: Globaler Chat
+  claim:
+    notice:
+      success: '%s Landstücke für %s erfolgreich beansprucht.'
+      fail-auto: Anspruch konnte nicht geltend gemacht werden, automatische Beanspruchung deaktiviert.
+      pass-auto: Beansprucht
+    error:
+      radius: Radius muss größer oder gleich %s und kleiner oder gleich %s sein.
+      missing: Muss in der Nähe eines bestehenden Gebiets beansprucht werden.
+      proximity: Zu nah an einem anderen Gebiet.
+      fail-adjacent: Anspruch fehlgeschlagen, kein angrenzendes Gebiet.
+      fail-far: Anspruch fehlgeschlagen, zu weit vom Gebietszentrum entfernt.
+      fail-claimed: Anspruch fehlgeschlagen, bereits beansprucht.
+  favor:
+    notice:
+      message: Sie haben %s Gunst, die Kosten betragen...
+      cost-spy: Spion
+      cost-travel: Reisen
+      cost-claim: Anspruch
+      cost-town-settle: Stadt besiedeln
+      cost-town-rename: Stadt umbenennen
+      cost-kingdom-create: Königreich erstellen
+      cost-kingdom-rename: Königreich umbenennen
+      cost-capital-swap: Hauptstadt ändern
+  help:
+    notice:
+      header: Hilfeseite %s
+      detail: Für weitere Befehlsdetails verwenden Sie /k help <command>
+      page: Um weitere Seiten anzuzeigen, verwenden Sie /k help <page>
+      page-command: Um weitere Seiten anzuzeigen, verwenden Sie /k help %s <page>
+      command: Alle wichtigen Befehle verwenden
+    error:
+      page: Der Seitenwert muss eine Zahl sein.
+  kingdom:
+    broadcast:
+      create: '%s hat das Königreich %s erstellt'
+      join: '%s ist dem Königreich %s beigetreten'
+      rename: Das Königreich %s wurde in %s umbenannt
+      peace: Die Königreiche %s und %s haben Frieden geschlossen.
+      peace-request: Das Königreich %s bittet um Frieden. Verwenden Sie "/k kingdom", um die Beziehungen zu ändern.
+      trade: Die Königreiche %s und %s sind jetzt Handelspartner.
+      trade-request: Das Königreich %s bittet um Handel. Verwenden Sie "/k kingdom", um die Beziehungen zu ändern.
+      no-trade: Die Königreiche %s und %s handeln nicht mehr.
+      ally: Die Königreiche %s und %s haben eine Allianz gebildet.
+      ally-request: Das Königreich %s bittet um eine Allianz. Verwenden Sie "/k kingdom", um die Beziehungen zu ändern.
+      no-ally: Die Königreiche %s und %s sind keine Verbündeten mehr.
+      war: Die Königreiche %s und %s befinden sich im Krieg!
+      war-request: Das Königreich %s bittet um Krieg. Verwenden Sie "/k kingdom", um die Beziehungen zu ändern.
+      transfer: '%s ist jetzt der Königreichsmeister von %s.'
+      promote: '%s wurde zum Königreichsoffizier von %s befördert.'
+      demote: '%s wurde zum Mitglied des Königreichs %s herabgestuft.'
+      disband: Das Königreich %s wurde aufgelöst!
+      destroy: Die Stadt %s wurde zerstört!
+      capital-swap: Die Hauptstadt des Königreichs %s wurde in die Stadt %s verlegt.
+      capital-warmup: Die Hauptstadt des Königreichs %s wird in %s in die Stadt %s verlegt.
+      capital-cancel: Feindliche Angriffe haben die Verlegung der Hauptstadt des Königreichs %s in die Stadt %s verhindert!
+    notice:
+      request-sent: Mitgliedsanfrage zum Beitritt zu %s gesendet.
+      request-received: Neue Beitrittsanfrage zum Königreich, geben Sie "/k kingdom" ein, um sie zu überprüfen.
+      request-declined: Beitrittsanfrage zum Königreich für Spieler %s abgelehnt.
+      request-pending: Spieler haben um Beitritt zu Ihrem Königreich gebeten. Verwenden Sie "/k kingdom" und wählen Sie dann „Anfragen“, um zu antworten.
+      request-list: Diese Spieler haben um Beitritt zu Ihrem Königreich gebeten …
+      invite-sent: '%s zum Beitritt eingeladenim Königreich.'
+      invite-received: Einladung zum Königreich erhalten. Geben Sie „/k kingdom“ ein, um zu antworten.
+      invite-declined: Einladung zum Beitritt zu %s abgelehnt.
+      invite-pending: Sie haben ausstehende Einladungen zum Beitritt zu Königreichen. Verwenden Sie "/k kingdom" und wählen Sie dann „Einladungen“, um zu antworten.
+      invite-list: Diese Königreiche haben Sie zum Beitritt eingeladen …
+      exile: Sie sind jetzt als Barbar aus %s verbannt.
+      exile-stats: Alle Statistiken aus dem Exil entfernt!
+      exile-favor: Alle Gunst aus dem Exil entfernt!
+      remove-member: Sie sind kein Mitglied des Königreichs %s mehr.
+      kick: Spieler %s aus dem Königreich geworfen.
+      rename: Königreichsname erfolgreich in %s geändert.
+      transfer-master: Sie haben %s zum neuen Königreichsmeister von %s gemacht.
+      discount: Das Königreich %s gewährt Ihnen bei diesem Händler einen Rabatt von %s Prozent.
+      open: Königreich ist jetzt zum Beitritt geöffnet.
+      closed: Königreich ist jetzt nur für Einladungen geschlossen.
+      template-current: Die Vorlage für das Königreichsmonument ist %s.
+      template: Die Vorlage für das Königreichsmonument wurde auf %s aktualisiert.
+      pay: Zahlung des Königreichs erhalten.
+      diplomacy-current: Die diplomatische Beziehung Ihres Königreichs zum Königreich %s ist %s.
+      diplomacy-sent: Diplomatieanfrage an das Königreich %s gesendet.
+      diplomacy-pending: Ihr Königreich hat ausstehende Diplomatieanfragen. Verwenden Sie "/k kingdom" und wählen Sie dann „Beziehungen“, um zu antworten.
+      web-color-show: Das Königreich %s hat eine Webkartenfarbe von %s
+      web-color-set: Stellen Sie die Webkartenfarbe von %s auf %s ein
+      offer-purchase: Sie haben ein Angebot zum Kauf der Stadt %s vom Königreich %s für %s gesendet.
+      offer-pending: Für Ihr Königreich liegen ausstehende Angebote zum Kauf von Städten vor. Verwenden Sie "/k kingdom" und wählen Sie dann Stadtangebote, um zu antworten.
+      offer-towns: Für diese Städte in Ihrem Königreich gibt es Kaufangebote …
+      offer-players: Diese Spieler haben angeboten, die Stadt %s zu kaufen …
+      offer-declined: Das Angebot des Spielers %s zum Kauf der Stadt %s wurde abgelehnt.
+    error:
+      barbarian-create: Sie müssen ein Barbar sein, um ein Königreich zu erstellen. Verwenden Sie die Option „Exil“ im Königreichsmenü.
+      invalid-template: '%s ist eine ungültige Monumentvorlage. Überprüfen Sie die Rechtschreibung oder wählen Sie eine andere.'
+      missing-template: Sie müssen einen Vorlagennamen angeben. Zeigen Sie Vorlagen mit "/k kingdom templates" an.
+      missing-name: Sie müssen einen Königreichsnamen angeben.
+      invite-member: '%s ist bereits Mitglied des Königreichs.'
+      invite-exists: '%s wurde bereits eingeladen, dem Königreich beizutreten.'
+      invite-open: Spieler können nicht in ein offenes Königreich eingeladen werden.
+      request-exists: Sie haben bereits eine Beitrittsanfrage zu %s gestellt.
+      request-deny: Die Anfrage zum Beitritt zum Königreich %s wurde abgelehnt.
+      join-member: Sie sind bereits Mitglied eines Königreichs.
+      join-limit: Das Königreich %s hat zu viele Spieler!
+      join-master: Königreichsmeister können anderen Königreichen nicht beitreten.
+      join-switch: Spieler können rivalisierenden Königreichen nicht beitreten.
+      join-cooldown: Warten Sie, bevor Sie einem anderen Königreich %s beitreten.
+      kick-master: Der Königreichsmeister kann nicht rausgeworfen werden.
+      kick-barbarian: Der Spieler ist bereits ein Barbar.
+      exile-cooldown: Warten Sie, bevor Sie den Barbaren %s ins Exil schicken.
+      merchant: Kann nicht mit Händlern im Königreich %s handeln, benötigt Handels- oder Alliiertendiplomatie.
+      diplomacy-exists: Eine Anfrage zum Ändern der Diplomatie liegt bereits vor.
+      diplomacy-peaceful: Die diplomatischen Beziehungen friedlicher Königreiche können nicht geändert werden.
+      diplomacy-invalid: Diese diplomatische Beziehung ist nicht verfügbar oder bereits aktiv.
+      template-attack: Die Denkmalvorlage kann nicht geändert werden, während die Hauptstadt des Königreichs angegriffen wird.
+      template-chosen: Diese Denkmalvorlage wurde bereits für das Königreich ausgewählt.
+      web-color-invalid: Ungültige Farbe, muss mit einem Farbnamen oder Hex-Code übereinstimmen, der mit \# beginnt
+      capital-swap-attack: Die Hauptstadt des Königreichs kann nicht geändert werden, während ein Angriff stattfindet.
+      capital-swap-war: Die Hauptstadt des Königreichs kann nicht geändert werden, während Ihr Königreich im Krieg ist.
+  list:
+    notice:
+      header: '%s-Liste'
+  prefix:
+    notice:
+      disable: Ihr Präfixtitel wurde deaktiviert.
+      new: Ihr Präfix ist jetzt %s
+    error:
+      disable: Ihr Präfixtitel ist bereits deaktiviert.
+      new: Das Präfix %s ist nicht entsperrt!
+      default: Ihr Präfix wurde auf die Standardeinstellung zurückgesetzt.
+      always-on: Ihr Präfixtitel kann nicht deaktiviert werden.
+  score:
+    notice:
+      all-header: Alle Königreichs-Punktzahlen
+      score: Ihre Punktzahl %s, Königreich %s Punktzahl %s
+      player: '%s‘ Punktzahl %s, Königreich %s Punktzahl %s'
+      kingdom: Königreich %s Punktzahl %s
+    error:
+      peaceful: Das Königreich %s ist friedlich und kann nicht gewertet werden.
+      barbarian: '%s ist ein Barbar und kann nicht gewertet werden.'
+      kingdom: Dieses Königreich kann nicht gewertet werden.
+  settle:
+    broadcast:
+      settle: '%s hat die Stadt %s für das Königreich %s besiedelt.'
+    notice:
+      success: Neue Stadt %s erfolgreich besiedelt
+      map-hint: Verwenden Sie „/k map“ für hilfreiche Informationen.
+    error:
+      missing-name: Es muss ein Stadtname angegeben werden.
+      space-name: Falscher Stadtname, keine Leerzeichen verwenden.
+      fail-name: Ungültiger Stadtname, bereits vergeben oder enthält Leerzeichen.
+      fail-overlap: Stadt überlappt sich mit einem nahe gelegenen Gebiet.
+      fail-placement: Es konnte keine gute Platzierung für das Monument gefunden werden.
+      fail-template: Ungültige oder nicht verfügbare Monumentvorlage.
+      fail-proximity: Die Stadt ist zu nah an einem anderen Gebiet. Derzeit %s Chunks entfernt, muss mindestens %s sein.
+      fail-max: Die Stadt ist zu weit von anderen Gebieten entfernt. Derzeit %s Chunks entfernt, muss höchstens %s sein.
+      fail-flat: Ihr Chunk-Bereich ist nicht flach genug. Drücken Sie F3+G, um die Chunk-Grenzen anzuzeigen.ries. Bäume fällen und den Boden einebnen!
+      fail-height: Falsche Höhe, versuchen Sie, sich irgendwo höher oder tiefer niederzulassen.
+      fail-air: Zu viel Luft unter der Erde. Versuchen Sie, sich woanders niederzulassen, oder füllen Sie die gesamte Luft unter Ihnen auf.
+      fail-water: Zu viel Wasser unter der Erde. Versuchen Sie, sich woanders niederzulassen, oder entfernen Sie das gesamte Wasser unter Ihnen.
+      fail-container: Zu viele Container unter der Erde. Versuchen Sie, sich woanders niederzulassen, oder entfernen Sie alle Container unter Ihnen.
+      fail-init: Stadt konnte anfängliche Chunks nicht beanspruchen.
+      fail-limit-all: Es können nicht mehr Städte angesiedelt werden als das globale Maximallimit von %s. Derzeit gibt es %s Städte in allen Welten.
+      fail-limit-world: Es können nicht mehr Städte angesiedelt werden als das Maximallimit pro Welt von %s. Derzeit gibt es %s Städte in dieser Welt.
+      officer-only: Nur der Königreichsmeister und Offiziere können Städte ansiedeln. Bitten Sie um eine Beförderung!
+  spy:
+    notice:
+      nearby: in der Nähe
+      regional: regional
+      faraway: weit weg
+      very-distant: sehr weit entfernt
+      success: Ein Spion hat diese Karte einer feindlichen Stadt von %s geborgen!
+    error:
+      inventory: Nicht genug Inventarplatz, machen Sie Platz.
+      town: Es konnte keine feindliche Stadt gefunden werden.
+  town:
+    notice:
+      open: '%s für Zugriff durch alle Königreichsmitglieder geöffnet.'
+      close: '%s geschlossen, nur Einwohner dürfen Container bauen und darauf zugreifen.'
+      plot-enable: '%s erlaubt Einwohnern jetzt nur, innerhalb von Grundstücken zu bauen.'
+      plot-disable: '%s erlaubt Einwohnern jetzt, auf Stadtland und innerhalb von Grundstücken zu bauen.'
+      allied-building-enable: '%s erlaubt Verbündeten jetzt, zu bauen.'
+      allied-building-disable: '%s verhindert jetzt, dass Verbündete bauen.'
+      friendly-redstone-enable: '%s erlaubt Königreichsmitgliedern jetzt, Redstone-Schalter und -Türen zu verwenden.'
+      friendly-redstone-disable: '%s verhindert jetzt, dass Königreichsmitglieder Redstone-Schalter und -Türen verwenden.'
+      redstone-enable: '%s erlaubt Feinden jetzt, Redstone-Schalter und -Türen zu benutzen.'
+      redstone-disable: '%s verhindert jetzt, dass Feinde Redstone-Schalter und -Türen benutzen.'
+      golem-enable: Eisengolems in %s greifen alle Feinde innerhalb des Stadtgebiets an.
+      golem-disable: Eisengolems in %s verteidigen das Stadtdenkmal nur vor Feinden.
+      add-resident: Einwohner %s zur Stadt %s hinzugefügt.
+      kick-resident: Einwohner %s aus der Stadt %s geworfen.
+      lord-success: Herrschaft über %s an %s übertragen.
+      lord-claim: '%s hat Herrschaft über %s beansprucht!'
+      knight-set: '%s wurde in %s zum Ritter geschlagen.'
+      knight-clear: '%s ist kein Ritter mehr in %s.'
+      rename: Lord %s hat die Stadt %s in %s umbenannt.
+      no-lord: '%s ist verlassen! Verwenden Sie "/k town lord %s", um Herrschaft zu beanspruchen.'
+      shield-list: '%s verbleibende Schilde für die Stadt %s.'
+      armor-list: '%s verbleibende Rüstungsblöcke für die Stadt %s.'
+      specialize-list: '%s Stadtspezialisierung ist %s.'
+      specialize: '%s Stadtspezialisierung erfolgreich in %s geändert.'
+      new-resident: '%s ist als Stadtbewohner von %s beigetreten.'
+      leave-resident: '%s hat die Stadt %s verlassen.'
+      request-sent: Bewohneranfrage zum Beitritt zu %s gesendet.
+      request-received: Neue Stadtbeitrittsanfrage, geben Sie "/k town" ein, um sie zu überprüfen.
+      request-declined: Stadtbeitrittsanfrage für Spieler %s abgelehnt.
+      request-pending: Spieler möchten Bewohner Ihrer Städte werden. Verwenden Sie den Befehl „/k town“, um zu antworten.
+      request-town-list: Diese Städte haben neue Bewohner, die um Beitritt bitten...
+      request-player-list: Diese Spieler haben um Beitritt zur Stadt %s gebeten...
+      invite-sent: '%s zum Beitritt zur Stadt %s eingeladen.'
+      invite-received: Einladung zur Stadt erhalten. Geben Sie "/k town" ein, um zu antworten.
+      invite-declined: Einladung zum Beitritt zu %s abgelehnt.
+      invite-pending: Sie haben ausstehende Einladungen zum Beitritt zu Städten. Verwenden Sie den Befehl "/k town", um zu antworten.
+      invite-list: Diese Städte haben Sie zum Beitritt eingeladen …
+    error:
+      kick-fail: '%s ist kein Einwohner von %s.'
+      knight-resident: Ritter müssen zuerst als Einwohner hinzugefügt werden.
+      invite-member: '%s ist bereits ein Einwohner der Stadt.'
+      invite-exists: '%s wurde bereits eingeladen, der Stadt beizutreten.'
+      invite-open: Spieler können nicht zu einer offenen Stadt eingeladen werden.
+      request-exists: Sie haben bereits einen Beitritt zu %s beantragt.
+      request-deny: Der Antrag zum Beitritt zur Stadt %s wurde abgelehnt.
+      join-member: Sie sind bereits ein Einwohner der Stadt.
+      join-limit: Die Stadt %s hat zu viele Einwohner!
+      kicked: Sie wurden aus der Stadt %s geworfen.
+      promote-knight: '%s ist bereits ein Ritter.'
+      demote-resident: '%s ist bereits ein Einwohner.'
+      upgrade-unavailable: Upgrade %s ist für die Stadt %s nicht verfügbar.
+      upgrade-level: Upgrade-Level muss zwischen %s und %s liegen.
+  travel:
+    notice:
+      town-travel: '%s ist nach %s gereist.'
+      wild-search: Suche nach einem zufälligen Ort in der Wildnis …
+      wild-travel: Bin zu einem zufälligen Ort in der Wildnis gereist.
+      warmup: Reise beginnt in %s Sekunden.
+    error:
+      wild-timeout: Es konnte kein geeigneter Ort in der Wildnis gefunden werden.
+      enemy-territory: Sie können nicht in feindliches Gebiet reisen!
+      no-home: Sie haben kein Zuhause!
+      no-camp: Du hast kein Lager!
+      no-town: Diese Stadt existiert nicht in deinem Königreich.
+      cooldown: Du musst %s warten, bevor du nach %s reisen kannst.
+      canceled: Deine Reise wurde durch Bewegung abgebrochen.
+      damaged: Deine Reise wurde durch Schaden abgebrochen.
+      disabled: Reise in dieses Gebiet ist deaktiviert.
+  unclaim:
+    notice:
+      success: Erfolgreich %s Landstücke von %s zurückgenommen.
+      fail-auto: Konnte nicht zurücknehmen, automatisches Zurücknehmen deaktiviert.
+      pass-auto: Zurückgenommen
+    error:
+      radius: Radius muss größer oder gleich %s und kleiner oder gleich %s sein.
+      fail-town: Darf nur von Städten zurückgenommen werden.
+      fail-lord: Zurücknehmen fehlgeschlagen, du musst der Stadtherr sein.
+      fail-unclaimed: Zurücknehmen fehlgeschlagen, du musst im beanspruchten Gebiet stehen.
+      fail-center: Zurücknehmen fehlgeschlagen, Gebietszentrum kann nicht entfernt werden.
+# //// SHOP \\\\
+# Nachrichten, die für die Integration des Truhenshops verwendet werden.
+shop:
+  error:
+    use-disabled: Läden können hier nicht verwendet werden!
+    use-relation: Mit diesem Laden kann kein Handel getrieben werden, das Königreich der Stadt muss befreundet, verbündet oder in einem Handelsabkommen sein.
+    create-town: Läden können nur in befreundeten Städten erstellt werden.
+    create-camp: Läden können nur in Ihrem eigenen Lager erstellt werden.
+    create-monument: Läden können nicht innerhalb von Monumenten erstellt werden!
+    create-fail: Läden können hier nicht erstellt werden!
+    create-wild: Läden können in der Wildnis nicht erstellt werden!
+# //// REGION \\\\
+# Nachrichten, die für die Integration von Landregionen verwendet werden.
+region:
+  error:
+    claim-deny: Eine nahe gelegene Region verweigert die Inanspruchnahme dieses Landes.
+    unclaim-deny: Eine nahe gelegene Region verweigert die Aufhebung der Inanspruchnahme dieses Landes.
+    travel-enter-deny: Eine Region am Ziel verweigert die Reise dorthin.
+    travel-exit-deny: Eine Region an Ihrem aktuellen Standort verweigert die Reise hinaus.
+# //// DISCORD-SRV \\\\
+# Für die DiscordSRV-Integration verwendete Nachrichten.
+discord-srv:
+  discord: Discord
+  no-link: Sie sind nicht mit Discord verbunden. Geben Sie /discord link ein
+  no-user: Der Discord-Benutzer, mit dem Sie verbunden sind, konnte nicht gefunden werden.
+  linked-user: Sie sind in Discord mit %s verbunden.
+# //// DIRECTIVE \\\\
+# Bezeichnungen und Beschreibungen für die Quest-Anweisungen.
+directive:
+  create-kingdom: Fundamente
+  create-kingdom-info: Erschaffen Sie Ihr eigenes Königreich.
+  settle-town: Neuanfang
+  settle-town-info: Besiedeln Sie eine Stadt für Ihr Königreich.
+  claim-land: Weg zum Adel
+  claim-land-info: Beanspruchen Sie Land für jede Stadt in Ihrem Königreich.
+  build-town: Mauerwerk
+  build-town-info: Bauen Sie Gebäude für jede Stadt in Ihrem Königreich.
+  craft-armor: Ritterschaft
+  craft-armor-info: Stellen Sie eine Eisenrüstung her, um sich zu schützen.
+  create-golem: Stoischer Beschützer
+  create-golem-info: Erschaffe einen eisernen Golem, um jede Stadt in deinem Königreich zu beschützen.
+  enchant-item: Göttliche Werkzeuge
+  enchant-item-info: Wende eine beliebige Verzauberung auf Werkzeuge/Waffen an.
+  attack-town: Akt der Aggression
+  attack-town-info: Greife jede Stadt in einem feindlichen Königreich an, indem du Blöcke zerstörst.
+  capture-town: Militärische Aktion
+  capture-town-info: Erobere jede Stadt in einem feindlichen Königreich, indem du die kritischen Blöcke im Stadtdenkmal zerstörst.
+  kill-enemy: Beste Feinde
+  kill-enemy-info: Töte einen Spieler aus einem feindlichen Königreich.
+# //// PREFIX \\\\
+# Namen für alle Titel und Kategorien von Errungenschaftspräfixen.
+prefix:
+  category:
+    clergy: Klerus
+    nobility: Adel
+    tradesman: Händler
+    military: Militär
+    farming: Landwirtschaft
+    cooking: Kochen
+    fishing: Fischen
+    joking: Scherzen
+    royalty: König
+  title:
+    king: König
+    queen: Königin
+    prince: Prinz
+    princess: Prinzessin
+    noble: Adliger
+    cardinal: Kardinal
+    bishop: Bischof
+    priest: Priester
+    cleric: Kleriker
+    chaplain: Kaplan
+    scribe: Schreiber
+    viceroy: Vizekönig
+    duke: Herzog
+    count: Graf
+    earl: Graf
+    baron: Baron
+    lord: Lord
+    vassal: Vasall
+    peasant: Bauer
+    master: Meister
+    artisan: Handwerker
+    journeyman: Geselle
+    craftsman: Handwerker
+    merchant: Kaufmann
+    peddler: Hausierer
+    general: General
+    major: Major
+    captain: Hauptmann
+    sergeant: Sergeant
+    knight: Sir
+    squire: Knappe
+    cowboy: Cowboy
+    breeder: Züchter
+    rancher: Rancher
+    farmer: Bauer
+    picker: Pflücker
+    sprout: Sprössling
+    jester: Narr
+    fool: Narr
+    dancer: Tänzer
+    bard: Barde
+    fisherman: Fischer
+    caster: Caster
+    chum: Chum
+    chef: Chef
+    cook: Koch
+    baker: Bäcker
+# //// STAT \\\\
+# Namen und Beschreibungen für alle Leistungsstatistiken.
+stat:
+  enchantments: Verzauberungen
+  enchantments-info: Auf Gegenstände angewendete Verzauberungen
+  potions: Tränke
+  potions-info: Verwendete oder eingesetzte Tränke
+  mobs: Mobs
+  mobs-info: Getötete feindliche Mobs
+  settled: Besiedelt
+  settled-info: Besiedelte Städte
+  claimed: Claimed
+  claimed-info: Beanspruchtes Land
+  lords: Lords
+  lords-info: Stadtherrschaften
+  knights: Ritter
+  knights-info: Stadtritterschaften
+  residents: Residents
+  residents-info: Stadtresidenzen
+  ingots: Barren
+  ingots-info: Geschmolzene Barren
+  diamonds: Diamanten
+  diamonds-info: Abgebaute Diamanterze
+  crafted: Crafted
+  crafted-info: Fertigkeit zur Herstellung von Werkzeugen, Waffen und Rüstungen
+  favor: Gunst
+  favor-info: Ausgegebene Gunst
+  kills: Kills
+  kills-info: Getötete Spieler
+  damage: Schaden
+  damage-info: Spielerschaden
+  golems: Golems
+  golems-info: Getötete feindliche Eisengolems
+  captures: Gefangennahmen
+  captures-info: Eroberte feindliche Städte
+  criticals: Kritische Treffer
+  criticals-info: Kritische Treffer in feindlichen Städten
+  seeds: Samen
+  seeds-info: Gepflanzte Samen
+  breed: Rasse
+  breed-info: Romantisierte Mobs
+  till: Pflügen
+  till-info: Düngtes Ackerland
+  harvest: Ernte
+  harvest-info: Eingeerntete Feldfrüchte
+  food: Nahrung
+  food-info: Hergestellte Nahrungsmittel
+  music: Musik
+  music-info: Abgespielte Musik-CDs
+  egg: Ei
+  egg-info: Mit Eiern beworfene Spieler
+  fish: Fisch
+  fish-info: Angelfertigkeit
+  kingdoms: Königreiche
+  kingdoms-info: Neue Königreiche geschaffen
+  conquests: Eroberungen
+  conquests-info: Eroberte feindliche Königreiche
+# //// UPGRADE \\\\
+# Namen und Beschreibungen für alle Stadt-Upgrades.
+upgrade:
+  disabled: Diese Stadt hat nicht genug Einwohner für das volle Upgrade-Level.
+  loot:
+    name: Monument Loot
+    level-1: Fügt 1 weiteres Beutestück pro Truhe hinzu
+    level-2: Fügt 2 weitere Beutestücke pro Truhe hinzu
+    level-3: Fügt 3 weitere Beutestücke pro Truhe hinzu
+  drops:
+    name: Animal Drops
+    level-1: Tiermobs lassen 1 weiteres Stück fallen
+  fatigue:
+    name: Feindmüdigkeit
+    level-1: Feinde erhalten Bergbaumüdigkeit 2
+  counter:
+    name: Gegenspionage
+    level-1: Verhindert, dass Spionagekarten diese Stadt orten
+    level-2: Verhindert, dass Kompasse auf diese Stadt zeigen
+  health:
+    name: Gesundheitsbuff
+    level-1: Fügt 1 Herz zu den Gesundheitsbalken von Freunden hinzu
+    level-2: Fügt 2 Herzen zu den Gesundheitsbalken von Freunden hinzu
+    level-3: Fügt 3 Herzen zu den Gesundheitsbalken von Freunden hinzu
+  damage:
+    name: Schaden verhindern
+    level-1: Verhindert die Ausbreitung von Feuer
+    level-2: Verhindert alle Explosionen
+  watch:
+    name: Stadtwache
+    level-1: Verhindert feindliche Überfälle, es sei denn mindestens 1 Einwohner ist online
+    level-2: Verhindert feindliche Überfälle, sofern nicht mindestens 2 Einwohner online sind
+    level-3: Verhindert feindliche Überfälle, sofern nicht mindestens 3 Einwohner online sind
+  enchant:
+    name: Bessere Verzauberungen
+    level-1: Erhöht Verzauberungsangebote um 1 Level
+# //// DESCRIPTION \\\\
+# Beschreibungen für alle Plugin-Befehle.
+description:
+  help: Zeigt die Hilfemeldung an.
+  menu: Öffnet das Hauptmenü von Konquest.
+  info: Zeigt Informationen zu verschiedenen Dingen an.
+  list: Listet verschiedene Gebiete auf.
+  favor: Zeigt eure Währung als Gunst an.
+  map: Zeigt eine Karte der beanspruchten Gebiete an.
+  chat: Wechselt zwischen globalem und Königreich-exklusivem Chat.
+  spy: Zeigt den Standort einer feindlichen Stadt an.
+  settle: Besiedelt eine neue Stadt.
+  claim: Beansprucht ein Stück Land.
+  unclaim: Beansprucht ein Stück Land.
+  travel: Teleportiert euch in andere Gebiete.
+  kingdom: Erstellt oder verwaltet Königreiche.
+  town: Verwaltet Städte, denen ihr angehört.
+  quest: Zeigt Ihr Questprotokoll an.
+  stats: Zeigt Ihre Leistungsstatistiken an.
+  prefix: Legt Ihren Präfixtitel fest.
+  score: Zeigt die aktuelle Punktzahl eines Spielers an.
+  fly: Fliegen Sie innerhalb befreundeter Gebiete.
+  border: Schaltet Partikelgrenzen von Territorien und Grundstücken um.
+  admin: Nur für Administratoren.
+  admin-help: Zeigt die Hilfemeldung des Administrators an.
+  admin-bypass: Schaltet den Admin-Bypass-Modus um.
+  admin-claim: Beanspruchen Sie Landstücke.
+  admin-unclaim: Bringen Sie ein Stück in die Wildnis zurück.
+  admin-kingdom: Verwaltet ein Königreich.
+  admin-town: Verwaltet eine Stadt oder Hauptstadt.
+  admin-camp: Verwaltet ein Barbarenlager.
+  admin-capture: Erobert eine Stadt für ein beliebiges Königreich.
+  admin-monument: Verwaltet eine Monumentvorlage.
+  admin-ruin: Verwaltet ein Ruinengebiet.
+  admin-sanctuary: Verwaltet ein Schutzgebiet.
+  admin-save: Speichert Plugin-Datendateien.
+  admin-settravel: Legt den Reisepunkt für das Gebiet fest, in dem Sie sich befinden.
+  admin-travel: Teleportiert zum angegebenen Königreich oder zur angegebenen Stadt.
+  admin-reload: Lädt Konfigurationsdateien neu.
+  admin-flag: Legt Eigenschaftsflags für Königreiche und Gebiete fest.
+  admin-stat: Verwaltet Spielerstatistiken.
+# //// PROPERTIES \\\\
+# Namen und Beschreibungen für alle Eigenschaftsflags in Königreichen und Gebieten.
+properties:
+  travel-name: Reisen
+  travel: Erlaubt Reisen in dieses Gebiet
+  pvp-name: PvP
+  pvp: Spielerschaden zulassen
+  pve-name: PvE
+  pve: Entitätsschaden zulassen
+  build-name: Bauen
+  build: Blockbearbeitungen zulassen
+  use-name: Verwenden
+  use: Verwenden von Blöcken zulassen
+  chest-name: Truhe
+  chest: Verwenden von Containern zulassen
+  mobs-name: Mobs
+  mobs: Mobs spawnen lassen
+  portals-name: Portale
+  portals: Erlaubt Spielern Portale zu benutzen
+  enter-name: Eintreten
+  enter: Erlaubt Spielern das Betreten
+  exit-name: Verlassen
+  exit: Erlaubt Spielern das Verlassen
+  capture-name: Erobern
+  capture: Erlaubt die Eroberung dieser Stadt
+  claim-name: Beanspruchen
+  claim: Erlaubt Spielern Land zu beanspruchen
+  unclaim-name: Aufheben
+  unclaim: Erlaubt Spielern Land aufzuheben
+  upgrade-name: Upgrade
+  upgrade: Erlaubt Spielern diese Stadt aufzuwerten
+  plots-name: Grundstücke
+  plots: Erlaubt Spielern Stadtgrundstücke zu setzen
+  peaceful-name: Friedlich
+  peaceful: Erstellt nur ein Königreich friedlich
+  golems-name: Golems
+  golems: Ermöglicht eisernen Golems, Feinde anzugreifen
+  join-name: Beitreten
+  join: Spielern Beitritt erlauben
+  leave-name: Verlassen
+  leave: Spielern Austritt erlauben
+  promote-name: Befördern
+  promote: Beförderung von Spielern erlauben
+  demote-name: Degradieren
+  demote: Degradierung von Spielern erlauben
+  transfer-name: Übertragen
+  transfer: Besitzübertragung erlaubenAntwort
+  shop-name: Shop
+  shop: Erlaubt Spielern, Shops zu erstellen
+  arena-name: Arena
+  arena: Erlaubt allen Spielern, gegeneinander zu kämpfen

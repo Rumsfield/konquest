@@ -1,47 +1,32 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
 import com.github.rumsfield.konquest.utility.HelperUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+public class PlayerIcon extends MenuIcon {
 
-public class PlayerIcon implements MenuIcon {
-
-	public enum PlayerIconAction {
-		DISPLAY_SCORE,
-		DISPLAY_INFO
-    }
-	
-	private final String name;
-	private final List<String> lore;
 	private final OfflinePlayer player;
-	private final int index;
+	private final String contextColor;
 	private final boolean isClickable;
-	private final PlayerIconAction action;
 
-	private final String propertyColor = DisplayManager.propertyFormat;
-	private final String loreColor = DisplayManager.loreFormat;
-	private final String valueColor = DisplayManager.valueFormat;
-
-	public PlayerIcon(String name, List<String> lore, OfflinePlayer player, int index, boolean isClickable, PlayerIconAction action) {
-		this.name = name;
-		this.lore = lore;
+	public PlayerIcon(OfflinePlayer player, String contextColor, KonquestRelationshipType relation, int index, boolean isClickable) {
+		super(index);
+		this.contextColor = contextColor;
 		this.player = player;
-		this.index = index;
 		this.isClickable = isClickable;
-		this.action = action;
-	}
-
-	public PlayerIconAction getAction() {
-		return action;
+		// Item Lore
+		addProperty(MessagePath.LABEL_PLAYER.getMessage());
+		if (relation != null) {
+			addProperty(Labeler.lookup(relation));
+		}
+		String lastOnlineFormat = DisplayManager.valueFormat+HelperUtil.getLastSeenFormat(player);
+		addDescription(MessagePath.LABEL_LAST_SEEN.getMessage(lastOnlineFormat));
 	}
 	
 	public OfflinePlayer getOfflinePlayer() {
@@ -49,24 +34,13 @@ public class PlayerIcon implements MenuIcon {
 	}
 
 	@Override
-	public int getIndex() {
-		return index;
-	}
-
-	@Override
 	public String getName() {
-		return name;
+		return contextColor+player.getName();
 	}
 
 	@Override
 	public ItemStack getItem() {
-		List<String> loreList = new ArrayList<>();
-		String lastOnlineFormat = HelperUtil.getLastSeenFormat(player);
-		loreList.add(propertyColor+MessagePath.LABEL_PLAYER.getMessage());
-		loreList.add(loreColor+ MessagePath.LABEL_LAST_SEEN.getMessage(valueColor+lastOnlineFormat));
-		loreList.addAll(lore);
-		String name = getName();
-		return CompatibilityUtil.buildItem(null, name, loreList, false, player);
+		return CompatibilityUtil.buildItem(null, getName(), getLore(), false, player);
 	}
 	
 	@Override

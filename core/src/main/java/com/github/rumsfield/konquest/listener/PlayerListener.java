@@ -159,6 +159,12 @@ public class PlayerListener implements Listener {
 				ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TOWN_NOTICE_INVITE_PENDING.getMessage());
 				ChatUtil.sendCommaMessage(bukkitPlayer, townInviteNames);
 			}
+			// Notify offers (officers only)
+			if(konquest.getKingdomManager().getIsTownPurchaseEnable() && isPlayerKingdomOfficer) {
+				if (konquest.getKingdomManager().getNumTownPurchaseOffers(player.getKingdom()) > 0) {
+					ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_KINGDOM_NOTICE_OFFER_PENDING.getMessage(), ChatColor.GOLD);
+				}
+			}
 
 			// DiscordSRV
 			if(konquest.getIntegrationManager().getDiscordSrv().isEnabled()) {
@@ -892,14 +898,6 @@ public class PlayerListener implements Listener {
     		int baseAmount = event.getAmount();
     		int boostAmount = ((boostPercent*baseAmount)/100)+baseAmount;
     		event.setAmount(boostAmount);
-    	}
-    }
-    
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerDropMenuItem(PlayerDropItemEvent event) {
-    	if(konquest.getDisplayManager().isPlayerViewingMenu(event.getPlayer())) {
-    		ChatUtil.printDebug("Player "+event.getPlayer().getName()+" tried to drop an item from an inventory menu!");
-    		//TODO: Destroy the item dropped from the menu GUI
     	}
     }
     

@@ -1,93 +1,84 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.manager.DisplayManager;
+import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.model.KonKingdom;
+import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
+import com.github.rumsfield.konquest.utility.Labeler;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class KingdomIcon implements MenuIcon {
+public class KingdomIcon extends MenuIcon {
 
 	private final KonKingdom kingdom;
 	private final String contextColor;
-	private final List<String> lore;
-	private final int index;
-	private final ItemStack item;
+	private final KonquestRelationshipType relation;
 	private final boolean isClickable;
 
-	private final String propertyColor = DisplayManager.propertyFormat;
-	private final String loreColor = DisplayManager.loreFormat;
-	private final String valueColor = DisplayManager.valueFormat;
-
-	public KingdomIcon(KonKingdom kingdom, String contextColor, List<String> lore, int index, boolean isClickable) {
+	public KingdomIcon(KonKingdom kingdom, String contextColor, KonquestRelationshipType relation, int index, boolean isClickable) {
+		super(index);
 		this.kingdom = kingdom;
 		this.contextColor = contextColor;
-		this.lore = lore;
-		this.index = index;
+		this.relation = relation;
 		this.isClickable = isClickable;
-		this.item = initItem();
-	}
-	
-	private ItemStack initItem() {
-		// Determine material
-		Material material = Material.DIAMOND_HELMET;
-		if(kingdom.isAdminOperated()) {
-			material = Material.GOLDEN_HELMET;
+		// Item Lore
+		if(kingdom.isCreated()) {
+			if(kingdom.isOfflineProtected()) {
+				addAlert(MessagePath.LABEL_PROTECTED.getMessage());
+			}
+			if(kingdom.isAdminOperated()) {
+				addProperty(MessagePath.LABEL_ADMIN_KINGDOM.getMessage());
+			} else {
+				addProperty(MessagePath.LABEL_KINGDOM.getMessage());
+			}
 		}
-		// Add applicable labels
-		boolean isProtected = false;
-		List<String> loreList = new ArrayList<>();
-		if(kingdom.isAdminOperated()) {
-			loreList.add(propertyColor+MessagePath.LABEL_ADMIN_KINGDOM.getMessage());
-		} else {
-			loreList.add(propertyColor+MessagePath.LABEL_KINGDOM.getMessage());
+		if (relation != null) {
+			addProperty(Labeler.lookup(relation));
 		}
-		if(kingdom.isPeaceful()) {
-			loreList.add(propertyColor+MessagePath.LABEL_PEACEFUL.getMessage());
+		if(kingdom.isCreated()) {
+			if (kingdom.isPeaceful()) {
+				addProperty(MessagePath.LABEL_PEACEFUL.getMessage());
+			}
+			if (kingdom.isOpen()) {
+				addProperty(MessagePath.LABEL_OPEN.getMessage());
+			}
+			if (kingdom.isSmallest()) {
+				addProperty(MessagePath.LABEL_SMALLEST.getMessage());
+			}
+			int numKingdomLand = 0;
+			for (KonTown town : kingdom.getCapitalTowns()) {
+				numKingdomLand += town.getNumLand();
+			}
+			addNameValue(MessagePath.LABEL_MEMBERS.getMessage(), kingdom.getNumMembers());
+			addNameValue(MessagePath.LABEL_TOWNS.getMessage(), kingdom.getNumTowns());
+			addNameValue(MessagePath.LABEL_LAND.getMessage(), numKingdomLand);
 		}
-		if(kingdom.isOpen()) {
-			loreList.add(propertyColor+MessagePath.LABEL_OPEN.getMessage());
-		}
-		if(kingdom.isOfflineProtected()) {
-			isProtected = true;
-			loreList.add(propertyColor+MessagePath.LABEL_PROTECTED.getMessage());
-		}
-		loreList.add(loreColor+MessagePath.LABEL_TOWNS.getMessage()+": "+valueColor+kingdom.getNumTowns());
-		loreList.add(loreColor+MessagePath.LABEL_MEMBERS.getMessage()+": "+valueColor+kingdom.getNumMembers());
-		loreList.addAll(lore);
-		String name = contextColor+kingdom.getName();
-		return CompatibilityUtil.buildItem(material, name, loreList, isProtected);
 	}
 	
 	public KonKingdom getKingdom() {
 		return kingdom;
 	}
-	
-	@Override
-	public int getIndex() {
-		return index;
-	}
 
 	@Override
 	public String getName() {
-		String name = kingdom.getName();
-		if(name.equalsIgnoreCase("barbarians")) {
-			name = MessagePath.LABEL_BARBARIANS.getMessage();
-		}
-		return name;
+		return contextColor+kingdom.getName();
 	}
 
 	@Override
 	public ItemStack getItem() {
-		return item;
+		Material iconMat = Material.DIAMOND_HELMET;
+		if (relation != null) {
+			switch (relation) {
+				case FRIENDLY:
+					iconMat = Material.GOLDEN_HELMET;
+					break;
+				case BARBARIAN:
+					iconMat = Material.STONE_AXE;
+					break;
+			}
+		}
+		return CompatibilityUtil.buildItem(iconMat, getName(), getLore(), kingdom.isOfflineProtected());
 	}
 
 	@Override

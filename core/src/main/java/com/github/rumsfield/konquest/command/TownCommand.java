@@ -27,7 +27,7 @@ public class TownCommand extends CommandBase {
 		// Note: <town> non-literal arguments accept names of towns, and name of kingdom for capital, and literal "capital".
 		// None
 		setOptionalArgs(true);
-		// menu
+		// [menu]
 		addArgument(
 				newArg("menu",true,false)
 		);
@@ -252,7 +252,7 @@ public class TownCommand extends CommandBase {
 								}
 								if (args.size() == 3) {
 									// Open plots menu
-									konquest.getDisplayManager().displayTownPlotMenu(bukkitPlayer, town);
+									konquest.getDisplayManager().displayTownPlotMenu(player, town);
 								} else {
 									sendInvalidArgMessage(bukkitPlayer);
 								}
@@ -346,7 +346,7 @@ public class TownCommand extends CommandBase {
 												upgrade.toString() +
 												" - " +
 												ChatColor.RESET +
-												upgrade.getDescription() +
+												upgrade.getName() +
 												" " +
 												upgradeLevel +
 												" " +
@@ -395,7 +395,7 @@ public class TownCommand extends CommandBase {
 												ChatColor.DARK_AQUA +
 												MessagePath.LABEL_COST.getMessage() +
 												" " +
-												shieldCost;
+												KonquestPlugin.getCurrencyFormat(shieldCost);
 										ChatUtil.sendMessage(bukkitPlayer, shieldInfo);
 									}
 								} else if (args.size() == 4) {
@@ -435,7 +435,7 @@ public class TownCommand extends CommandBase {
 												ChatColor.DARK_AQUA +
 												MessagePath.LABEL_COST.getMessage() +
 												" " +
-												armorCost;
+												KonquestPlugin.getCurrencyFormat(armorCost);
 										ChatUtil.sendMessage(bukkitPlayer, armorInfo);
 									}
 								} else if (args.size() == 4) {

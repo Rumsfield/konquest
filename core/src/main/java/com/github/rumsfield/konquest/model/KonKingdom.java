@@ -402,29 +402,22 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		return memberList;
 	}
 
-	public String getPlayerRoleName(KonOfflinePlayer offlinePlayer) {
-		return getPlayerRoleName(offlinePlayer.getOfflineBukkitPlayer());
+	public String getPlayerRankName(KonOfflinePlayer offlinePlayer) {
+		return getPlayerRankName(offlinePlayer.getOfflineBukkitPlayer());
 	}
-	public String getPlayerRoleName(OfflinePlayer offlinePlayer) {
-		String result = "";
-		if(isMaster(offlinePlayer.getUniqueId())) {
-			result = MessagePath.LABEL_MASTER.getMessage();
-		} else if(isOfficer(offlinePlayer.getUniqueId())) {
-			result = MessagePath.LABEL_OFFICER.getMessage();
-		} else if(isMember(offlinePlayer.getUniqueId())) {
-			result = MessagePath.LABEL_MEMBER.getMessage();
-		}
-		return result;
+
+	public String getPlayerRankName(OfflinePlayer offlinePlayer) {
+		return getPlayerRankName(offlinePlayer.getUniqueId());
 	}
 
 	public String getPlayerRankName(UUID id) {
 		String result = "";
 		if(isMaster(id)) {
-			result = MessagePath.PLACEHOLDER_RANK_MASTER.getMessage();
+			result = MessagePath.RELATIONSHIP_RANK_MASTER.getMessage();
 		} else if(isOfficer(id)) {
-			result = MessagePath.PLACEHOLDER_RANK_OFFICER.getMessage();
+			result = MessagePath.RELATIONSHIP_RANK_OFFICER.getMessage();
 		} else if(isMember(id)) {
-			result = MessagePath.PLACEHOLDER_RANK_MEMBER.getMessage();
+			result = MessagePath.RELATIONSHIP_RANK_MEMBER.getMessage();
 		}
 		return result;
 	}

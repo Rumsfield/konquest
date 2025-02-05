@@ -4,14 +4,14 @@ import java.util.HashMap;
 
 public class KonKingdomScoreAttributes {
 	
-	public enum KonKingdomScoreAttribute {
+	public enum ScoreAttribute {
 		TOWNS 		(100),
 		LAND 		(10),
 		FAVOR 		(1),
 		POPULATION 	(50);
 		
 		private final int weight;
-		KonKingdomScoreAttribute(int weight) {
+		ScoreAttribute(int weight) {
 			this.weight = weight;
 		}
 		
@@ -20,27 +20,27 @@ public class KonKingdomScoreAttributes {
 		}
 	}
 
-	private final HashMap<KonKingdomScoreAttribute,Integer> attributeMap;
-	private final HashMap<KonKingdomScoreAttribute,Integer> attributeWeights;
+	private final HashMap<ScoreAttribute,Integer> attributeMap;
+	private final HashMap<ScoreAttribute,Integer> attributeWeights;
 	
 	public KonKingdomScoreAttributes() {
 		this.attributeMap = new HashMap<>();
 		this.attributeWeights = new HashMap<>();
-		for(KonKingdomScoreAttribute attribute : KonKingdomScoreAttribute.values()) {
+		for(ScoreAttribute attribute : ScoreAttribute.values()) {
 			attributeMap.put(attribute, 0);
 			attributeWeights.put(attribute, attribute.getWeight());
 		}
 	}
 	
-	public void setAttributeWeight(KonKingdomScoreAttribute attribute, int value) {
+	public void setAttributeWeight(ScoreAttribute attribute, int value) {
 		attributeWeights.put(attribute, value);
 	}
 	
-	public void setAttribute(KonKingdomScoreAttribute attribute, int value) {
+	public void setAttribute(ScoreAttribute attribute, int value) {
 		attributeMap.put(attribute, value);
 	}
 	
-	public int getAttributeValue(KonKingdomScoreAttribute attribute) {
+	public int getAttributeValue(ScoreAttribute attribute) {
 		int result = 0;
 		if(attributeMap.containsKey(attribute)) {
 			result = attributeMap.get(attribute);
@@ -48,7 +48,7 @@ public class KonKingdomScoreAttributes {
 		return result;
 	}
 	
-	public int getAttributeScore(KonKingdomScoreAttribute attribute) {
+	public int getAttributeScore(ScoreAttribute attribute) {
 		int result = 0;
 		if(attributeMap.containsKey(attribute)) {
 			result = attributeMap.get(attribute)*attributeWeights.get(attribute);
@@ -58,7 +58,7 @@ public class KonKingdomScoreAttributes {
 	
 	public int getScore() {
 		int result = 0;
-		for(KonKingdomScoreAttribute attribute : attributeMap.keySet()) {
+		for(ScoreAttribute attribute : attributeMap.keySet()) {
 			result += (attributeMap.get(attribute)*attributeWeights.get(attribute));
 		}
 		return result;

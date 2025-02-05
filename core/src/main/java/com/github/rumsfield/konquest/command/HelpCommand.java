@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-public class HelpCommand extends CommandBase{
+public class HelpCommand extends CommandBase {
 
 	public HelpCommand() {
 		// Define name and sender support

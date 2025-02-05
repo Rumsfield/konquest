@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class KonPlayerScoreAttributes {
 
-	public enum KonPlayerScoreAttribute {
+	public enum ScoreAttribute {
 		TOWN_LORDS 		(20),
 		TOWN_KNIGHTS 	(10),
 		TOWN_RESIDENTS 	(5),
@@ -13,7 +13,7 @@ public class KonPlayerScoreAttributes {
 		LAND_RESIDENTS 	(1);
 		
 		private final int weight;
-		KonPlayerScoreAttribute(int weight) {
+		ScoreAttribute(int weight) {
 			this.weight = weight;
 		}
 		
@@ -22,27 +22,27 @@ public class KonPlayerScoreAttributes {
 		}
 	}
 	
-	private final HashMap<KonPlayerScoreAttribute,Integer> attributeMap;
+	private final HashMap<ScoreAttribute,Integer> attributeMap;
 	
 	public KonPlayerScoreAttributes() {
 		this.attributeMap = new HashMap<>();
-		for(KonPlayerScoreAttribute attribute : KonPlayerScoreAttribute.values()) {
+		for(ScoreAttribute attribute : ScoreAttribute.values()) {
 			attributeMap.put(attribute, 0);
 		}
 	}
 	
-	public void setAttribute(KonPlayerScoreAttribute attribute, int value) {
+	public void setAttribute(ScoreAttribute attribute, int value) {
 		attributeMap.put(attribute, value);
 	}
 	
-	public void addAttribute(KonPlayerScoreAttribute attribute, int value) {
+	public void addAttribute(ScoreAttribute attribute, int value) {
 		if(attributeMap.containsKey(attribute)) {
 			int current = attributeMap.get(attribute);
 			attributeMap.put(attribute, current+value);
 		}
 	}
 	
-	public int getAttributeValue(KonPlayerScoreAttribute attribute) {
+	public int getAttributeValue(ScoreAttribute attribute) {
 		int result = 0;
 		if(attributeMap.containsKey(attribute)) {
 			result = attributeMap.get(attribute);
@@ -50,7 +50,7 @@ public class KonPlayerScoreAttributes {
 		return result;
 	}
 	
-	public int getAttributeScore(KonPlayerScoreAttribute attribute) {
+	public int getAttributeScore(ScoreAttribute attribute) {
 		int result = 0;
 		if(attributeMap.containsKey(attribute)) {
 			result = attributeMap.get(attribute)*attribute.getWeight();
@@ -60,7 +60,7 @@ public class KonPlayerScoreAttributes {
 	
 	public int getScore() {
 		int result = 0;
-		for(KonPlayerScoreAttribute attribute : attributeMap.keySet()) {
+		for(ScoreAttribute attribute : attributeMap.keySet()) {
 			result += (attributeMap.get(attribute)*attribute.getWeight());
 		}
 		return result;

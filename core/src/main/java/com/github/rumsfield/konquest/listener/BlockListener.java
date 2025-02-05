@@ -196,7 +196,7 @@ public class BlockListener implements Listener {
 							// If town is upgraded to require a minimum online resident amount, prevent block edits
 							if(town.isTownWatchProtected()) {
 								int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+								ChatUtil.sendError(event.getPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getName(), upgradeLevelWatch));
 								event.setCancelled(true);
 								return;
 							}
@@ -670,7 +670,7 @@ public class BlockListener implements Listener {
 							// If town is upgraded to require a minimum online resident amount, prevent block damage
 							if(town.isTownWatchProtected()) {
 								int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+								ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getName(), upgradeLevelWatch));
 								event.setCancelled(true);
 								return;
 							}
@@ -1454,26 +1454,6 @@ public class BlockListener implements Listener {
 					captureTimer.setTime(townCaptureTimeSeconds);
 					captureTimer.startTimer();
 					ChatUtil.printDebug("Starting capture timer for "+townCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID());
-					// For all online players...
-					for(KonPlayer onlinePlayer : playerManager.getPlayersOnline()) {
-						// Teleport all players inside center chunk to new spawn location
-						if(capturedTown.isLocInsideCenterChunk(onlinePlayer.getBukkitPlayer().getLocation())) {
-							onlinePlayer.getBukkitPlayer().teleport(konquest.getSafeRandomCenteredLocation(capturedTown.getCenterLoc(), 2));
-							onlinePlayer.getBukkitPlayer().playEffect(onlinePlayer.getBukkitPlayer().getLocation(), Effect.ANVIL_LAND, null);
-						}
-						// Remove mob targets
-						if(capturedTown.isLocInside(onlinePlayer.getBukkitPlayer().getLocation())) {
-							onlinePlayer.clearAllMobAttackers();
-						}
-						// Update particle border renders for nearby players
-						for(Chunk chunk : HelperUtil.getAreaChunks(onlinePlayer.getBukkitPlayer().getLocation(), 2)) {
-							if(capturedTown.hasChunk(chunk)) {
-								territoryManager.updatePlayerBorderParticles(onlinePlayer);
-								break;
-							}
-						}
-						
-					}
 					// Execute custom commands from config
 					konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_CAPTURE,player.getBukkitPlayer());
 					// Update directive progress
@@ -1488,10 +1468,6 @@ public class BlockListener implements Listener {
 					int y = capturedTown.getCenterLoc().getBlockY();
 					int z = capturedTown.getCenterLoc().getBlockZ();
 					konquest.getMapHandler().postBroadcast(MessagePath.PROTECTION_NOTICE_CONQUER.getMessage(capturedTown.getName())+" ("+x+","+y+","+z+")");
-					capturedTown.getMonumentTimer().stopTimer();
-					capturedTown.setAttacked(false,player);
-					capturedTown.setBarProgress(1.0);
-					capturedTown.updateBarTitle();
 					// Fire event post-capture
 					Konquest.callKonquestEvent(new KonquestTownCapturePostEvent(konquest, capturedTown, player, oldKingdom, isCapital));
 				} else {

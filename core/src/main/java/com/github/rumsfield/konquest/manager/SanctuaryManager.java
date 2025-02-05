@@ -163,6 +163,15 @@ public class SanctuaryManager {
 		}
 		return result;
 	}
+
+	public KonSanctuary getSanctuaryOfTemplate(KonMonumentTemplate template) {
+		for(KonSanctuary sanctuary : sanctuaryMap.values()) {
+			if(sanctuary.isTemplate(template.getName())) {
+				return sanctuary;
+			}
+		}
+		return null;
+	}
 	
 	public boolean isTemplate(String name) {
 		boolean result = false;

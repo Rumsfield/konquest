@@ -23,7 +23,8 @@ public class TravelManager implements Timeable {
 		CAMP,
 		HOME,
 		TOWN,
-		WILD
+		WILD,
+		OTHER
 	}
 	
 	private final Konquest konquest;
@@ -39,9 +40,30 @@ public class TravelManager implements Timeable {
 		this.travelExecutor.startLoopTimer();
 		
 	}
+
+	public void submitWildTravel(Player bukkitPlayer) {
+		if(!konquest.isWorldValid(bukkitPlayer.getWorld())) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_INVALID_WORLD.getMessage());
+			return;
+		}
+		ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WILD_SEARCH.getMessage());
+		// Wild travel is a little different.
+		// It takes a lot of effort to load random chunks and find a valid travel location,
+		// too much effort for 1 tick. So the search will take place in a separate thread
+		// over multiple ticks. When the task is finished, use a lamba expression to submit the travel.
+		RandomWildLocationSearchTask task = new RandomWildLocationSearchTask(konquest,bukkitPlayer.getWorld(),location -> {
+			if(location == null) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TRAVEL_ERROR_WILD_TIMEOUT.getMessage());
+			} else {
+				konquest.getTravelManager().submitTravel(bukkitPlayer, TravelDestination.WILD, null, location);
+			}
+		});
+		// schedule the task to run once every 10 ticks (20 ticks per second)
+		task.runTaskTimer(konquest.getPlugin(), 20L, 10L);
+	}
 	
-	public void submitTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc) {
-		if(travelLoc == null) return;
+	public boolean submitTravel(Player bukkitPlayer, TravelDestination destination, KonTerritory territory, Location travelLoc) {
+		if(travelLoc == null) return false;
 
 		// Check for other plugin flags
 		if(konquest.getIntegrationManager().getWorldGuard().isEnabled()) {
@@ -49,13 +71,13 @@ public class TravelManager implements Timeable {
 			if(!konquest.getIntegrationManager().getWorldGuard().isLocationTravelExitAllowed(bukkitPlayer.getLocation(),bukkitPlayer)) {
 				// A region is denying this action
 				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_TRAVEL_EXIT_DENY.getMessage());
-				return;
+				return false;
 			}
 			// Destination location
 			if(!konquest.getIntegrationManager().getWorldGuard().isLocationTravelEnterAllowed(travelLoc,bukkitPlayer)) {
 				// A region is denying this action
 				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_TRAVEL_ENTER_DENY.getMessage());
-				return;
+				return false;
 			}
 		}
 
@@ -86,7 +108,7 @@ public class TravelManager implements Timeable {
 		if(!isTravelAlwaysAllowed && total_cost > 0) {
 			if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
-				return;
+				return false;
 			}
 		}
 		if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
@@ -122,6 +144,7 @@ public class TravelManager implements Timeable {
 			// There is no warmup time, do the travel now
 			executeTravel(bukkitPlayer, destination, territory, travelLocAng, total_cost);
 		}
+		return true;
 	}
 	
 	// Returns true when the player's travel was successfully canceled

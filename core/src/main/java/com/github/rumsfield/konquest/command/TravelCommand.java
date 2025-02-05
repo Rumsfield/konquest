@@ -1,7 +1,6 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.manager.KingdomManager;
 import com.github.rumsfield.konquest.manager.TravelManager.TravelDestination;
@@ -9,12 +8,10 @@ import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
-import com.github.rumsfield.konquest.utility.RandomWildLocationSearchTask;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,23 +23,20 @@ public class TravelCommand extends CommandBase {
 	public TravelCommand() {
 		// Define name and sender support
 		super("travel",true, false);
-		// town <town>
+		// None
+		setOptionalArgs(true);
+		// [menu]
 		addArgument(
-				newArg("town", true, false)
-						.sub( newArg("town", false, false) )
+				newArg("menu",true,false)
 		);
-		// kingdom <kingdom>
+		// town|kingdom|sanctuary <name>
+		List<String> argNames = Arrays.asList("town", "kingdom", "sanctuary");
 		addArgument(
-				newArg("kingdom", true, false)
-						.sub( newArg("kingdom", false, false) )
-		);
-		// sanctuary <sanctuary>
-		addArgument(
-				newArg("sanctuary", true, false)
-						.sub( newArg("sanctuary", false, false) )
+				newArg(argNames,true,false)
+						.sub( newArg("name",false,false) )
 		);
 		// capital|home|camp|wild
-		List<String> argNames = Arrays.asList("capital", "home", "camp", "wild");
+		argNames = Arrays.asList("capital", "home", "camp", "wild");
 		addArgument(
 				newArg(argNames,true,false)
 		);
@@ -84,11 +78,14 @@ public class TravelCommand extends CommandBase {
 			}
 		}
 
-		// Determine travel destination and location
-		if (args.isEmpty()) {
-			sendInvalidArgMessage(sender);
+		// No arguments, or menu argument
+		if (args.isEmpty() || args.get(0).equalsIgnoreCase("menu")) {
+			// Display travel menu
+			konquest.getDisplayManager().displayTravelMenu(player);
 			return;
 		}
+
+		// Determine travel destination and location
 		String travelType = args.get(0);
 		Location travelLoc = null;
 		TravelDestination destination;
@@ -169,21 +166,9 @@ public class TravelCommand extends CommandBase {
 					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 					return;
 				}
-				ChatUtil.sendNotice(sender, MessagePath.COMMAND_TRAVEL_NOTICE_WILD_SEARCH.getMessage());
 				destination = TravelDestination.WILD;
-				// Wild travel is a little different.
-				// It takes a lot of effort to load random chunks and find a valid travel location,
-				// too much effort for 1 tick. So the search will take place in a separate thread
-				// over multiple ticks. When the task is finished, use a lamba expression to submit the travel.
-				RandomWildLocationSearchTask task = new RandomWildLocationSearchTask(konquest,bukkitWorld,location -> {
-					if(location == null) {
-						ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_TRAVEL_ERROR_WILD_TIMEOUT.getMessage());
-					} else {
-						konquest.getTravelManager().submitTravel(bukkitPlayer, destination, null, location);
-					}
-				});
-				// schedule the task to run once every 20 ticks (20 ticks per second)
-				task.runTaskTimer(konquest.getPlugin(), 0L, 20L);
+				// Execute wild travel using manager
+				konquest.getTravelManager().submitWildTravel(bukkitPlayer);
 				break;
 			case "sanctuary":
 				if (args.size() != 2) {
@@ -329,6 +314,7 @@ public class TravelCommand extends CommandBase {
 		boolean isWildTravel = konquest.getCore().getBoolean(CorePath.TRAVEL_ENABLE_WILD.getPath(),false);
 
 		if (args.size() == 1) {
+			tabList.add("menu");
 			if (isWildTravel) {
 				tabList.add("wild");
 			}

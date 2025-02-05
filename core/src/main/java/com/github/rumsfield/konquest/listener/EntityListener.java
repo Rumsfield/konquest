@@ -383,8 +383,8 @@ public class EntityListener implements Listener {
 				if(territoryManager.isChunkClaimed(tLoc)) {
 					KonTerritory targetTerritory = territoryManager.getChunkTerritory(tLoc);
 					// Prevent hostile mobs from targeting players inside of territory with PVE disabled
-					if(eAttacker instanceof Enemy && eAttacker instanceof Mob && targetTerritory instanceof KonPropertyFlagHolder) {
-						Mob monsterAttacker = (Mob)eAttacker;
+					if(eAttacker instanceof Monster && targetTerritory instanceof KonPropertyFlagHolder) {
+						Monster monsterAttacker = (Monster)eAttacker;
 						KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)targetTerritory;
 						if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
 							if(!flagHolder.getPropertyValue(KonPropertyFlag.PVE)) {
@@ -624,8 +624,8 @@ public class EntityListener implements Listener {
 			if(territory instanceof KonPropertyFlagHolder) {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.PVE)) {
-					// Block non-enemy PVE
-					if(!(flagHolder.getPropertyValue(KonPropertyFlag.PVE) || event.getEntity() instanceof Enemy)) {
+					// Block non-monster PVE
+					if(!(flagHolder.getPropertyValue(KonPropertyFlag.PVE) || event.getEntity() instanceof Monster)) {
 						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 						return;
@@ -676,7 +676,7 @@ public class EntityListener implements Listener {
 	    				// If town is upgraded to require a minimum online resident amount, prevent block damage
 						if(town.isTownWatchProtected()) {
 							int upgradeLevelWatch = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.WATCH);
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getDescription(), upgradeLevelWatch));
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_UPGRADE.getMessage(town.getName(), KonUpgrade.WATCH.getName(), upgradeLevelWatch));
 							event.setCancelled(true);
 							return;
 						}

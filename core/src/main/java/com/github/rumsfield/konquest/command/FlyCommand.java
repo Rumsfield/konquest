@@ -32,31 +32,8 @@ public class FlyCommand extends CommandBase {
 			sendInvalidArgMessage(sender);
 			return;
 		}
-		Player bukkitPlayer = player.getBukkitPlayer();
-		if(bukkitPlayer.getGameMode().equals(GameMode.SURVIVAL)) {
-			if(player.isFlyEnabled()) {
-				player.setIsFlyEnabled(false);
-				ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
-			} else {
-				// Verify player is in friendly territory
-				boolean isFriendly = false;
-				if(konquest.getTerritoryManager().isChunkClaimed(bukkitPlayer.getLocation())) {
-					KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(bukkitPlayer.getLocation());
-					if(territory != null && territory.getKingdom().equals(player.getKingdom())) {
-						isFriendly = true;
-					}
-				}
-				if(isFriendly) {
-					player.setIsFlyEnabled(true);
-					player.setFlyDisableWarmup(false);
-					ChatUtil.sendNotice(bukkitPlayer, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
-				} else {
-					ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-				}
-			}
-		} else {
-			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-		}
+		// Toggle player flying
+		konquest.getPlayerManager().togglePlayerFly(player);
 	}
 	
 	@Override

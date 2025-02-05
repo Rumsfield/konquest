@@ -81,6 +81,10 @@ public class ConfigManager{
 		updateConfigVersion("lang_russian");
 		addConfig("lang_spanish", new KonConfig("lang/spanish",false));
 		updateConfigVersion("lang_spanish");
+		addConfig("lang_turkish", new KonConfig("lang/turkish",false));
+		updateConfigVersion("lang_turkish");
+		addConfig("lang_german", new KonConfig("lang/german",false));
+		updateConfigVersion("lang_german");
 		
 		// Language selection
 		language = getConfig("core").getString("language","english");

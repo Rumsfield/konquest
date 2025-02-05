@@ -36,11 +36,9 @@ public class BypassAdminCommand extends CommandBase {
 		if(player.isAdminBypassActive()) {
 			player.setIsAdminBypassActive(false);
 			ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_DISABLE_AUTO.getMessage());
-			ChatUtil.resetTitle(player.getBukkitPlayer());
 		} else {
 			player.setIsAdminBypassActive(true);
 			ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_ENABLE_AUTO.getMessage());
-			ChatUtil.sendConstantTitle(player.getBukkitPlayer(), "", ChatColor.GOLD+MessagePath.LABEL_BYPASS.getMessage());
 		}
     }
     

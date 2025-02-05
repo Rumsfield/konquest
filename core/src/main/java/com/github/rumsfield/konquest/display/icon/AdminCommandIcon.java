@@ -1,36 +1,25 @@
 package com.github.rumsfield.konquest.display.icon;
 
-import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.admin.AdminCommandType;
 import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.utility.CompatibilityUtil;
-import com.github.rumsfield.konquest.utility.HelperUtil;
-import org.bukkit.ChatColor;
-import org.bukkit.inventory.ItemFlag;
+import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class AdminCommandIcon  implements MenuIcon{
+public class AdminCommandIcon extends MenuIcon{
 
     private final AdminCommandType command;
-    private final int index;
-    private final ItemStack item;
+    private final boolean permission;
 
-    private final String loreColor = DisplayManager.loreFormat;
-
-    public AdminCommandIcon(AdminCommandType command, int index) {
+    public AdminCommandIcon(AdminCommandType command, boolean permission, int index) {
+        super(index);
         this.command = command;
-        this.index = index;
-        this.item = initItem();
-    }
-
-    private ItemStack initItem() {
-        List<String> loreList = new ArrayList<>(HelperUtil.stringPaginate(command.description(), loreColor));
-        String name = ""+ChatColor.GOLD+ChatColor.ITALIC+getName();
-        return CompatibilityUtil.buildItem(command.iconMaterial(), name, loreList);
+        this.permission = permission;
+        // Item Lore
+        if(!permission) {
+            addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
+        }
+        addDescription(command.description());
     }
 
     public AdminCommandType getCommand() {
@@ -38,23 +27,18 @@ public class AdminCommandIcon  implements MenuIcon{
     }
 
     @Override
-    public int getIndex() {
-        return index;
-    }
-
-    @Override
     public String getName() {
-        return command.toString();
+        return DisplayManager.adminFormat+command.toString();
     }
 
     @Override
     public ItemStack getItem() {
-        return item;
+        return CompatibilityUtil.buildItem(command.iconMaterial(), getName(), getLore());
     }
 
     @Override
     public boolean isClickable() {
-        return true;
+        return permission;
     }
 
 }
