@@ -41,6 +41,9 @@ public class MapHandler {
 		if (konquest.getIntegrationManager().getBlueMap().isEnabled()) {
 			renderers.put("BlueMap",new BlueMapRender(konquest));
 		}
+		if (konquest.getIntegrationManager().getSquaremap().isEnabled()) {
+			renderers.put("squaremap",new SquaremapRender(konquest));
+		}
 		for(Renderable ren : renderers.values()) {
 			ren.initialize();
 		}

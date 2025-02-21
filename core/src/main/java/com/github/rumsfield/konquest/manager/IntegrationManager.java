@@ -19,6 +19,7 @@ public class IntegrationManager {
 	private final DiscordSrvHook discordsrvHook;
 	private final DynmapHook dynmapHook;
 	private final BlueMapHook bluemapHook;
+	private final SquaremapHook squaremapHook;
 	private final WorldGuardHook worldguardHook;
 	private final ProtocolLibHook protocollibHook;
 	private final PlaceholderAPIHook placeholderapiHook;
@@ -33,6 +34,7 @@ public class IntegrationManager {
 		discordsrvHook = new DiscordSrvHook(konquest);
 		dynmapHook = new DynmapHook(konquest);
 		bluemapHook = new BlueMapHook(konquest);
+		squaremapHook = new SquaremapHook(konquest);
 		worldguardHook = new WorldGuardHook(konquest);
 		protocollibHook = new ProtocolLibHook();
 		placeholderapiHook = new PlaceholderAPIHook();
@@ -44,6 +46,7 @@ public class IntegrationManager {
 		hooks.add(luckpermsHook);
 		hooks.add(dynmapHook);
 		hooks.add(bluemapHook);
+		hooks.add(squaremapHook);
 		hooks.add(worldguardHook);
 		hooks.add(discordsrvHook);
 		hooks.add(quickshopHook);
@@ -126,6 +129,10 @@ public class IntegrationManager {
 
 	public BlueMapHook getBlueMap() {
 		return bluemapHook;
+	}
+
+	public SquaremapHook getSquaremap() {
+		return squaremapHook;
 	}
 
 	public WorldGuardHook getWorldGuard() {

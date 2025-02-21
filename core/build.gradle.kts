@@ -64,6 +64,7 @@ dependencies{
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5")
     compileOnly("net.essentialsx:EssentialsX:2.20.1")
+    compileOnly("xyz.jpenilla:squaremap-api:1.3.4")
 
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.xerial:sqlite-jdbc:3.41.2.2")
