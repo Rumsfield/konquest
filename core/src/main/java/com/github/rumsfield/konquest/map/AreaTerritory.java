@@ -23,6 +23,7 @@ public class AreaTerritory {
 	private final List<double[]> zContours;
 	private final String worldName;
 	private final Location center;
+	private final KonTerritory territory;
 	
 	private enum FaceDirection {
 		NE,
@@ -47,6 +48,7 @@ public class AreaTerritory {
 	}
 	
 	public AreaTerritory(KonTerritory territory) {
+		this.territory = territory;
 		this.worldName = territory.getWorld().getName();
 		this.areaPoints = territory.getChunkList().keySet();
 		this.center = territory.getCenterLoc();
@@ -139,6 +141,10 @@ public class AreaTerritory {
 	
 	public double getCenterZ() {
 		return center.getZ();
+	}
+
+	public KonTerritory getTerritory() {
+		return territory;
 	}
 	
 	/**

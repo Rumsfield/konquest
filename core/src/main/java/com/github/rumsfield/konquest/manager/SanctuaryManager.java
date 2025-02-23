@@ -331,7 +331,7 @@ public class SanctuaryManager {
 				sanctuary.stopTemplateBlanking(name);
 				result = sanctuary.removeTemplate(name);
 				// Update Sanctuary Label
-				konquest.getMapHandler().drawLabel(sanctuary);
+				konquest.getMapHandler().drawLabelTerritory(sanctuary);
 				sanctuaryName = sanctuary.getName();
 				break;
 			}
@@ -436,7 +436,7 @@ public class SanctuaryManager {
 			}
 		}
 		// Update Sanctuary Label
-		konquest.getMapHandler().drawLabel(sanctuary);
+		konquest.getMapHandler().drawLabelTerritory(sanctuary);
 		// Before exit, save to file
 		if(status == 0 && save) {
 			saveSanctuaries();

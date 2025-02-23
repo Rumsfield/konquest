@@ -2,11 +2,9 @@ package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.event.kingdom.KonquestKingdomCapitalSwapEvent;
-import com.github.rumsfield.konquest.api.event.town.KonquestTownDestroyPostEvent;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.api.model.KonquestUpgrade;
 import com.github.rumsfield.konquest.utility.Timer;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
@@ -332,7 +330,7 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 		OfflinePlayer townPlayer = Bukkit.getOfflinePlayer(id);
 		for(KonTown town : getCapitalTowns()) {
 			if(town.removePlayerResident(townPlayer)) {
-				konquest.getMapHandler().drawLabel(town);
+				konquest.getMapHandler().drawLabelTerritory(town);
 			}
 		}
 	}

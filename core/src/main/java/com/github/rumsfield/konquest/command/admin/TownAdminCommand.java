@@ -10,11 +10,8 @@ import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.util.StringUtil;
 
 import java.util.*;
 
@@ -188,8 +185,8 @@ public class TownAdminCommand extends CommandBase {
 					if(createdTown != null) {
 						player.getBukkitPlayer().teleport(konquest.getKingdomManager().getKingdom(createKingdomName).getTown(townName).getSpawnLoc());
 						// Update labels
-						konquest.getMapHandler().drawLabel(createdTown);
-						konquest.getMapHandler().drawLabel(createdTown.getKingdom().getCapital());
+						konquest.getMapHandler().drawLabelTerritory(createdTown);
+						konquest.getMapHandler().drawLabelTerritory(createdTown.getKingdom().getCapital());
 						ChatUtil.sendNotice(sender, MessagePath.COMMAND_SETTLE_NOTICE_SUCCESS.getMessage(townName));
 					} else {
 						ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage());

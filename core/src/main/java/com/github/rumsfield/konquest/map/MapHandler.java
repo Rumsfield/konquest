@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -56,26 +57,51 @@ public class MapHandler {
 	/* Rendering Methods */
 
 	public void drawUpdateTerritory(KonKingdom kingdom) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawUpdate(kingdom);
+		drawUpdateTerritory(kingdom,"");
+	}
+
+	public void drawUpdateTerritory(KonKingdom kingdom, String rendererName) {
+		for (KonTown town : kingdom.getCapitalTowns()) {
+			drawUpdateTerritory(town, rendererName);
 		}
 	}
 
 	public void drawUpdateTerritory(KonTerritory territory) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawUpdate(territory);
+		drawUpdateTerritory(territory,"");
+	}
+
+	public void drawUpdateTerritory(KonTerritory territory, String rendererName) {
+		if (isTerritoryDisabled(territory) || isTerritoryInvalid(territory)) return;
+		AreaTerritory area = new AreaTerritory(territory);
+		// Draw updates
+		for (Renderable render : getRenderers(rendererName)) {
+			render.drawUpdate(area);
 		}
 	}
 
 	public void drawRemoveTerritory(KonTerritory territory) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawRemove(territory);
+		drawRemoveTerritory(territory,"");
+	}
+
+	public void drawRemoveTerritory(KonTerritory territory, String rendererName) {
+		if (isTerritoryDisabled(territory) || isTerritoryInvalid(territory)) return;
+		AreaTerritory area = new AreaTerritory(territory);
+		// Draw removes
+		for (Renderable render : getRenderers(rendererName)) {
+			render.drawRemove(area);
 		}
 	}
+
+	public void drawLabelTerritory(KonTerritory territory) {
+		drawLabelTerritory(territory,"");
+	}
 	
-	public void drawLabel(KonTerritory territory) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawLabel(territory);
+	public void drawLabelTerritory(KonTerritory territory, String rendererName) {
+		if (isTerritoryDisabled(territory) || isTerritoryInvalid(territory)) return;
+		AreaTerritory area = new AreaTerritory(territory);
+		// Draw labels
+		for (Renderable render : getRenderers(rendererName)) {
+			render.drawLabel(area);
 		}
 	}
 	
@@ -84,64 +110,50 @@ public class MapHandler {
 			ren.postBroadcast(message);
 		}
 	}
-	
-	public void drawAllTerritories() {
-		Date start = new Date();
-		// Sanctuaries
-		for (KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(sanctuary);
-			}
-		}
-		// Ruins
-		for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(ruin);
-			}
-		}
-		// Camps
-		for (KonCamp camp : konquest.getCampManager().getCamps()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(camp);
-			}
-		}
-		// Kingdoms
-		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(kingdom);
-			}
-		}
-		Date end = new Date();
-		int time = (int)(end.getTime() - start.getTime());
-		ChatUtil.printDebug("Rendering all territories in maps took "+time+" ms");
-	}
 
+	public void drawAllTerritories() {
+		drawAllTerritories("");
+	}
+	
 	public void drawAllTerritories(String rendererName) {
 		Date start = new Date();
-		Renderable renderer = renderers.get(rendererName);
-		if(renderer == null) {
-			ChatUtil.printDebug("Failed to draw with unknown renderer "+rendererName);
-			return;
-		}
 		// Sanctuaries
 		for (KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			renderer.drawUpdate(sanctuary);
+			drawUpdateTerritory(sanctuary, rendererName);
 		}
 		// Ruins
 		for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			renderer.drawUpdate(ruin);
+			drawUpdateTerritory(ruin, rendererName);
 		}
 		// Camps
 		for (KonCamp camp : konquest.getCampManager().getCamps()) {
-			renderer.drawUpdate(camp);
+			drawUpdateTerritory(camp, rendererName);
 		}
 		// Kingdoms
 		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			renderer.drawUpdate(kingdom);
+			drawUpdateTerritory(kingdom, rendererName);
 		}
 		Date end = new Date();
 		int time = (int)(end.getTime() - start.getTime());
-		ChatUtil.printDebug("Rendering all territories with "+rendererName+" took "+time+" ms");
+		if (rendererName.isEmpty()) {
+			ChatUtil.printDebug("Rendering all territories in maps took "+time+" ms");
+		} else {
+			ChatUtil.printDebug("Rendering all territories with "+rendererName+" took "+time+" ms");
+		}
+	}
+
+	/* Helper Methods */
+
+	private ArrayList<Renderable> getRenderers(String name) {
+		ArrayList<Renderable> renderList = new ArrayList<>();
+		if(name.isEmpty() || !renderers.containsKey(name)) {
+			// Include all renderers
+			renderList.addAll(renderers.values());
+		} else {
+			// Only include the specified renderer
+			renderList.add(renderers.get(name));
+		}
+		return renderList;
 	}
 
 	public static int getWebColor(KonTerritory territory) {
@@ -156,7 +168,7 @@ public class MapHandler {
 		return result;
 	}
 
-	static boolean isTerritoryInvalid(KonTerritory territory) {
+	private boolean isTerritoryInvalid(KonTerritory territory) {
 		boolean isValid = false;
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
@@ -177,7 +189,7 @@ public class MapHandler {
 		return !isValid;
 	}
 
-	static boolean isTerritoryDisabled(KonTerritory territory) {
+	private boolean isTerritoryDisabled(KonTerritory territory) {
 		boolean result = false;
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:

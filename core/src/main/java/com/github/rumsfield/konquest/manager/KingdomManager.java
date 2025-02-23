@@ -1044,7 +1044,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
 		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
 		// Update maps
-    	konquest.getMapHandler().drawLabel(joinKingdom.getCapital());
+    	konquest.getMapHandler().drawLabelTerritory(joinKingdom.getCapital());
     	updateSmallestKingdom();
     	
 		return 0;
@@ -1232,7 +1232,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
 		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
 		// Common updates
-    	konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
+    	konquest.getMapHandler().drawLabelTerritory(getKingdom(oldKingdomName).getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
     	
@@ -2507,7 +2507,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		// Update maps
 		konquest.getMapHandler().drawRemoveTerritory(town);
-		konquest.getMapHandler().drawLabel(town.getKingdom().getCapital());
+		konquest.getMapHandler().drawLabelTerritory(town.getKingdom().getCapital());
 		// Update shops
 		konquest.getShopHandler().deleteShopsInPoints(townPoints,town.getWorld());
 		return true;
@@ -2581,8 +2581,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 			captureTown.clearPlots();
 			konquest.getMapHandler().drawUpdateTerritory(captureTown);
-			konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
-			konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
+			konquest.getMapHandler().drawLabelTerritory(getKingdom(oldKingdomName).getCapital());
+			konquest.getMapHandler().drawLabelTerritory(conquerKingdom.getCapital());
 			konquest.getShopHandler().deleteShopsInPoints(captureTown.getChunkList().keySet(),captureTown.getWorld());
 			// Post-capture updates
 			captureTownUpdate(captureTown);
@@ -2666,7 +2666,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     			refreshTownHearts(town);
 				town.updateBarPlayers();
 				konquest.getMapHandler().drawUpdateTerritory(town);
-				konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
+				konquest.getMapHandler().drawLabelTerritory(conquerKingdom.getCapital());
 				konquest.getShopHandler().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
 				// Fire event
 				Konquest.callKonquestEvent(new KonquestKingdomConquerEvent(konquest, oldKingdomName, conquerKingdom));

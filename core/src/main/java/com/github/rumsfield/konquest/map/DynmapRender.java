@@ -60,23 +60,11 @@ public class DynmapRender implements Renderable {
      */
 
     @Override
-    public void drawUpdate(KonKingdom kingdom) {
-        drawUpdate(kingdom.getCapital());
-        for (KonTown town : kingdom.getTowns()) {
-            drawUpdate(town);
-        }
-    }
-
-    @Override
-    public void drawUpdate(KonTerritory territory) {
+    public void drawUpdate(AreaTerritory area) {
         if (!isEnabled) return;
 
-        if(MapHandler.isTerritoryDisabled(territory)) return;
+        KonTerritory territory = area.getTerritory();
 
-        if (MapHandler.isTerritoryInvalid(territory)) {
-            ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
-            return;
-        }
         String groupId = getGroupId(territory);
         String groupLabel = MapHandler.getGroupLabel(territory);
         String areaId = getAreaId(territory);
@@ -96,11 +84,10 @@ public class DynmapRender implements Renderable {
         AreaMarker areaPoint;
         AreaMarker areaContour;
         // Prune any points and contours
-        AreaTerritory drawArea = new AreaTerritory(territory);
         if(areaCache.containsKey(territory)) {
             // Territory is already rendered
             AreaTerritory oldArea = areaCache.get(territory);
-            for(int i = (oldArea.getNumContours()-1); i >= drawArea.getNumContours(); i--) {
+            for(int i = (oldArea.getNumContours()-1); i >= area.getNumContours(); i--) {
                 contourId = areaId + ".contour." + i;
                 areaContour = territoryGroup.findAreaMarker(contourId);
                 if (areaContour != null) {
@@ -108,7 +95,7 @@ public class DynmapRender implements Renderable {
                     areaContour.deleteMarker();
                 }
             }
-            for(int i = (oldArea.getNumPoints()-1); i >= drawArea.getNumPoints(); i--) {
+            for(int i = (oldArea.getNumPoints()-1); i >= area.getNumPoints(); i--) {
                 pointId = areaId + ".point." + i;
                 areaPoint = territoryGroup.findAreaMarker(pointId);
                 if (areaPoint != null) {
@@ -117,30 +104,30 @@ public class DynmapRender implements Renderable {
                 }
             }
         }
-        areaCache.put(territory, drawArea);
+        areaCache.put(territory, area);
         // Update or create all points and contours
-        for(int i = 0; i < drawArea.getNumContours(); i++) {
+        for(int i = 0; i < area.getNumContours(); i++) {
             contourId = areaId + ".contour." + i;
             areaContour = territoryGroup.findAreaMarker(contourId);
             if (areaContour == null) {
                 // Area does not exist, create new
-                areaContour = territoryGroup.createAreaMarker(contourId, "", false, drawArea.getWorldName(), drawArea.getXContour(i), drawArea.getZContour(i), false);
+                areaContour = territoryGroup.createAreaMarker(contourId, "", false, area.getWorldName(), area.getXContour(i), area.getZContour(i), false);
                 if (areaContour != null) {
                     areaContour.setFillStyle(0, areaColor);
                     areaContour.setLineStyle(1, 1, lineColor);
                 }
             } else {
                 // Area already exists, update corners and color
-                areaContour.setCornerLocations(drawArea.getXContour(i), drawArea.getZContour(i));
+                areaContour.setCornerLocations(area.getXContour(i), area.getZContour(i));
                 areaContour.setFillStyle(0, areaColor);
             }
         }
-        for(int i = 0; i < drawArea.getNumPoints(); i++) {
+        for(int i = 0; i < area.getNumPoints(); i++) {
             pointId = areaId + ".point." + i;
             areaPoint = territoryGroup.findAreaMarker(pointId);
             if (areaPoint == null) {
                 // Area does not exist, create new
-                areaPoint = territoryGroup.createAreaMarker(pointId, areaLabel, true, drawArea.getWorldName(), drawArea.getXPoint(i), drawArea.getZPoint(i), false);
+                areaPoint = territoryGroup.createAreaMarker(pointId, areaLabel, true, area.getWorldName(), area.getXPoint(i), area.getZPoint(i), false);
                 if (areaPoint != null) {
                     areaPoint.setFillStyle(0.5, areaColor);
                     areaPoint.setLineStyle(0, 0, lineColor);
@@ -148,7 +135,7 @@ public class DynmapRender implements Renderable {
                 }
             } else {
                 // Area already exists, update corners and label and color
-                areaPoint.setCornerLocations(drawArea.getXPoint(i), drawArea.getZPoint(i));
+                areaPoint.setCornerLocations(area.getXPoint(i), area.getZPoint(i));
                 areaPoint.setLabel(areaLabel,true);
                 areaPoint.setFillStyle(0.5, areaColor);
             }
@@ -156,7 +143,7 @@ public class DynmapRender implements Renderable {
         Marker territoryIcon = territoryGroup.findMarker(iconId);
         if (territoryIcon == null) {
             // Icon does not exist, create new
-            territoryIcon = territoryGroup.createMarker(iconId, iconLabel, true, drawArea.getWorldName(), drawArea.getCenterX(), drawArea.getCenterY(), drawArea.getCenterZ(), icon, false);
+            territoryIcon = territoryGroup.createMarker(iconId, iconLabel, true, area.getWorldName(), area.getCenterX(), area.getCenterY(), area.getCenterZ(), icon, false);
         } else {
             // Icon already exists, update label
             territoryIcon.setLabel(iconLabel);
@@ -164,15 +151,11 @@ public class DynmapRender implements Renderable {
     }
 
     @Override
-    public void drawRemove(KonTerritory territory) {
+    public void drawRemove(AreaTerritory area) {
         if (!isEnabled) return;
 
-        if(MapHandler.isTerritoryDisabled(territory)) return;
+        KonTerritory territory = area.getTerritory();
 
-        if (MapHandler.isTerritoryInvalid(territory)) {
-            ChatUtil.printDebug("Could not delete territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
-            return;
-        }
         ChatUtil.printDebug("Erasing Dynmap area of territory "+territory.getName());
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
@@ -221,15 +204,11 @@ public class DynmapRender implements Renderable {
     }
 
     @Override
-    public void drawLabel(KonTerritory territory) {
+    public void drawLabel(AreaTerritory area) {
         if (!isEnabled) return;
 
-        if(MapHandler.isTerritoryDisabled(territory)) return;
+        KonTerritory territory = area.getTerritory();
 
-        if (MapHandler.isTerritoryInvalid(territory)) {
-            ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
-            return;
-        }
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
         String areaLabel = MapHandler.getAreaLabel(territory);

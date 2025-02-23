@@ -1,7 +1,6 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownRaidEvent;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
@@ -1413,7 +1412,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		residents.put(id,true);
 		if (doUpdates) {
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawLabel(this);
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 		}
 	}
 	
@@ -1464,7 +1463,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			residents.put(playerUUID,isElite);
 			if (doUpdates) {
 				getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-				getKonquest().getMapHandler().drawLabel(this);
+				getKonquest().getMapHandler().drawLabelTerritory(this);
 			}
 			status = true;
 		}
@@ -1480,7 +1479,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				lord = null;
 			}
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawLabel(this);
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 			if(residents.isEmpty()) {
 				clearShieldsArmors();
 			}

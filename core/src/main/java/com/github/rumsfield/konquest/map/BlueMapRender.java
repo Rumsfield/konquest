@@ -3,9 +3,7 @@ package com.github.rumsfield.konquest.map;
 import com.flowpowered.math.vector.Vector2d;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
-import com.github.rumsfield.konquest.model.KonKingdom;
 import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
@@ -64,24 +62,12 @@ public class BlueMapRender implements Renderable {
      */
 
     @Override
-    public void drawUpdate(KonKingdom kingdom) {
-        drawUpdate(kingdom.getCapital());
-        for (KonTown town : kingdom.getTowns()) {
-            drawUpdate(town);
-        }
-    }
-
-    @Override
-    public void drawUpdate(KonTerritory territory) {
+    public void drawUpdate(AreaTerritory area) {
         if (!isEnabled) return;
 
-        if(MapHandler.isTerritoryDisabled(territory)) return;
+        KonTerritory territory = area.getTerritory();
 
-        if (MapHandler.isTerritoryInvalid(territory)) {
-            ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
-            return;
-        }
-
+        float areaY = (float)territory.getCenterLoc().getY();
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
         String groupLabel = MapHandler.getGroupLabel(territory); // The display name of the group
@@ -109,21 +95,17 @@ public class BlueMapRender implements Renderable {
                     .build();
         }
 
-        // Render markers for the territory
-        AreaTerritory drawArea = new AreaTerritory(territory);
-        float areaY = (float)territory.getCenterLoc().getY();
-
         // Create an area shape
         ShapeMarker.Builder areaBuilder = ShapeMarker.builder()
                 .label(areaLabel)
                 .fillColor(areaColor)
                 .lineColor(lineColor);
-        for(int i = 0; i < drawArea.getNumContours(); i++) {
+        for(int i = 0; i < area.getNumContours(); i++) {
             // Build a new shape from the current area
             // First contour is always the outline
             // The rest are holes
-            double[] xPoints = drawArea.getXContour(i);
-            double[] zPoints = drawArea.getZContour(i);
+            double[] xPoints = area.getXContour(i);
+            double[] zPoints = area.getZContour(i);
             Shape.Builder shapeBuilder = Shape.builder();
             for(int c = 0; c < xPoints.length; c++) {
                 Vector2d point = new Vector2d(xPoints[c], zPoints[c]);
@@ -153,15 +135,11 @@ public class BlueMapRender implements Renderable {
     }
 
     @Override
-    public void drawRemove(KonTerritory territory) {
+    public void drawRemove(AreaTerritory area) {
         if (!isEnabled) return;
 
-        if(MapHandler.isTerritoryDisabled(territory)) return;
+        KonTerritory territory = area.getTerritory();
 
-        if (MapHandler.isTerritoryInvalid(territory)) {
-            ChatUtil.printDebug("Could not delete territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
-            return;
-        }
         ChatUtil.printDebug("Erasing BlueMap area of territory "+territory.getName());
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
@@ -178,22 +156,18 @@ public class BlueMapRender implements Renderable {
                         ChatUtil.printDebug("Removing BlueMap group of territory "+territory.getName());
                     }
                 } else {
-                    ChatUtil.printDebug("Failed to erase from missing group, territory "+territory.getName());
+                    ChatUtil.printDebug("Failed to erase from missing BlueMap group, territory "+territory.getName());
                 }
             }
         }
     }
 
     @Override
-    public void drawLabel(KonTerritory territory) {
+    public void drawLabel(AreaTerritory area) {
         if (!isEnabled) return;
 
-        if(MapHandler.isTerritoryDisabled(territory)) return;
+        KonTerritory territory = area.getTerritory();
 
-        if (MapHandler.isTerritoryInvalid(territory)) {
-            ChatUtil.printDebug("Could not update label for territory "+territory.getName()+" with invalid type, "+territory.getTerritoryType().toString());
-            return;
-        }
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
         String areaDetail = MapHandler.getAreaLabel(territory);
@@ -210,9 +184,9 @@ public class BlueMapRender implements Renderable {
                     ChatUtil.printDebug("Failed to set detail of missing area, BlueMap territory "+territory.getName());
                     continue;
                 }
-                Marker area = territoryGroup.get(areaId);
-                if(area instanceof DetailMarker) {
-                    ((DetailMarker)area).setDetail(areaDetail);
+                Marker detailLabel = territoryGroup.get(areaId);
+                if(detailLabel instanceof DetailMarker) {
+                    ((DetailMarker)detailLabel).setDetail(areaDetail);
                 } else {
                     ChatUtil.printDebug("Failed to set detail of wrong marker type, BlueMap territory "+territory.getName());
                 }
