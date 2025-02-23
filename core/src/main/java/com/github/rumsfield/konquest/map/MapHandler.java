@@ -5,10 +5,13 @@ import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 //TODO: Make this class into a listener, make events for territory updates, deletes, etc
 
@@ -52,6 +55,45 @@ public class MapHandler {
 		isEnableCamps = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_CAMPS.getPath());
 		isEnableSanctuaries = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_SANCTUARIES.getPath());
 		isEnableRuins = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_RUINS.getPath());
+
+		printMapFeatures();
+	}
+
+	private void printMapFeatures() {
+		String lineTemplate = "%-30s -> %s";
+		String unavailable = ChatColor.GRAY+"Unavailable";
+		String statusKingdoms = ChatUtil.boolean2enable(isEnableKingdoms);
+		String statusCamps = ChatUtil.boolean2enable(isEnableCamps);
+		String statusSanctuaries = ChatUtil.boolean2enable(isEnableSanctuaries);
+		String statusRuins = ChatUtil.boolean2enable(isEnableRuins);
+		StringBuilder availableMaps = new StringBuilder();
+		if (renderers.isEmpty()) {
+			availableMaps.append("None");
+			statusKingdoms =unavailable;
+			statusCamps =unavailable;
+			statusSanctuaries =unavailable;
+			statusRuins =unavailable;
+		} else {
+			Iterator<Renderable> renderIterator = renderers.values().iterator();
+			while (renderIterator.hasNext()) {
+				availableMaps.append(renderIterator.next().getMapName());
+				if (renderIterator.hasNext()) {
+					availableMaps.append(", ");
+				}
+			}
+		}
+		String [] status = {
+				String.format(lineTemplate,"Available Maps", availableMaps),
+				String.format(lineTemplate,"Show Kingdoms",statusKingdoms),
+				String.format(lineTemplate,"Show Barbarian Camps",statusCamps),
+				String.format(lineTemplate,"Show Sanctuaries",statusSanctuaries),
+				String.format(lineTemplate,"Show Ruins",statusRuins),
+		};
+		ChatUtil.printConsoleAlert("Map Summary...");
+		for (String row : status) {
+			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
 	}
 
 	/* Rendering Methods */

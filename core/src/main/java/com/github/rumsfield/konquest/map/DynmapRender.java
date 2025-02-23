@@ -35,6 +35,11 @@ public class DynmapRender implements Renderable {
         }
     }
 
+    @Override
+    public String getMapName() {
+        return konquest.getIntegrationManager().getDynmap().getPluginName();
+    }
+
     /*
      * Dynmap Area ID formats:
      * Sanctuaries

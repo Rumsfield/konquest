@@ -33,4 +33,10 @@ public interface Renderable {
      */
     void postBroadcast(String message);
 
+    /**
+     * Get the name of the mapping service.
+     * @return The map plugin's name
+     */
+    String getMapName();
+
 }

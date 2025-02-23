@@ -38,6 +38,11 @@ public class SquaremapRender implements Renderable {
         }
     }
 
+    @Override
+    public String getMapName() {
+        return konquest.getIntegrationManager().getSquaremap().getPluginName();
+    }
+
     /*
      * squaremap Marker Key formats:
      * Sanctuaries
@@ -88,9 +93,10 @@ public class SquaremapRender implements Renderable {
         // Ensure group layer exists in the registry
         final Registry<LayerProvider> layerRegistry = mapWorld.layerRegistry();
         if (!layerRegistry.hasEntry(groupKey)) {
-            ChatUtil.printDebug("Creating new group layer in squaremap for territory "+territory.getName());
+            ChatUtil.printDebug("Creating new group layer "+groupKey.getKey()+" in squaremap for territory "+territory.getName());
             int index = getGroupIndex(territory);
             layerRegistry.register(groupKey, SimpleLayerProvider.builder(groupLabel)
+                    .showControls(true)
                     .defaultHidden(false)
                     .layerPriority(index)
                     .zIndex(index)
@@ -123,7 +129,7 @@ public class SquaremapRender implements Renderable {
         final MarkerOptions markerOptions = MarkerOptions.builder()
                 .stroke(true)
                 .strokeColor(lineColor)
-                .strokeWeight(4)
+                .strokeWeight(3)
                 .strokeOpacity(0.5)
                 .fill(true)
                 .fillColor(areaColor)

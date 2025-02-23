@@ -42,6 +42,11 @@ public class BlueMapRender implements Renderable {
         }
     }
 
+    @Override
+    public String getMapName() {
+        return konquest.getIntegrationManager().getBlueMap().getPluginName();
+    }
+
     /*
      * BlueMap Marker ID formats:
      * Sanctuaries
