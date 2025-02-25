@@ -301,34 +301,35 @@ public class MapHandler {
 
 	static String getAreaLabel(KonTerritory territory) {
 		String result = "Konquest";
-		String bodyBegin = "<body style=\"background-color:#fff0cc;font-family:Georgia;\">";
-		String nameHeaderFormat = "<h2 style=\"color:#de791b;\">%s</h2>";
+		String bodyBegin = "<body style=\"background-color:#fff0cc;font-family:Helvetica;\">";
+		String nameHeaderFormat = "<h2 style=\"text-align:center;color:#de791b;\">%s</h2>";
 		String typeHeaderFormat = "<h3 style=\"color:#8048b8;\">%s</h3>";
-		String propertyLineFormat = "%s: %s <br>";
+		String propertyLineFormat = "<b>%s:</b> %s <br>";
 		StringBuilder labelMaker = new StringBuilder();
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
 				KonSanctuary sanctuary = (KonSanctuary)territory;
-				int numTemplates = sanctuary.getTemplates().size();
 				result = labelMaker.append(bodyBegin)
 						.append(String.format(nameHeaderFormat, sanctuary.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_SANCTUARY.getMessage()))
 						.append("<p>")
-						.append(String.format(propertyLineFormat, MessagePath.MAP_TEMPLATES.getMessage(), numTemplates))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_TEMPLATES.getMessage(), sanctuary.getTemplates().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), sanctuary.getChunkList().size()))
 						.append("</p>")
 						.append("</body>")
 						.toString();
 				break;
 			case RUIN:
 				KonRuin ruin = (KonRuin)territory;
-				int numCriticals = ruin.getMaxCriticalHits();
-				int numSpawns = ruin.getSpawnLocations().size();
 				result = labelMaker.append(bodyBegin)
 						.append(String.format(nameHeaderFormat, ruin.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_RUIN.getMessage()))
 						.append("<p>")
-						.append(String.format(propertyLineFormat, MessagePath.MAP_CRITICAL_HITS.getMessage(), numCriticals))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_GOLEM_SPAWNS.getMessage(), numSpawns))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CRITICAL_HITS.getMessage(), ruin.getMaxCriticalHits()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_GOLEM_SPAWNS.getMessage(), ruin.getSpawnLocations().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), ruin.getChunkList().size()))
 						.append("</p>")
 						.append("</body>")
 						.toString();
@@ -337,9 +338,11 @@ public class MapHandler {
 				KonCamp camp = (KonCamp)territory;
 				result = labelMaker.append(bodyBegin)
 						.append(String.format(nameHeaderFormat, camp.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_BARBARIANS.getMessage()))
 						.append("<p>")
-						.append(String.format(propertyLineFormat, MessagePath.LABEL_PLAYER.getMessage(), camp.getOwner().getName()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_OWNER.getMessage(), camp.getOwner().getName()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), camp.getChunkList().size()))
 						.append("</p>")
 						.append("</body>")
 						.toString();
@@ -350,6 +353,11 @@ public class MapHandler {
 				if(capital.getPlayerLord() != null) {
 					capitalLordName = capital.getPlayerLord().getName();
 				}
+				String kingdomMasterName = "-";
+				if(capital.getKingdom().isMasterValid()) {
+					kingdomMasterName = capital.getKingdom().getPlayerMaster().getName();
+				}
+				int numKingdomOfficers = capital.getKingdom().getPlayerOfficersOnly().size();
 				int numAllKingdomPlayers = territory.getKingdom().getNumMembers();
 				int numKingdomTowns = territory.getKingdom().getTowns().size();
 				int numKingdomLand = 0;
@@ -358,18 +366,22 @@ public class MapHandler {
 				}
 				result = labelMaker.append(bodyBegin)
 						.append(String.format(nameHeaderFormat, capital.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_CAPITAL.getMessage()))
 						.append("<p>")
 						.append(String.format(propertyLineFormat, MessagePath.MAP_KINGDOM.getMessage(), capital.getKingdom().getName()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LORD.getMessage(), capitalLordName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_KNIGHTS.getMessage(), capital.getPlayerKnightsOnly().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_RESIDENTS.getMessage(), capital.getNumResidents()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), capital.getNumLand()))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_POPULATION.getMessage(), capital.getNumResidents()))
 						.append("</p>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_KINGDOM.getMessage()))
 						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.MAP_MASTER.getMessage(), kingdomMasterName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_OFFICERS.getMessage(), numKingdomOfficers))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_MEMBERS.getMessage(), numAllKingdomPlayers))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_TOWNS.getMessage(), numKingdomTowns))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), numKingdomLand))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_PLAYERS.getMessage(), numAllKingdomPlayers))
 						.append("</p>")
 						.append("</body>")
 						.toString();
@@ -382,12 +394,14 @@ public class MapHandler {
 				}
 				result = labelMaker.append(bodyBegin)
 						.append(String.format(nameHeaderFormat, town.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_TOWN.getMessage()))
 						.append("<p>")
 						.append(String.format(propertyLineFormat, MessagePath.MAP_KINGDOM.getMessage(), town.getKingdom().getName()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LORD.getMessage(), townLordName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_KNIGHTS.getMessage(), town.getPlayerKnightsOnly().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_RESIDENTS.getMessage(), town.getNumResidents()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), town.getNumLand()))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_POPULATION.getMessage(), town.getNumResidents()))
 						.append("</p>")
 						.append("</body>")
 						.toString();

@@ -137,9 +137,13 @@ map:
   town: 城鎮
   towns: 城鎮
   land: 土地
-  players: 玩家
+  owner: 擁有者
   lord: 領主
-  population: 人口
+  knights: 騎士
+  residents: 居民
+  master: 王國大師
+  officers: 官員
+  members: 成員
   ruin: 遺跡
   critical-hits: 致命打擊
   golem-spawns: 鐵傀儡生成

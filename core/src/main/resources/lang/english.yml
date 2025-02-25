@@ -137,9 +137,13 @@ map:
   town: Town
   towns: Towns
   land: Land
-  players: Players
+  owner: Owner
   lord: Lord
-  population: Population
+  knights: Knights
+  residents: Residents
+  master: Master
+  officers: Officers
+  members: Members
   ruin: Ruin
   critical-hits: Critical Hits
   golem-spawns: Golem Spawns

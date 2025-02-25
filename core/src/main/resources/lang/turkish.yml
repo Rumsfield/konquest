@@ -137,9 +137,13 @@ map:
   town: Kasaba
   towns: Kasabalar
   land: Alan
-  players: Oyuncular
+  owner: Mal sahibi
   lord: Lord
-  population: Nüfus
+  knights: Şovalyeler
+  residents: Oturan Kişiler
+  master: Usta
+  officers: Memurlar
+  members: Üyeler
   ruin: Kalıntı
   critical-hits: Kritik Vuruşlar
   golem-spawns: Golem Doğum Yeri

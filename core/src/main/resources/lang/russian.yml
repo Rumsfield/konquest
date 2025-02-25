@@ -137,9 +137,13 @@ map:
   town: Город
   towns: Города
   land: Земли
-  players: Игроки
+  owner: Владелец
   lord: Лорд
-  population: Население
+  knights: Рыцари
+  residents: Жители
+  master: Мастер
+  officers: Офицеры
+  members: Участвующе
   ruin: Руины
   critical-hits: Критический урон
   golem-spawns: Спавн големов
