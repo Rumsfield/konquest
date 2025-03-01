@@ -86,7 +86,10 @@ tasks {
     }
 
     processResources {
-        filter<org.apache.tools.ant.filters.ReplaceTokens>("tokens" to mapOf("version" to project.version))
+        // Apply filtering only to specific text-based files.
+        filesMatching("**/*.yml") {
+            filter<org.apache.tools.ant.filters.ReplaceTokens>("tokens" to mapOf("version" to project.version))
+        }
     }
 }
 

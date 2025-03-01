@@ -9,7 +9,11 @@ import xyz.jpenilla.squaremap.api.Point;
 import xyz.jpenilla.squaremap.api.marker.Marker;
 import xyz.jpenilla.squaremap.api.marker.MarkerOptions;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +38,25 @@ public class SquaremapRender implements Renderable {
             if(api == null) {
                 isEnabled = false;
                 ChatUtil.printDebug("Failed to initialize SquaremapRender with null API reference.");
+            } else {
+                // Register icons
+                ArrayList<KonquestTerritoryType> iconTypes = new ArrayList<>();
+                iconTypes.add(KonquestTerritoryType.CAPITAL);
+                iconTypes.add(KonquestTerritoryType.TOWN);
+                iconTypes.add(KonquestTerritoryType.SANCTUARY);
+                iconTypes.add(KonquestTerritoryType.RUIN);
+                iconTypes.add(KonquestTerritoryType.CAMP);
+                for (KonquestTerritoryType type : iconTypes) {
+                    BufferedImage iconImage = getIconImage(type);
+                    if (iconImage != null) {
+                        Key imageKey = getImageKey(type);
+                        if (!api.iconRegistry().hasEntry(imageKey)) {
+                            api.iconRegistry().register(imageKey, iconImage);
+                        }
+                    } else {
+                        ChatUtil.printConsoleError("Failed to register null image with squaremap for territory "+type);
+                    }
+                }
             }
         }
     }
@@ -47,19 +70,29 @@ public class SquaremapRender implements Renderable {
      * squaremap Marker Key formats:
      * Sanctuaries
      * 		Layer Group:  		    konquest.marker.sanctuary
+     *      Icon Image:             konquest.image.sanctuary
      * 		Marker Shapes: 	        konquest.area.sanctuary.<name>
+     *      Marker Icon:            konquest.icon.sanctuary.<name>
      * Ruins
      * 		Layer Group:  		    konquest.marker.ruin
+     *      Icon Image:             konquest.image.ruin
      * 		Marker Shapes: 	        konquest.area.ruin.<name>
+     * 		Marker Icon: 	        konquest.icon.ruin.<name>
      * Camps
      * 		Layer Group:  		    konquest.marker.camp
+     *      Icon Image:             konquest.image.camp
      * 		Marker Shapes: 	        konquest.area.camp.<name>
+     * 		Marker Icon: 	        konquest.icon.camp.<name>
      * Kingdoms
      * 		Layer Group:  		    konquest.marker.kingdom
      * 		Capital
+     *      Icon Image:             konquest.image.kingdom.capital
      * 		Marker Shapes: 	        konquest.area.kingdom.<kingdom>.capital
+     * 		Marker Icon: 	        konquest.icon.kingdom.<kingdom>.capital
      * 		Towns
+     *      Icon Image:             konquest.image.kingdom.town
      * 		Marker Shapes: 	        konquest.area.kingdom.<kingdom>.<town>
+     * 		Marker Icon: 	        konquest.icon.kingdom.<kingdom>.<town>
      */
 
     /**
@@ -77,6 +110,8 @@ public class SquaremapRender implements Renderable {
 
         Key groupKey = getGroupKey(territory);
         Key areaKey = getAreaKey(territory);
+        Key imageKey = getImageKey(territory.getTerritoryType());
+        Key iconKey = getIconKey(territory);
         String groupLabel = MapHandler.getGroupLabel(territory); // The display name of the group
         String areaLabel = MapHandler.getIconLabel(territory); // The display name of the area (icon)
         String areaDetail = MapHandler.getAreaLabel(territory); // The display details of the area
@@ -139,8 +174,19 @@ public class SquaremapRender implements Renderable {
                 .build();
         areaShape.markerOptions(markerOptions);
 
-        // Add area to group layer
+        // Add area and icon to group layer
         groupLayerProvider.addMarker(areaKey, areaShape);
+
+        // Create an icon
+        if (api.iconRegistry().hasEntry(imageKey)) {
+            Marker iconImage = Marker.icon(Point.of(area.getCenterX(), area.getCenterZ()), imageKey, 15);
+            MarkerOptions iconOptions = iconImage.markerOptions().asBuilder()
+                    .clickTooltip(areaDetail)
+                    .hoverTooltip(areaLabel)
+                    .build();
+            iconImage.markerOptions(iconOptions);
+            groupLayerProvider.addMarker(iconKey, iconImage);
+        }
 
     }
 
@@ -158,6 +204,7 @@ public class SquaremapRender implements Renderable {
         ChatUtil.printDebug("Erasing squaremap area of territory "+territory.getName());
         Key groupKey = getGroupKey(territory);
         Key areaKey = getAreaKey(territory);
+        Key iconKey = getAreaKey(territory);
 
         // Get the layer provider
         MapWorld mapWorld = api.getWorldIfEnabled(BukkitAdapter.worldIdentifier(territory.getWorld())).orElse(null);
@@ -171,6 +218,7 @@ public class SquaremapRender implements Renderable {
         if (layerRegistry.hasEntry(groupKey)) {
             SimpleLayerProvider groupLayerProvider = (SimpleLayerProvider) layerRegistry.get(groupKey);
             groupLayerProvider.removeMarker(areaKey);
+            groupLayerProvider.removeMarker(iconKey);
             // Delete group if no more areas
             if (groupLayerProvider.getMarkers().isEmpty()) {
                 layerRegistry.unregister(groupKey);
@@ -194,6 +242,7 @@ public class SquaremapRender implements Renderable {
 
         Key groupKey = getGroupKey(territory);
         Key areaKey = getAreaKey(territory);
+        Key iconKey = getAreaKey(territory);
         String areaLabel = MapHandler.getIconLabel(territory); // The display name of the area (icon)
         String areaDetail = MapHandler.getAreaLabel(territory); // The display details of the area
         Color areaColor = getAreaColor(territory);
@@ -216,15 +265,23 @@ public class SquaremapRender implements Renderable {
             ChatUtil.printDebug("Failed to label missing squaremap marker, territory "+territory.getName());
             return;
         }
+        MarkerOptions markerOptions;
         // Get area marker
         Marker areaShape = groupLayerProvider.registeredMarkers().get(areaKey);
-        MarkerOptions markerOptions = areaShape.markerOptions().asBuilder()
+        markerOptions = areaShape.markerOptions().asBuilder()
                 .strokeColor(lineColor)
                 .fillColor(areaColor)
                 .clickTooltip(areaDetail)
                 .hoverTooltip(areaLabel)
                 .build();
         areaShape.markerOptions(markerOptions);
+        // Get icon marker
+        Marker icon = groupLayerProvider.registeredMarkers().get(iconKey);
+        markerOptions = icon.markerOptions().asBuilder()
+                .clickTooltip(areaDetail)
+                .hoverTooltip(areaLabel)
+                .build();
+        icon.markerOptions(markerOptions);
     }
 
     /**
@@ -299,6 +356,87 @@ public class SquaremapRender implements Renderable {
                 break;
         }
         return Key.of(result);
+    }
+
+    private Key getIconKey(KonTerritory territory) {
+        String result = "konquest";
+        switch (territory.getTerritoryType()) {
+            case SANCTUARY:
+                result = result+".icon.sanctuary."+territory.getName().toLowerCase();
+                break;
+            case RUIN:
+                result = result+".icon.ruin."+territory.getName().toLowerCase();
+                break;
+            case CAMP:
+                result = result+".icon.camp."+territory.getName().toLowerCase();
+                break;
+            case CAPITAL:
+                result = result+".icon.kingdom."+territory.getKingdom().getName().toLowerCase()+".capital";
+                break;
+            case TOWN:
+                result = result+".icon.kingdom."+territory.getKingdom().getName().toLowerCase()+"."+territory.getName().toLowerCase();
+                break;
+            default:
+                break;
+        }
+        return Key.of(result);
+    }
+
+    private Key getImageKey(KonquestTerritoryType type) {
+        String result = "konquest";
+        switch (type) {
+            case SANCTUARY:
+                result = result+".image.sanctuary";
+                break;
+            case RUIN:
+                result = result+".image.ruin";
+                break;
+            case CAMP:
+                result = result+".image.camp";
+                break;
+            case CAPITAL:
+                result = result+".image.kingdom.capital";
+                break;
+            case TOWN:
+                result = result+".image.kingdom.town";
+                break;
+            default:
+                break;
+        }
+        return Key.of(result);
+    }
+
+    private BufferedImage getIconImage(KonquestTerritoryType type) {
+        InputStream resourceStream = null;
+        BufferedImage image = null;
+        switch (type) {
+            case SANCTUARY:
+                resourceStream = konquest.getPlugin().getResource("img/temple.png");
+                break;
+            case RUIN:
+                resourceStream = konquest.getPlugin().getResource("img/tower.png");
+                break;
+            case CAMP:
+                resourceStream = konquest.getPlugin().getResource("img/pirateflag.png");
+                break;
+            case CAPITAL:
+                resourceStream = konquest.getPlugin().getResource("img/star.png");
+                break;
+            case TOWN:
+                resourceStream = konquest.getPlugin().getResource("img/orangeflag.png");
+                break;
+            default:
+                break;
+        }
+        try {
+            if (resourceStream != null) {
+                image = ImageIO.read(resourceStream);
+                resourceStream.close();
+            } else {
+                ChatUtil.printConsoleError("Failed to find image file for territory type "+type);
+            }
+        } catch (IOException ignored) {}
+        return image;
     }
 
     private Color getAreaColor(KonTerritory territory) {

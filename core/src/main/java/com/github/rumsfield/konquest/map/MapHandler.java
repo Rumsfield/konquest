@@ -1,13 +1,19 @@
 package com.github.rumsfield.konquest.map;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.dynmap.markers.MarkerIcon;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
