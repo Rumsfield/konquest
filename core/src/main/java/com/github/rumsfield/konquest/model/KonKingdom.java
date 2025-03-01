@@ -948,25 +948,26 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 			konquest.getTerritoryManager().removeAllTerritory(oldTown.getWorld(),oldTown.getChunkList().keySet());
 			konquest.getMapHandler().drawRemoveTerritory(oldTown);
 		}
-		// Replace Capital
+		// Replace Capital and Town
 		capital = newCapital;
-		capital.updateBarTitle();
-		capital.updateBarPlayers();
-		capital.refreshMonument();
-		konquest.getKingdomManager().refreshTownNerfs(capital);
-		konquest.getKingdomManager().refreshTownHearts(capital);
-		konquest.getUpgradeManager().updateTownDisabledUpgrades(capital);
-		konquest.getTerritoryManager().addAllTerritory(capital.getWorld(),capital.getChunkList());
-		konquest.getMapHandler().drawUpdateTerritory(capital);
-		// Replace Town
 		townMap.put(townName, newTown);
-		newTown.updateBarTitle();
-		newTown.updateBarPlayers();
-		newTown.refreshMonument();
-		konquest.getKingdomManager().refreshTownNerfs(newTown);
-		konquest.getKingdomManager().refreshTownHearts(newTown);
-		konquest.getUpgradeManager().updateTownDisabledUpgrades(newTown);
+		// Town Updates
+		konquest.getTerritoryManager().addAllTerritory(capital.getWorld(),capital.getChunkList());
 		konquest.getTerritoryManager().addAllTerritory(newTown.getWorld(),newTown.getChunkList());
+		capital.refreshMonument();
+		newTown.refreshMonument();
+		capital.updateBarTitle();
+		newTown.updateBarTitle();
+		capital.updateBarPlayers();
+		newTown.updateBarPlayers();
+		konquest.getKingdomManager().refreshTownNerfs(capital);
+		konquest.getKingdomManager().refreshTownNerfs(newTown);
+		konquest.getKingdomManager().refreshTownHearts(capital);
+		konquest.getKingdomManager().refreshTownHearts(newTown);
+		konquest.getUpgradeManager().updateTownDisabledUpgrades(capital);
+		konquest.getUpgradeManager().updateTownDisabledUpgrades(newTown);
+		// Update maps
+		konquest.getMapHandler().drawUpdateTerritory(capital);
 		konquest.getMapHandler().drawUpdateTerritory(newTown);
 		// Send broadcast
 		ChatUtil.sendBroadcast(MessagePath.COMMAND_KINGDOM_BROADCAST_CAPITAL_SWAP.getMessage(getName(),townName));

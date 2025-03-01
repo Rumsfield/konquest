@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.awt.*;
 import java.util.List;
@@ -128,9 +129,11 @@ public class SanctuaryManager {
 	public boolean renameSanctuary(String name, String newName) {
 		boolean result = false;
 		if(isSanctuary(name) && konquest.validateNameConstraints(newName) == 0) {
+			konquest.getMapHandler().drawRemoveTerritory(sanctuaryMap.get(name.toLowerCase()));
 			sanctuaryMap.get(name.toLowerCase()).setName(newName);
 			KonSanctuary sanctuary = sanctuaryMap.remove(name.toLowerCase());
 			sanctuaryMap.put(newName.toLowerCase(), sanctuary);
+			konquest.getMapHandler().drawUpdateTerritory(sanctuary);
 			sanctuary.updateBarTitle();
 			sanctuary.updateBarPlayers();
 			result = true;
@@ -740,55 +743,61 @@ public class SanctuaryManager {
 			ChatUtil.printConsoleError("Aborted saving sanctuary data because a problem was encountered while loading data from sanctuaries.yml");
 			return;
 		}
-		FileConfiguration sanctuariesConfig = konquest.getConfigManager().getConfig("sanctuaries");
-		sanctuariesConfig.set("sanctuaries", null); // reset sanctuaries config
-		ConfigurationSection root = sanctuariesConfig.createSection("sanctuaries");
-		for(String name : sanctuaryMap.keySet()) {
-			KonSanctuary sanctuary = sanctuaryMap.get(name);
-			ConfigurationSection sanctuarySection = root.createSection(sanctuary.getName());
-			sanctuarySection.set("world", sanctuary.getWorld().getName());
-			sanctuarySection.set("spawn", new int[] {sanctuary.getSpawnLoc().getBlockX(),
-					sanctuary.getSpawnLoc().getBlockY(),
-					sanctuary.getSpawnLoc().getBlockZ(),
-												   (int) sanctuary.getSpawnLoc().getPitch(),
-												   (int) sanctuary.getSpawnLoc().getYaw()});
-			sanctuarySection.set("center", new int[] {sanctuary.getCenterLoc().getBlockX(),
-					sanctuary.getCenterLoc().getBlockY(),
-					sanctuary.getCenterLoc().getBlockZ()});
-			sanctuarySection.set("chunks", HelperUtil.formatPointsToString(sanctuary.getChunkList().keySet()));
-			// Properties
-			ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.createSection("properties");
-			for(KonPropertyFlag flag : KonPropertyFlag.values()) {
-				if(sanctuary.hasPropertyValue(flag)) {
-					sanctuaryPropertiesSection.set(flag.toString(), sanctuary.getPropertyValue(flag));
+		// Create new config entries
+		FileConfiguration newSaveConfig = new YamlConfiguration();
+		ConfigurationSection root = newSaveConfig.createSection("sanctuaries");
+		try {
+			for (String name : sanctuaryMap.keySet()) {
+				KonSanctuary sanctuary = sanctuaryMap.get(name);
+				ConfigurationSection sanctuarySection = root.createSection(sanctuary.getName());
+				sanctuarySection.set("world", sanctuary.getWorld().getName());
+				sanctuarySection.set("spawn", new int[]{sanctuary.getSpawnLoc().getBlockX(),
+						sanctuary.getSpawnLoc().getBlockY(),
+						sanctuary.getSpawnLoc().getBlockZ(),
+						(int) sanctuary.getSpawnLoc().getPitch(),
+						(int) sanctuary.getSpawnLoc().getYaw()});
+				sanctuarySection.set("center", new int[]{sanctuary.getCenterLoc().getBlockX(),
+						sanctuary.getCenterLoc().getBlockY(),
+						sanctuary.getCenterLoc().getBlockZ()});
+				sanctuarySection.set("chunks", HelperUtil.formatPointsToString(sanctuary.getChunkList().keySet()));
+				// Properties
+				ConfigurationSection sanctuaryPropertiesSection = sanctuarySection.createSection("properties");
+				for (KonPropertyFlag flag : KonPropertyFlag.values()) {
+					if (sanctuary.hasPropertyValue(flag)) {
+						sanctuaryPropertiesSection.set(flag.toString(), sanctuary.getPropertyValue(flag));
+					}
+				}
+				// Monuments
+				// Any template in memory, valid or invalid, gets saved to data file.
+				// When it gets loaded again by plugin onEnable, validation checks will print detailed errors.
+				ConfigurationSection sanctuaryMonumentsSection = sanctuarySection.createSection("monuments");
+				for (String monumentName : sanctuary.getTemplateNames()) {
+					KonMonumentTemplate template = sanctuary.getTemplate(monumentName);
+					if (!template.isValid()) {
+						ChatUtil.printConsoleError("Saved invalid monument template named " + monumentName + ", in Sanctuary " + name + ".");
+					}
+					ConfigurationSection monumentSection = sanctuaryMonumentsSection.createSection(monumentName);
+					monumentSection.set("cost", template.getCost());
+					monumentSection.set("travel", new int[]{template.getTravelPoint().getBlockX(),
+							template.getTravelPoint().getBlockY(),
+							template.getTravelPoint().getBlockZ()});
+					monumentSection.set("cornerone", new int[]{template.getCornerOne().getBlockX(),
+							template.getCornerOne().getBlockY(),
+							template.getCornerOne().getBlockZ()});
+					monumentSection.set("cornertwo", new int[]{template.getCornerTwo().getBlockX(),
+							template.getCornerTwo().getBlockY(),
+							template.getCornerTwo().getBlockZ()});
 				}
 			}
-			// Monuments
-			// Any template in memory, valid or invalid, gets saved to data file.
-			// When it gets loaded again by plugin onEnable, validation checks will print detailed errors.
-			ConfigurationSection sanctuaryMonumentsSection = sanctuarySection.createSection("monuments");
-			for(String monumentName : sanctuary.getTemplateNames()) {
-				KonMonumentTemplate template = sanctuary.getTemplate(monumentName);
-				if(!template.isValid()) { 
-					ChatUtil.printConsoleError("Saved invalid monument template named "+monumentName+", in Sanctuary "+name+".");
-				}
-	            ConfigurationSection monumentSection = sanctuaryMonumentsSection.createSection(monumentName);
-				monumentSection.set("cost", template.getCost());
-	            monumentSection.set("travel", new int[] {template.getTravelPoint().getBlockX(),
-						template.getTravelPoint().getBlockY(),
-						template.getTravelPoint().getBlockZ()});
-	            monumentSection.set("cornerone", new int[] {template.getCornerOne().getBlockX(),
-						template.getCornerOne().getBlockY(),
-						template.getCornerOne().getBlockZ()});
-	            monumentSection.set("cornertwo", new int[] {template.getCornerTwo().getBlockX(),
-						template.getCornerTwo().getBlockY(),
-						template.getCornerTwo().getBlockZ()});
+			// Save to file
+			FileConfiguration sanctuariesConfig = konquest.getConfigManager().getConfig("sanctuaries");
+			sanctuariesConfig.set("sanctuaries", newSaveConfig.get("sanctuaries")); // apply new save data
+			if(!sanctuaryMap.isEmpty()) {
+				ChatUtil.printConsole("Saved Sanctuaries");
 			}
-		}
-		if(sanctuaryMap.isEmpty()) {
-			ChatUtil.printDebug("No Sanctuaries to save!");
-		} else {
-			ChatUtil.printDebug("Saved Sanctuaries");
+		} catch (Exception | Error internalError) {
+			ChatUtil.printConsoleError("Failed to save sanctuaries, report this as a bug to the plugin author!");
+			internalError.printStackTrace();
 		}
 	}
 	
