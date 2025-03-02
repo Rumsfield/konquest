@@ -9,11 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-//TODO: X and Z corner double[]'s are primary boundary contour. Internal unclaimed points yield secondary contours within primary area that will
-// be shaded white. These dead zones will be kept in a collection that can be used to spawn secondary AreaMarkers to mark the unclaimed pockets.
-
-//TODO: Keep set of points for individual area markers, and set of contours for boundaries
-
 public class AreaTerritory {
 
 	private final Set<Point> areaPoints;

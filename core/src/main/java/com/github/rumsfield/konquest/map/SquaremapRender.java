@@ -128,7 +128,6 @@ public class SquaremapRender implements Renderable {
         // Ensure group layer exists in the registry
         final Registry<LayerProvider> layerRegistry = mapWorld.layerRegistry();
         if (!layerRegistry.hasEntry(groupKey)) {
-            ChatUtil.printDebug("Creating new group layer "+groupKey.getKey()+" in squaremap for territory "+territory.getName());
             int index = getGroupIndex(territory);
             layerRegistry.register(groupKey, SimpleLayerProvider.builder(groupLabel)
                     .showControls(true)
@@ -201,10 +200,9 @@ public class SquaremapRender implements Renderable {
 
         KonTerritory territory = area.getTerritory();
 
-        ChatUtil.printDebug("Erasing squaremap area of territory "+territory.getName());
         Key groupKey = getGroupKey(territory);
         Key areaKey = getAreaKey(territory);
-        Key iconKey = getAreaKey(territory);
+        Key iconKey = getIconKey(territory);
 
         // Get the layer provider
         MapWorld mapWorld = api.getWorldIfEnabled(BukkitAdapter.worldIdentifier(territory.getWorld())).orElse(null);

@@ -93,7 +93,6 @@ public class BlueMapRender implements Renderable {
         }
         if (territoryGroup == null) {
             // Need to create the group
-            ChatUtil.printDebug("Creating new group in BlueMap for territory "+territory.getName());
             territoryGroup = MarkerSet.builder()
                     .label(groupLabel)
                     .toggleable(true)
@@ -145,7 +144,6 @@ public class BlueMapRender implements Renderable {
 
         KonTerritory territory = area.getTerritory();
 
-        ChatUtil.printDebug("Erasing BlueMap area of territory "+territory.getName());
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
 
@@ -158,7 +156,6 @@ public class BlueMapRender implements Renderable {
                     // Delete group if no more areas
                     if(map.getMarkerSets().get(groupId).getMarkers().isEmpty()) {
                         map.getMarkerSets().remove(groupId);
-                        ChatUtil.printDebug("Removing BlueMap group of territory "+territory.getName());
                     }
                 } else {
                     ChatUtil.printDebug("Failed to erase from missing BlueMap group, territory "+territory.getName());
