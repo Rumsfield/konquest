@@ -19,6 +19,7 @@ import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -1044,7 +1045,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
 		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
 		// Update maps
-    	konquest.getMapHandler().drawLabel(joinKingdom.getCapital());
+    	konquest.getMapHandler().drawLabelTerritory(joinKingdom.getCapital());
     	updateSmallestKingdom();
     	
 		return 0;
@@ -1232,7 +1233,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		KonOfflinePlayer commonPlayer = isOnline ? onlinePlayer : offlinePlayer;
 		konquest.getIntegrationManager().getDiscordSrv().refreshPlayerRoles(commonPlayer);
 		// Common updates
-    	konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
+    	konquest.getMapHandler().drawLabelTerritory(getKingdom(oldKingdomName).getCapital());
     	updateSmallestKingdom();
     	updateKingdomOfflineProtection();
     	
@@ -2507,7 +2508,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		}
 		// Update maps
 		konquest.getMapHandler().drawRemoveTerritory(town);
-		konquest.getMapHandler().drawLabel(town.getKingdom().getCapital());
+		konquest.getMapHandler().drawLabelTerritory(town.getKingdom().getCapital());
 		// Update shops
 		konquest.getShopHandler().deleteShopsInPoints(townPoints,town.getWorld());
 		return true;
@@ -2581,8 +2582,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			}
 			captureTown.clearPlots();
 			konquest.getMapHandler().drawUpdateTerritory(captureTown);
-			konquest.getMapHandler().drawLabel(getKingdom(oldKingdomName).getCapital());
-			konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
+			konquest.getMapHandler().drawLabelTerritory(getKingdom(oldKingdomName).getCapital());
+			konquest.getMapHandler().drawLabelTerritory(conquerKingdom.getCapital());
 			konquest.getShopHandler().deleteShopsInPoints(captureTown.getChunkList().keySet(),captureTown.getWorld());
 			// Post-capture updates
 			captureTownUpdate(captureTown);
@@ -2666,7 +2667,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     			refreshTownHearts(town);
 				town.updateBarPlayers();
 				konquest.getMapHandler().drawUpdateTerritory(town);
-				konquest.getMapHandler().drawLabel(conquerKingdom.getCapital());
+				konquest.getMapHandler().drawLabelTerritory(conquerKingdom.getCapital());
 				konquest.getShopHandler().deleteShopsInPoints(town.getChunkList().keySet(),town.getWorld());
 				// Fire event
 				Konquest.callKonquestEvent(new KonquestKingdomConquerEvent(konquest, oldKingdomName, conquerKingdom));
@@ -4958,144 +4959,150 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.printConsoleError("Aborted saving kingdom data because a problem was encountered while loading data from kingdoms.yml");
 			return;
 		}
-		FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
-		kingdomsConfig.set("kingdoms", null); // reset kingdoms config
-		ConfigurationSection root = kingdomsConfig.createSection("kingdoms");
-		for(KonKingdom kingdom : kingdomMap.values()) {
-			ConfigurationSection kingdomSection = root.createSection(kingdom.getName());
-			// Kingdom Template Name
-			kingdomSection.set("template",kingdom.getMonumentTemplateName());
-			// Kingdom Operating Mode
-			kingdomSection.set("admin",kingdom.isAdminOperated());
-			// Kingdom Web Color
-			kingdomSection.set("webcolor",kingdom.getWebColor());
-			// Kingdom Properties
-			ConfigurationSection kingdomPropertiesSection = kingdomSection.createSection("properties");
-			for(KonPropertyFlag flag : KonPropertyFlag.values()) {
-				if(kingdom.hasPropertyValue(flag)) {
-					kingdomPropertiesSection.set(flag.toString(), kingdom.getPropertyValue(flag));
-				}
-			}
-			// Kingdom Membership
-			kingdomSection.set("open", kingdom.isOpen());
-			kingdomSection.set("master", "");
-			ConfigurationSection kingdomMemberSection = kingdomSection.createSection("members");
-			for(OfflinePlayer member : kingdom.getPlayerMembers()) {
-				String uuid = member.getUniqueId().toString();
-				if(kingdom.isMaster(member.getUniqueId())) {
-					kingdomSection.set("master", uuid);
-				} else if(kingdom.isOfficer(member.getUniqueId())) {
-					kingdomMemberSection.set(uuid, true);
-				} else {
-					kingdomMemberSection.set(uuid, false);
-				}
-			}
-			ConfigurationSection kingdomRequestsSection = kingdomSection.createSection("requests");
-			for(OfflinePlayer requestee : kingdom.getJoinRequests()) {
-				String uuid = requestee.getUniqueId().toString();
-				kingdomRequestsSection.set(uuid, false);
-			}
-			for(OfflinePlayer invitee : kingdom.getJoinInvites()) {
-				String uuid = invitee.getUniqueId().toString();
-				kingdomRequestsSection.set(uuid, true);
-			}
-			// Kingdom Diplomacy
-			ConfigurationSection kingdomRelationActiveSection = kingdomSection.createSection("diplomacy_active");
-			for(KonquestKingdom diplomacyKingdom : kingdom.getActiveRelationKingdoms()) {
-				kingdomRelationActiveSection.set(diplomacyKingdom.getName(), kingdom.getActiveRelation(diplomacyKingdom).toString());
-			}
-			ConfigurationSection kingdomRelationRequestSection = kingdomSection.createSection("diplomacy_request");
-			for(KonquestKingdom diplomacyKingdom : kingdom.getRelationRequestKingdoms()) {
-				kingdomRelationRequestSection.set(diplomacyKingdom.getName(), kingdom.getRelationRequest(diplomacyKingdom).toString());
-			}
-			// Towns + Capital
-			List<KonTown> allTowns = new ArrayList<>();
-			allTowns.add(kingdom.getCapital());
-			allTowns.addAll(kingdom.getTowns());
-			ConfigurationSection townsSection = kingdomSection.createSection("towns");
-			for(KonTown town : allTowns) {
-				ConfigurationSection townInstanceSection;
-				if(town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
-					townInstanceSection = townsSection.createSection("capital");
-				} else {
-					townInstanceSection = townsSection.createSection(town.getName());
-				}
-				// Town Properties
-				ConfigurationSection townPropertiesSection = townInstanceSection.createSection("properties");
-				for(KonPropertyFlag flag : KonPropertyFlag.values()) {
-					if(town.hasPropertyValue(flag)) {
-						townPropertiesSection.set(flag.toString(), town.getPropertyValue(flag));
+		// Create new config entries
+		FileConfiguration newSaveConfig = new YamlConfiguration();
+		ConfigurationSection root = newSaveConfig.createSection("kingdoms");
+		try {
+			for (KonKingdom kingdom : kingdomMap.values()) {
+				ConfigurationSection kingdomSection = root.createSection(kingdom.getName());
+				// Kingdom Template Name
+				kingdomSection.set("template", kingdom.getMonumentTemplateName());
+				// Kingdom Operating Mode
+				kingdomSection.set("admin", kingdom.isAdminOperated());
+				// Kingdom Web Color
+				kingdomSection.set("webcolor", kingdom.getWebColor());
+				// Kingdom Properties
+				ConfigurationSection kingdomPropertiesSection = kingdomSection.createSection("properties");
+				for (KonPropertyFlag flag : KonPropertyFlag.values()) {
+					if (kingdom.hasPropertyValue(flag)) {
+						kingdomPropertiesSection.set(flag.toString(), kingdom.getPropertyValue(flag));
 					}
 				}
-            	townInstanceSection.set("world", town.getWorld().getName());
-            	townInstanceSection.set("base", town.getMonument().getBaseY());
-            	townInstanceSection.set("spawn", new int[] {town.getSpawnLoc().getBlockX(),
-						town.getSpawnLoc().getBlockY(),
-						town.getSpawnLoc().getBlockZ(),
-						   									(int) town.getSpawnLoc().getPitch(),
-						   									(int) town.getSpawnLoc().getYaw()});
-            	townInstanceSection.set("center", new int[] {town.getCenterLoc().getBlockX(),
-						town.getCenterLoc().getBlockY(),
-						town.getCenterLoc().getBlockZ()});
-                townInstanceSection.set("chunks", HelperUtil.formatPointsToString(town.getChunkList().keySet()));
-				townInstanceSection.set("specialization", town.getSpecializationName());
-				townInstanceSection.set("open", town.isOpen());
-                townInstanceSection.set("plot", town.isPlotOnly());
-				townInstanceSection.set("allied_building", town.isAlliedBuildingAllowed());
-				townInstanceSection.set("friendly_redstone", town.isFriendlyRedstoneAllowed());
-                townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
-                townInstanceSection.set("golem_offensive", town.isGolemOffensive());
-                townInstanceSection.set("shield", town.isShielded());
-                townInstanceSection.set("shield_time", town.getShieldEndTime());
-                townInstanceSection.set("armor", town.isArmored());
-                townInstanceSection.set("armor_blocks", town.getArmorBlocks());
-                townInstanceSection.set("lord", "");
-                ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");
-                for(OfflinePlayer resident : town.getPlayerResidents()) {
-                	String uuid = resident.getUniqueId().toString();
-                	if(town.isPlayerLord(resident)) {
-                		townInstanceSection.set("lord", uuid);
-                	} else if(town.isPlayerKnight(resident)) {
-                		townInstanceResidentSection.set(uuid, true);
-                	} else {
-                		townInstanceResidentSection.set(uuid, false);
-                	}
-                }
-                ConfigurationSection townInstanceRequestsSection = townInstanceSection.createSection("requests");
-                for(OfflinePlayer requestee : town.getJoinRequests()) {
-                	String uuid = requestee.getUniqueId().toString();
-                	townInstanceRequestsSection.set(uuid, false);
-                }
-                for(OfflinePlayer invitee : town.getJoinInvites()) {
-                	String uuid = invitee.getUniqueId().toString();
-                	townInstanceRequestsSection.set(uuid, true);
-                }
-				ConfigurationSection townInstanceOffersSection = townInstanceSection.createSection("offers");
-				for(UUID id : town.getPurchaseOffers()) {
-					double amount = town.getPurchaseOfferAmount(id);
-					townInstanceOffersSection.set(id.toString(), amount);
+				// Kingdom Membership
+				kingdomSection.set("open", kingdom.isOpen());
+				kingdomSection.set("master", "");
+				ConfigurationSection kingdomMemberSection = kingdomSection.createSection("members");
+				for (OfflinePlayer member : kingdom.getPlayerMembers()) {
+					String uuid = member.getUniqueId().toString();
+					if (kingdom.isMaster(member.getUniqueId())) {
+						kingdomSection.set("master", uuid);
+					} else if (kingdom.isOfficer(member.getUniqueId())) {
+						kingdomMemberSection.set(uuid, true);
+					} else {
+						kingdomMemberSection.set(uuid, false);
+					}
 				}
-                ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
-                for(KonUpgrade upgrade : KonUpgrade.values()) {
-                	int level = town.getRawUpgradeLevel(upgrade);
-                	if(level > 0) {
-                		townInstanceUpgradeSection.set(upgrade.toString(), level);
-                	}
-                }
-                ConfigurationSection townInstancePlotSection = townInstanceSection.createSection("plots");
-                int plotIndex = 0;
-                for(KonPlot plot : town.getPlots()) {
-                	ConfigurationSection plotInstanceSection = townInstancePlotSection.createSection("plot_"+plotIndex);
-                	plotInstanceSection.set("chunks", HelperUtil.formatPointsToString(plot.getPoints()));
-                	plotInstanceSection.set("members",plot.getUserStrings());
-                	plotIndex++;
-                }
-            }
-		}
-		if(kingdomMap.isEmpty()) {
-			ChatUtil.printDebug("No Kingdoms to save!");
-		} else {
-			ChatUtil.printDebug("Saved Kingdoms");
+				ConfigurationSection kingdomRequestsSection = kingdomSection.createSection("requests");
+				for (OfflinePlayer requestee : kingdom.getJoinRequests()) {
+					String uuid = requestee.getUniqueId().toString();
+					kingdomRequestsSection.set(uuid, false);
+				}
+				for (OfflinePlayer invitee : kingdom.getJoinInvites()) {
+					String uuid = invitee.getUniqueId().toString();
+					kingdomRequestsSection.set(uuid, true);
+				}
+				// Kingdom Diplomacy
+				ConfigurationSection kingdomRelationActiveSection = kingdomSection.createSection("diplomacy_active");
+				for (KonquestKingdom diplomacyKingdom : kingdom.getActiveRelationKingdoms()) {
+					kingdomRelationActiveSection.set(diplomacyKingdom.getName(), kingdom.getActiveRelation(diplomacyKingdom).toString());
+				}
+				ConfigurationSection kingdomRelationRequestSection = kingdomSection.createSection("diplomacy_request");
+				for (KonquestKingdom diplomacyKingdom : kingdom.getRelationRequestKingdoms()) {
+					kingdomRelationRequestSection.set(diplomacyKingdom.getName(), kingdom.getRelationRequest(diplomacyKingdom).toString());
+				}
+				// Towns + Capital
+				List<KonTown> allTowns = new ArrayList<>();
+				allTowns.add(kingdom.getCapital());
+				allTowns.addAll(kingdom.getTowns());
+				ConfigurationSection townsSection = kingdomSection.createSection("towns");
+				for (KonTown town : allTowns) {
+					ConfigurationSection townInstanceSection;
+					if (town.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+						townInstanceSection = townsSection.createSection("capital");
+					} else {
+						townInstanceSection = townsSection.createSection(town.getName());
+					}
+					// Town Properties
+					ConfigurationSection townPropertiesSection = townInstanceSection.createSection("properties");
+					for (KonPropertyFlag flag : KonPropertyFlag.values()) {
+						if (town.hasPropertyValue(flag)) {
+							townPropertiesSection.set(flag.toString(), town.getPropertyValue(flag));
+						}
+					}
+					townInstanceSection.set("world", town.getWorld().getName());
+					townInstanceSection.set("base", town.getMonument().getBaseY());
+					townInstanceSection.set("spawn", new int[]{town.getSpawnLoc().getBlockX(),
+							town.getSpawnLoc().getBlockY(),
+							town.getSpawnLoc().getBlockZ(),
+							(int) town.getSpawnLoc().getPitch(),
+							(int) town.getSpawnLoc().getYaw()});
+					townInstanceSection.set("center", new int[]{town.getCenterLoc().getBlockX(),
+							town.getCenterLoc().getBlockY(),
+							town.getCenterLoc().getBlockZ()});
+					townInstanceSection.set("chunks", HelperUtil.formatPointsToString(town.getChunkList().keySet()));
+					townInstanceSection.set("specialization", town.getSpecializationName());
+					townInstanceSection.set("open", town.isOpen());
+					townInstanceSection.set("plot", town.isPlotOnly());
+					townInstanceSection.set("allied_building", town.isAlliedBuildingAllowed());
+					townInstanceSection.set("friendly_redstone", town.isFriendlyRedstoneAllowed());
+					townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
+					townInstanceSection.set("golem_offensive", town.isGolemOffensive());
+					townInstanceSection.set("shield", town.isShielded());
+					townInstanceSection.set("shield_time", town.getShieldEndTime());
+					townInstanceSection.set("armor", town.isArmored());
+					townInstanceSection.set("armor_blocks", town.getArmorBlocks());
+					townInstanceSection.set("lord", "");
+					ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");
+					for (OfflinePlayer resident : town.getPlayerResidents()) {
+						String uuid = resident.getUniqueId().toString();
+						if (town.isPlayerLord(resident)) {
+							townInstanceSection.set("lord", uuid);
+						} else if (town.isPlayerKnight(resident)) {
+							townInstanceResidentSection.set(uuid, true);
+						} else {
+							townInstanceResidentSection.set(uuid, false);
+						}
+					}
+					ConfigurationSection townInstanceRequestsSection = townInstanceSection.createSection("requests");
+					for (OfflinePlayer requestee : town.getJoinRequests()) {
+						String uuid = requestee.getUniqueId().toString();
+						townInstanceRequestsSection.set(uuid, false);
+					}
+					for (OfflinePlayer invitee : town.getJoinInvites()) {
+						String uuid = invitee.getUniqueId().toString();
+						townInstanceRequestsSection.set(uuid, true);
+					}
+					ConfigurationSection townInstanceOffersSection = townInstanceSection.createSection("offers");
+					for (UUID id : town.getPurchaseOffers()) {
+						double amount = town.getPurchaseOfferAmount(id);
+						townInstanceOffersSection.set(id.toString(), amount);
+					}
+					ConfigurationSection townInstanceUpgradeSection = townInstanceSection.createSection("upgrades");
+					for (KonUpgrade upgrade : KonUpgrade.values()) {
+						int level = town.getRawUpgradeLevel(upgrade);
+						if (level > 0) {
+							townInstanceUpgradeSection.set(upgrade.toString(), level);
+						}
+					}
+					ConfigurationSection townInstancePlotSection = townInstanceSection.createSection("plots");
+					int plotIndex = 0;
+					for (KonPlot plot : town.getPlots()) {
+						ConfigurationSection plotInstanceSection = townInstancePlotSection.createSection("plot_" + plotIndex);
+						plotInstanceSection.set("chunks", HelperUtil.formatPointsToString(plot.getPoints()));
+						plotInstanceSection.set("members", plot.getUserStrings());
+						plotIndex++;
+					}
+				}
+			}
+			// Save to file
+			FileConfiguration kingdomsConfig = konquest.getConfigManager().getConfig("kingdoms");
+			kingdomsConfig.set("kingdoms", newSaveConfig.get("kingdoms")); // apply new save data
+			if(!kingdomMap.isEmpty()) {
+				ChatUtil.printConsole("Saved Kingdoms");
+			}
+		} catch (Exception | Error internalError) {
+			ChatUtil.printConsoleError("Failed to save kingdoms, report this as a bug to the plugin author!");
+			internalError.printStackTrace();
 		}
 	}
 	

@@ -1,8 +1,5 @@
 package com.github.rumsfield.konquest.map;
 
-import com.github.rumsfield.konquest.model.KonKingdom;
-import com.github.rumsfield.konquest.model.KonTerritory;
-
 public interface Renderable {
 
     /**
@@ -11,35 +8,35 @@ public interface Renderable {
     void initialize();
 
     /**
-     * Draw the capital and all towns in a kingdom on the map.
-     * @param kingdom The kingdom to draw
-     */
-    void drawUpdate(KonKingdom kingdom);
-
-    /**
      * Draw the region of a territory on the map.
      * Adds the region if it doesn't already exist.
      * Updates the region if it exists.
-     * @param territory The territory to draw
+     * @param area The territory area to update
      */
-    void drawUpdate(KonTerritory territory);
+    void drawUpdate(AreaTerritory area);
 
     /**
      * Remove the region of a territory from the map.
-     * @param territory The territory to remove
+     * @param area The territory area to remove
      */
-    void drawRemove(KonTerritory territory);
+    void drawRemove(AreaTerritory area);
 
     /**
      * Update the label of a territory.
-     * @param territory The territory to update
+     * @param area The territory area to label
      */
-    void drawLabel(KonTerritory territory);
+    void drawLabel(AreaTerritory area);
 
     /**
      * Post a message to the web map.
      * @param message The message to send
      */
     void postBroadcast(String message);
+
+    /**
+     * Get the name of the mapping service.
+     * @return The map plugin's name
+     */
+    String getMapName();
 
 }

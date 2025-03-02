@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -446,17 +447,28 @@ public class CampManager implements KonquestCampManager {
 			ChatUtil.printConsoleError("Aborted saving camp data because a problem was encountered while loading data from camps.yml");
 			return;
 		}
-		FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
-		campsConfig.set("camps", null); // reset camps config
-		ConfigurationSection root = campsConfig.createSection("camps");
-		for(String uuid : barbarianCamps.keySet()) {
-			KonCamp camp = barbarianCamps.get(uuid);
-			ConfigurationSection campSection = root.createSection(uuid);
-			campSection.set("world", camp.getWorld().getName());
-			campSection.set("center", new int[] {camp.getCenterLoc().getBlockX(),
-					camp.getCenterLoc().getBlockY(),
-					camp.getCenterLoc().getBlockZ()});
-	        campSection.set("chunks", HelperUtil.formatPointsToString(camp.getChunkList().keySet()));
+		// Create new config entries
+		FileConfiguration newSaveConfig = new YamlConfiguration();
+		ConfigurationSection root = newSaveConfig.createSection("camps");
+		try {
+			for (String uuid : barbarianCamps.keySet()) {
+				KonCamp camp = barbarianCamps.get(uuid);
+				ConfigurationSection campSection = root.createSection(uuid);
+				campSection.set("world", camp.getWorld().getName());
+				campSection.set("center", new int[]{camp.getCenterLoc().getBlockX(),
+						camp.getCenterLoc().getBlockY(),
+						camp.getCenterLoc().getBlockZ()});
+				campSection.set("chunks", HelperUtil.formatPointsToString(camp.getChunkList().keySet()));
+			}
+			// Save to file
+			FileConfiguration campsConfig = konquest.getConfigManager().getConfig("camps");
+			campsConfig.set("camps", newSaveConfig.get("camps")); // apply new save data
+			if(!barbarianCamps.isEmpty()) {
+				ChatUtil.printConsole("Saved Camps");
+			}
+		} catch (Exception | Error internalError) {
+			ChatUtil.printConsoleError("Failed to save camps, report this as a bug to the plugin author!");
+			internalError.printStackTrace();
 		}
 	}
 }

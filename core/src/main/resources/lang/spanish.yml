@@ -137,9 +137,13 @@ map:
   town: Pueblo
   towns: Pueblos
   land: Tierra
-  players: Jugadores
+  owner: Dueño
   lord: Senor
-  population: Poblacion
+  knights: Caballeros
+  residents: Residentes
+  master: Maestro
+  officers: Oficiales
+  members: Miembros
   ruin: Ruina
   critical-hits: Golpes Criticos
   golem-spawns: Aparicion de Golems

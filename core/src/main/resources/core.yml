@@ -193,6 +193,9 @@ core:
     # (*) Enable plugin integration with BlueMap (true/false)
     bluemap: true
 
+    # (*) Enable plugin integration with squaremap (true/false)
+    squaremap: true
+
     # (*) Enable plugin integration with WorldGuard (true/false)
     worldguard: true
 

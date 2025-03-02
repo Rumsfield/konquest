@@ -305,7 +305,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		// Check that the location is inside of this ruin
 		if(!this.isLocInside(loc)) return;
 		criticalLocations.put(loc, true);
-		getKonquest().getMapHandler().drawLabel(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 	}
 
 	public boolean addCriticalLocation(Location loc) {
@@ -314,7 +314,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		// Check that the block at the location is a critical type
 		if(!loc.getBlock().getType().equals(getKonquest().getRuinManager().getRuinCriticalBlock())) return false;
 		criticalLocations.put(loc, true);
-		getKonquest().getMapHandler().drawLabel(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 		return true;
 	}
 	
@@ -331,7 +331,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		// Check that the location is inside of this ruin
 		if(!this.isLocInside(loc)) return false;
 		spawnLocations.put(loc, new KonRuinGolem(loc, this));
-		getKonquest().getMapHandler().drawLabel(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 		return true;
 	}
 	

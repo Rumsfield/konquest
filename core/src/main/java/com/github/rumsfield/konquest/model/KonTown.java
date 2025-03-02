@@ -1,7 +1,6 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
-import com.github.rumsfield.konquest.KonquestPlugin;
 import com.github.rumsfield.konquest.api.event.town.KonquestTownRaidEvent;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
@@ -1413,7 +1412,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		residents.put(id,true);
 		if (doUpdates) {
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawLabel(this);
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 		}
 	}
 	
@@ -1464,7 +1463,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			residents.put(playerUUID,isElite);
 			if (doUpdates) {
 				getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-				getKonquest().getMapHandler().drawLabel(this);
+				getKonquest().getMapHandler().drawLabelTerritory(this);
 			}
 			status = true;
 		}
@@ -1480,7 +1479,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				lord = null;
 			}
 			getKonquest().getUpgradeManager().updateTownDisabledUpgrades(this);
-			getKonquest().getMapHandler().drawLabel(this);
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 			if(residents.isEmpty()) {
 				clearShieldsArmors();
 			}
@@ -1514,7 +1513,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public ArrayList<OfflinePlayer> getPlayerKnights() {
 		ArrayList<OfflinePlayer> eliteList = new ArrayList<>();
 		for(UUID id : residents.keySet()) {
-			if(residents.get(id)) {
+			if(id != null && residents.get(id)) {
 				eliteList.add(Bukkit.getOfflinePlayer(id));
 			}
 		}
@@ -1524,7 +1523,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public ArrayList<OfflinePlayer> getPlayerKnightsOnly() {
 		ArrayList<OfflinePlayer> eliteList = new ArrayList<>();
 		for(UUID id : residents.keySet()) {
-			if(residents.get(id) && !lord.equals(id)) {
+			if(id != null && residents.get(id) && !isLord(id)) {
 				eliteList.add(Bukkit.getOfflinePlayer(id));
 			}
 		}
@@ -1534,7 +1533,9 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public ArrayList<OfflinePlayer> getPlayerResidents() {
 		ArrayList<OfflinePlayer> residentList = new ArrayList<>();
 		for(UUID id : residents.keySet()) {
-			residentList.add(Bukkit.getOfflinePlayer(id));
+			if(id != null) {
+				residentList.add(Bukkit.getOfflinePlayer(id));
+			}
 		}
 		return residentList;
 	}
@@ -1542,7 +1543,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	public ArrayList<OfflinePlayer> getPlayerResidentsOnly() {
 		ArrayList<OfflinePlayer> residentList = new ArrayList<>();
 		for(UUID id : residents.keySet()) {
-			if(!residents.get(id)) {
+			if(id != null && !residents.get(id)) {
 				residentList.add(Bukkit.getOfflinePlayer(id));
 			}
 		}

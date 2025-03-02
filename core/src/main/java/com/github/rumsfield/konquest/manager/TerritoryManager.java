@@ -228,7 +228,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				closestAdjTerr.addChunk(addPoint);
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
 				konquest.getMapHandler().drawUpdateTerritory(closestAdjTerr);
-				konquest.getMapHandler().drawLabel(closestAdjTerr.getKingdom().getCapital());
+				konquest.getMapHandler().drawLabelTerritory(closestAdjTerr.getKingdom().getCapital());
 				// Display town info to players in the newly claimed chunk
 	    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 	    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(loc.getChunk())) {
@@ -416,7 +416,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			}
 	    	// Update map render
 			konquest.getMapHandler().drawUpdateTerritory(closestTerritory);
-			konquest.getMapHandler().drawLabel(closestTerritory.getKingdom().getCapital());
+			konquest.getMapHandler().drawLabelTerritory(closestTerritory.getKingdom().getCapital());
 			// Display territory info to players in the newly claimed chunks
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				//if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
@@ -637,7 +637,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				((KonBarDisplayer)territory).updateBarPlayers();
 			}
 			konquest.getMapHandler().drawUpdateTerritory(territory);
-			konquest.getMapHandler().drawLabel(territory.getKingdom().getCapital());
+			konquest.getMapHandler().drawLabelTerritory(territory.getKingdom().getCapital());
 		}
 
 		return doUpdates;
