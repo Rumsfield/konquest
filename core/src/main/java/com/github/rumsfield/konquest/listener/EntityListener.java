@@ -578,10 +578,10 @@ public class EntityListener implements Listener {
 		EntityType eType = event.getEntity().getType();
 		if(entityVictim instanceof Player) return;// Victim is a player, skip this event.
 		Player bukkitPlayer;
-		if (event.getDamager() instanceof AbstractArrow) {
-			AbstractArrow arrow = (AbstractArrow) event.getDamager();
-            if (!(arrow.getShooter() instanceof Player))return;
-			bukkitPlayer = (Player) arrow.getShooter();
+		if (event.getDamager() instanceof Projectile) {
+			Projectile projectile = (Projectile) event.getDamager();
+            if (!(projectile.getShooter() instanceof Player))return;
+			bukkitPlayer = (Player) projectile.getShooter();
         } else if (event.getDamager() instanceof Player) {
         	bukkitPlayer = (Player) event.getDamager();
         } else { // if neither player nor arrow shot by player
@@ -768,25 +768,21 @@ public class EntityListener implements Listener {
 		if(event.isCancelled()) return;
 		if(konquest.isWorldIgnored(event.getEntity().getWorld())) return;
 		Player victimBukkitPlayer;
-        Player attackerBukkitPlayer = null;
+        Player attackerBukkitPlayer;
         boolean isEggAttack = false;
         if (event.getEntity() instanceof Player) {
         	victimBukkitPlayer = (Player) event.getEntity();
-            if (event.getDamager() instanceof AbstractArrow) {
-            	AbstractArrow arrow = (AbstractArrow) event.getDamager();
-                if (arrow.getShooter() instanceof Player) {
-                	attackerBukkitPlayer = (Player) arrow.getShooter();
+			//ChatUtil.printDebug("Player "+victimBukkitPlayer.getName()+" damaged by "+event.getDamager().getType());
+            if (event.getDamager() instanceof Projectile) {
+				Projectile projectile = (Projectile) event.getDamager();
+                if (projectile.getShooter() instanceof Player) {
+                	attackerBukkitPlayer = (Player) projectile.getShooter();
                 } else {
                 	return;
                 }
-            } else if (event.getDamager() instanceof Egg) {
-            	Egg egg = (Egg)event.getDamager();
-            	if (egg.getShooter() instanceof Player) {
-                	attackerBukkitPlayer = (Player) egg.getShooter();
-                	isEggAttack = true;
-                } else {
-                	return;
-                }
+				if (event.getDamager() instanceof Egg) {
+					isEggAttack = true;
+				}
             } else if (event.getDamager() instanceof Player) {
             	attackerBukkitPlayer = (Player) event.getDamager();
             } else { // if neither player nor arrow
@@ -806,6 +802,7 @@ public class EntityListener implements Listener {
 			// Update egg stat
 			if(isEggAttack) {
 				konquest.getAccomplishmentManager().modifyPlayerStat(attackerPlayer,KonStatsType.EGG,1);
+				return;
 			}
 
             // Check for property flags
