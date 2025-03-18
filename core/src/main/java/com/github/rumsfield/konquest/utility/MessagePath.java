@@ -47,6 +47,7 @@ public enum MessagePath {
 	LABEL_LEADERBOARD                           (0, "label.leaderboard"),
 	LABEL_LEVEL                                 (0, "label.level"),
 	LABEL_LOOT_CHESTS                           (0, "label.loot-chests"),
+	LABEL_LOOT_TYPE                             (0, "label.loot-type"),
 	LABEL_MAP_COLOR                             (0, "label.map-color"),
 	LABEL_MEMBERS                               (0, "label.members"),
 	LABEL_MODIFIED                              (0, "label.modified"),
@@ -444,6 +445,8 @@ public enum MessagePath {
 	GENERIC_NOTICE_PREFIX_LOST                  (0, "generic.notice.prefix-lost"),
 	GENERIC_NOTICE_QUEST                        (0, "generic.notice.quest"),
 	GENERIC_NOTICE_LOOT                         (0, "generic.notice.loot"),
+	GENERIC_NOTICE_LOOT_SHOW                    (1, "generic.notice.loot-show"),
+	GENERIC_NOTICE_LOOT_SET                     (1, "generic.notice.loot-set"),
 	GENERIC_NOTICE_ABSENT                       (0, "generic.notice.absent"),
 	GENERIC_NOTICE_FORCE_BARBARIAN              (0, "generic.notice.force-barbarian"),
 	GENERIC_ERROR_DENY_BARBARIAN                (0, "generic.error.deny-barbarian"),
@@ -467,7 +470,8 @@ public enum MessagePath {
 	GENERIC_ERROR_DISABLED                      (0, "generic.error.disabled"),
 	GENERIC_ERROR_REGION                        (0, "generic.error.region"),
 	GENERIC_ERROR_FAILED                        (0, "generic.error.failed"),
-	
+	GENERIC_ERROR_LOOT_UNKNOWN                  (1, "generic.error.loot-unknown"),
+
 	PROTECTION_NOTICE_IGNORE                    (0, "protection.notice.ignore"),
 	PROTECTION_NOTICE_PEACEFUL_TOWN             (1, "protection.notice.peaceful-town"),
 	PROTECTION_NOTICE_PEACEFUL_PLAYER           (0, "protection.notice.peaceful-player"),

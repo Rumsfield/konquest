@@ -47,7 +47,7 @@ public class HangingListener implements Listener {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
 					if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedProtectionTitle(player);
 						event.setCancelled(true);
 						return;
 					}
@@ -59,7 +59,7 @@ public class HangingListener implements Listener {
 				// Check for placement inside of town's monument
 				if(town.getMonument().isLocInside(placeLoc)) {
 					//ChatUtil.printDebug("EVENT: Hanging placed inside of monument");
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedProtectionTitle(player);
 					event.setCancelled(true);
 					return;
 				}
@@ -72,7 +72,7 @@ public class HangingListener implements Listener {
 				}
 			} else if(territory instanceof KonRuin) {
 				// Always prevent
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				event.setCancelled(true);
 				return;
 			}
@@ -97,7 +97,7 @@ public class HangingListener implements Listener {
 				KonPropertyFlagHolder flagHolder = (KonPropertyFlagHolder)territory;
 				if(flagHolder.hasPropertyValue(KonPropertyFlag.BUILD)) {
 					if(!flagHolder.getPropertyValue(KonPropertyFlag.BUILD)) {
-						ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+						ChatUtil.sendKonBlockedFlagTitle(player);
 						event.setCancelled(true);
 						return;
 					}
@@ -109,7 +109,7 @@ public class HangingListener implements Listener {
 				// Check for break inside of town's monument
 				if(town.getMonument().isLocInside(brakeLoc)) {
 					ChatUtil.printDebug("EVENT: Hanging broke inside of monument");
-					ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+					ChatUtil.sendKonBlockedProtectionTitle(player);
 					event.setCancelled(true);
 					return;
 				}
@@ -122,7 +122,7 @@ public class HangingListener implements Listener {
 				}
 			} else if(territory instanceof KonRuin) {
 				// Always prevent
-				ChatUtil.sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
+				ChatUtil.sendKonBlockedProtectionTitle(player);
 				event.setCancelled(true);
 				return;
 			}

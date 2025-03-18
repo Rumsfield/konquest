@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.command.admin;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
+import com.github.rumsfield.konquest.manager.LootManager;
 import com.github.rumsfield.konquest.model.KonMonumentTemplate;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.RegionType;
@@ -41,6 +42,12 @@ public class MonumentAdminCommand extends CommandBase {
 		addArgument(
 				newArg("rename",true,false)
 						.sub( newArg("monument",false,false)
+								.sub (newArg("name",false,false) ) )
+		);
+		// loot <monument> [<name>|default]
+		addArgument(
+				newArg("loot",true,false)
+						.sub( newArg("monument",false,true)
 								.sub (newArg("name",false,false) ) )
 		);
 		// remove|show|status <monument>
@@ -167,6 +174,30 @@ public class MonumentAdminCommand extends CommandBase {
 				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_FAILED.getMessage());
 			}
 
+		} else if(cmdMode.equalsIgnoreCase("loot")) {
+			// Confirm name is a template
+			if(!konquest.getSanctuaryManager().isTemplate(templateName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(templateName));
+				return;
+			}
+			KonMonumentTemplate template = konquest.getSanctuaryManager().getTemplate(templateName);
+			if (args.size() == 2) {
+				// Display current loot table
+				String lootTableName = template.getLootTableName();
+				ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_LOOT_SHOW.getMessage(lootTableName));
+			} else if (args.size() == 3) {
+				// Set new loot table, either default or a custom name
+				String newTableName = args.get(2);
+				if (!konquest.getLootManager().isMonumentLootTable(newTableName)) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_LOOT_UNKNOWN.getMessage(newTableName));
+					return;
+				}
+				template.setLootTableName(newTableName);
+				ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_LOOT_SHOW.getMessage(newTableName));
+			} else {
+				sendInvalidArgMessage(sender);
+			}
+
 		} else if(cmdMode.equalsIgnoreCase("show")) {
 			// Confirm name is a template
 			if(!konquest.getSanctuaryManager().isTemplate(templateName)) {
@@ -219,6 +250,7 @@ public class MonumentAdminCommand extends CommandBase {
 			tabList.add("create");
 			tabList.add("remove");
 			tabList.add("rename");
+			tabList.add("loot");
 			tabList.add("reset");
 			tabList.add("show");
 			tabList.add("status");
@@ -237,6 +269,9 @@ public class MonumentAdminCommand extends CommandBase {
 			} else if (args.get(0).equalsIgnoreCase("rename")) {
 				// New name
 				tabList.add("***");
+			} else if (args.get(0).equalsIgnoreCase("loot")) {
+				// Custom loot table name
+				tabList.addAll(konquest.getLootManager().getMonumentLootTableKeys());
 			}
 		}
 		return matchLastArgToList(tabList,args);

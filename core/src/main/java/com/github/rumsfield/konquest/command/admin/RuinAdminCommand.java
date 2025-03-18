@@ -2,8 +2,10 @@ package com.github.rumsfield.konquest.command.admin;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.command.CommandBase;
+import com.github.rumsfield.konquest.manager.LootManager;
 import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.model.KonPlayer.RegionType;
+import com.github.rumsfield.konquest.model.KonRuin;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
@@ -32,6 +34,12 @@ public class RuinAdminCommand extends CommandBase {
 		addArgument(
 				newArg("rename",true,false)
 						.sub( newArg("ruin",false,false)
+								.sub (newArg("name",false,false) ) )
+		);
+		// loot <ruin> [<name>|default]
+		addArgument(
+				newArg("loot",true,false)
+						.sub( newArg("ruin",false,true)
 								.sub (newArg("name",false,false) ) )
 		);
 		// reset|remove|criticals|spawns <ruin>
@@ -106,6 +114,29 @@ public class RuinAdminCommand extends CommandBase {
 			} else {
 				ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_RUIN_ERROR_RENAME.getMessage(ruinName,newRuinName));
 			}
+		}  else if(cmdMode.equalsIgnoreCase("loot")) {
+			// Check for valid ruin
+			if(!konquest.getRuinManager().isRuin(ruinName)) {
+				ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_UNKNOWN_NAME.getMessage(ruinName));
+				return;
+			}
+			KonRuin ruin = konquest.getRuinManager().getRuin(ruinName);
+			if (args.size() == 2) {
+				// Display current loot table
+				String lootTableName = ruin.getLootTableName();
+				ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_LOOT_SHOW.getMessage(lootTableName));
+			} else if (args.size() == 3) {
+				// Set new loot table, either default or a custom name
+				String newTableName = args.get(2);
+				if (!konquest.getLootManager().isRuinLootTable(newTableName)) {
+					ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_LOOT_UNKNOWN.getMessage(newTableName));
+					return;
+				}
+				ruin.setLootTableName(newTableName);
+				ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_LOOT_SHOW.getMessage(newTableName));
+			} else {
+				sendInvalidArgMessage(sender);
+			}
 		} else if(cmdMode.equalsIgnoreCase("reset")) {
 			// Check for valid ruin
 			if(!konquest.getRuinManager().isRuin(ruinName)) {
@@ -158,6 +189,7 @@ public class RuinAdminCommand extends CommandBase {
 			tabList.add("create");
 			tabList.add("remove");
 			tabList.add("rename");
+			tabList.add("loot");
 			tabList.add("reset");
 			tabList.add("criticals");
 			tabList.add("spawns");
@@ -168,6 +200,7 @@ public class RuinAdminCommand extends CommandBase {
 					break;
 				case "remove":
 				case "rename":
+				case "loot":
 				case "reset":
 				case "criticals":
 				case "spawns":
@@ -178,6 +211,9 @@ public class RuinAdminCommand extends CommandBase {
 			if (args.get(0).equalsIgnoreCase("rename")) {
 				// New name
 				tabList.add("***");
+			} else if (args.get(0).equalsIgnoreCase("loot")) {
+				// Custom loot table name
+				tabList.addAll(konquest.getLootManager().getRuinLootTableKeys());
 			}
 		}
 		return matchLastArgToList(tabList,args);

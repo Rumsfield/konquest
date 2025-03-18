@@ -280,10 +280,10 @@ public class ChatUtil {
 	public static void printDebug(String message, boolean showStack) {
 		if(Konquest.getInstance().getCore().getBoolean(CorePath.DEBUG.getPath())) {
         	Bukkit.getServer().getConsoleSender().sendMessage("[Konquest DEBUG] " + message);
+			if(showStack) {
+				showStackTrace();
+			}
         }
-		if(showStack) {
-			showDebugStackTrace();
-		}
 	}
 	
 	public static void printConsole(String message) {
@@ -410,33 +410,18 @@ public class ChatUtil {
 	}
 
 	public static void sendKonBlockedProtectionTitle(KonPlayer player) {
-		//printDebug("Blocked Protection by player "+player.getBukkitPlayer().getName());
-		//showDebugStackTrace();
+		printDebug("Blocked Protection by player "+player.getBukkitPlayer().getName(), true);
 		sendKonPriorityTitle(player, "", Konquest.blockedProtectionColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 	}
 
 	public static void sendKonBlockedFlagTitle(KonPlayer player) {
-		//printDebug("Blocked Flag by player "+player.getBukkitPlayer().getName());
-		//showDebugStackTrace();
+		printDebug("Blocked Flag by player "+player.getBukkitPlayer().getName(), true);
 		sendKonPriorityTitle(player, "", Konquest.blockedFlagColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
 	}
 
 	public static void sendKonBlockedShieldTitle(KonPlayer player) {
-		//printDebug("Blocked Shield by player "+player.getBukkitPlayer().getName());
-		//showDebugStackTrace();
+		printDebug("Blocked Shield by player "+player.getBukkitPlayer().getName(), true);
 		sendKonPriorityTitle(player, "", Konquest.blockedShieldColor+MessagePath.PROTECTION_ERROR_BLOCKED.getMessage(), 1, 10, 10);
-	}
-
-	private static void showDebugStackTrace() {
-		if(Konquest.getInstance().getCore().getBoolean(CorePath.DEBUG.getPath())) {
-			// Get stack trace
-			for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-				String traceStr = element.toString();
-				if (traceStr.contains("Konquest")) {
-					Bukkit.getServer().getConsoleSender().sendMessage(element.toString());
-				}
-			}
-		}
 	}
 
 	public static void showStackTrace() {

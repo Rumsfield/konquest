@@ -2,7 +2,8 @@
 # Instructions: There are 3 categories of loot: items, potions and enchanted_books. Modify, add or remove entries
 #    from each category. You may remove all entries from a category. The format is:
 # 
-#   loot/ruins:
+#   loot:
+#     name: <display name>          # The name that players see for this loot table
 #     items:
 #       <MATERIAL>:                 # Must be from this list: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 #         amount: <integer>         # The number of items in the stack
@@ -24,11 +25,26 @@
 #
 # The total weight for the loot section's items/potions/enchanted_books is independent from the ruins section's total weight.
 #
+# Here are the loot table sections. Each section defines items, potions, and enchanted_books.
+#   loot:             The default town monument loot.
+#   loot_special:
+#     <Profession>:   Town monument loot for every villager profession.
+#     ...
+#   loot_custom:
+#     <Custom Name>:  Town monument loot for your own custom named sections.
+#     ...
+#   ruins:            The default ruin loot.
+#   ruins_custom:
+#     <Custom Name>:  Ruin loot for your own custom named sections.
+#     ...
+#
 # /!\ DO NOT MODIFY VERSION /!\
 version: 0.0.0
+
 # //// LOOT \\\\
-# Town monument chest loot
+# Town monument chest loot (default).
 loot:
+  name: "Default Monument Loot"
   items:
     GOLD_INGOT:
       amount: 18
@@ -182,9 +198,507 @@ loot:
     THORNS:
       level: 0
       weight: 2
+
+# //// LOOT_SPECIAL \\\\
+# Town monument chest loot, for towns with a trade specialization.
+# Section names must be villager professions.
+loot_special:
+  ARMORER:
+    name: "Armorer Monument Loot"
+    items:
+      SHIELD:
+        amount: 1
+        weight: 12
+      IRON_CHESTPLATE:
+        amount: 1
+        weight: 12
+      CHAINMAIL_CHESTPLATE:
+        amount: 1
+        weight: 8
+      DIAMOND_HELMET:
+        amount: 1
+        weight: 4
+      DIAMOND_CHESTPLATE:
+        amount: 1
+        weight: 4
+      DIAMOND_LEGGINGS:
+        amount: 1
+        weight: 4
+      DIAMOND_BOOTS:
+        amount: 1
+        weight: 6
+    enchanted_books:
+      PROTECTION_ENVIRONMENTAL:
+        level: 1
+        weight: 2
+      PROTECTION_PROJECTILE:
+        level: 1
+        weight: 2
+      PROTECTION_FALL:
+        level: 0
+        weight: 4
+      OXYGEN:
+        level: 0
+        weight: 2
+  BUTCHER:
+    name: "Butcher Monument Loot"
+    items:
+      RABBIT_STEW:
+        amount: 3
+        weight: 10
+      BREAD:
+        amount: 16
+        weight: 10
+      STEAK:
+        amount: 8
+        weight: 16
+      COOKED_PORKCHOP:
+        amount: 8
+        weight: 16
+      GOLDEN_APPLE:
+        amount: 10
+        weight: 8
+  CARTOGRAPHER:
+    name: "Cartographer Monument Loot"
+    items:
+      EMPTY_MAP:
+        amount: 1
+        weight: 16
+      COMPASS:
+        amount: 1
+        weight: 10
+      WHITE_BANNER:
+        amount: 1
+        weight: 12
+      BLACK_BANNER:
+        amount: 1
+        weight: 12
+    potions:
+      SPEED:
+        upgraded: true
+        extended: false
+        weight: 6
+      JUMP:
+        upgraded: true
+        extended: false
+        weight: 4
+  CLERIC:
+    name: "Cleric Monument Loot"
+    items:
+      NETHER_WART:
+        amount: 8
+        weight: 10
+      BLAZE_ROD:
+        amount: 4
+        weight: 10
+      GLOWSTONE:
+        amount: 16
+        weight: 6
+      ENDER_PEARL:
+        amount: 8
+        weight: 6
+    potions:
+      HEAL:
+        upgraded: true
+        extended: false
+        weight: 10
+      REGENERATION:
+        upgraded: true
+        extended: false
+        weight: 6
+      FAST_DIGGING:
+        upgraded: true
+        extended: true
+        weight: 6
+    enchanted_books:
+      DAMAGE_ARTHROPODS:
+        level: 0
+        weight: 3
+      DAMAGE_UNDEAD:
+        level: 0
+        weight: 3
+  FARMER:
+    name: "Farmer Monument Loot"
+    items:
+      WHEAT:
+        amount: 16
+        weight: 6
+      POTATO:
+        amount: 16
+        weight: 6
+      CARROT:
+        amount: 16
+        weight: 6
+      BEETROOT:
+        amount: 16
+        weight: 6
+      PUMPKIN_SEEDS:
+        amount: 8
+        weight: 6
+      MELON_SEEDS:
+        amount: 8
+        weight: 6
+      GOLDEN_CARROT:
+        amount: 16
+        weight: 12
+    enchanted_books:
+      LOOT_BONUS_MOBS:
+        level: 10
+        weight: 12
+  FISHERMAN:
+    name: "Fisherman Monument Loot"
+    items:
+      COOKED_SALMON:
+        amount: 16
+        weight: 14
+      FISHING_ROD:
+        amount: 1
+        weight: 5
+      OAK_BOAT:
+        amount: 1
+        weight: 8
+    potions:
+      WATER_BREATHING:
+        upgraded: true
+        extended: true
+        weight: 5
+    enchanted_books:
+      WATER_WORKER:
+        level: 1
+        weight: 8
+      LUCK:
+        level: 0
+        weight: 10
+      LURE:
+        level: 0
+        weight: 10
+  FLETCHER:
+    name: "Fletcher Monument Loot"
+    items:
+      ARROW:
+        amount: 32
+        weight: 20
+      BOW:
+        amount: 1
+        weight: 8
+      CROSSBOW:
+        amount: 1
+        weight: 8
+    enchanted_books:
+      ARROW_DAMAGE:
+        level: 0
+        weight: 6
+      ARROW_FIRE:
+        level: 0
+        weight: 6
+      MULTISHOT:
+        level: 0
+        weight: 6
+      QUICK_CHARGE:
+        level: 0
+        weight: 6
+  LEATHERWORKER:
+    name: "Leatherworker Monument Loot"
+    items:
+      LEATHER_CAP:
+        amount: 1
+        weight: 5
+      LEATHER_TUNIC:
+        amount: 1
+        weight: 5
+      LEATHER_PANTS:
+        amount: 1
+        weight: 5
+      LEATHER_BOOTS:
+        amount: 1
+        weight: 5
+      LEATHER_HORSE_ARMOR:
+        amount: 1
+        weight: 15
+      SADDLE:
+        amount: 1
+        weight: 25
+  LIBRARIAN:
+    name: "Librarian Monument Loot"
+    items:
+      BOOKSHELF:
+        amount: 4
+        weight: 18
+      NAME_TAG:
+        amount: 1
+        weight: 14
+    enchanted_books:
+      FROST_WALKER:
+        level: 0
+        weight: 8
+      SOUL_SPEED:
+        level: 0
+        weight: 8
+      LOOT_BONUS_BLOCKS:
+        level: 0
+        weight: 8
+      MENDING:
+        level: 0
+        weight: 4
+  MASON:
+    name: "Mason Monument Loot"
+    items:
+      BRICKS:
+        amount: 64
+        weight: 8
+      QUARTZ_PILLAR:
+        amount: 64
+        weight: 8
+      BLOCK_OF_QUARTZ:
+        amount: 64
+        weight: 8
+      SMOOTH_STONE:
+        amount: 64
+        weight: 8
+      STONE:
+        amount: 64
+        weight: 20
+      STONE_BRICKS:
+        amount: 64
+        weight: 8
+  SHEPHERD:
+    name: "Shepherd Monument Loot"
+    items:
+      WHITE_WOOL:
+        amount: 64
+        weight: 16
+      BLACK_WOOL:
+        amount: 64
+        weight: 16
+      PAINTING:
+        amount: 1
+        weight: 6
+      RED_BED:
+        amount: 8
+        weight: 10
+    potions:
+      DAMAGE_RESISTANCE:
+        upgraded: true
+        extended: true
+        weight: 6
+      FIRE_RESISTANCE:
+        upgraded: true
+        extended: true
+        weight: 6
+  TOOLSMITH:
+    name: "Toolsmith Monument Loot"
+    items:
+      ANVIL:
+        amount: 1
+        weight: 3
+      IRON_PICKAXE:
+        amount: 1
+        weight: 8
+      IRON_SHOVEL:
+        amount: 1
+        weight: 8
+      IRON_HOE:
+        amount: 1
+        weight: 8
+      DIAMOND_PICKAXE:
+        amount: 1
+        weight: 6
+      DIAMOND_SHOVEL:
+        amount: 1
+        weight: 6
+      DIAMOND_HOE:
+        amount: 1
+        weight: 6
+    enchanted_books:
+      DIG_SPEED:
+        level: 1
+        weight: 5
+      DURABILITY:
+        level: 1
+        weight: 5
+      SILK_TOUCH:
+        level: 0
+        weight: 5
+  WEAPONSMITH:
+    name: "Weaponsmith Monument Loot"
+    items:
+      IRON_AXE:
+        amount: 1
+        weight: 8
+      IRON_SWORD:
+        amount: 1
+        weight: 8
+      DIAMOND_AXE:
+        amount: 1
+        weight: 6
+      DIAMOND_SWORD:
+        amount: 1
+        weight: 6
+      NETHERITE_SWORD:
+        amount: 1
+        weight: 4
+    potions:
+      INCREASE_DAMAGE:
+        upgraded: true
+        extended: true
+        weight: 16
+    enchanted_books:
+      DAMAGE_ALL:
+        level: 1
+        weight: 6
+      KNOCKBACK:
+        level: 1
+        weight: 6
+
+# //// LOOT_CUSTOM \\\\
+# Town monument chest loot, custom loot tables for specific monument templates.
+# Set monument templates in-game to use loot from the section names here.
+loot_custom:
+  # ADD_YOUR_OWN_SECTION_NAME:
+  #   items:
+  #     <put items here, see top comments>
+  #   potions:
+  #     <put potions here, see top comments>
+  #   enchanted_books:
+  #     <put enchantments here, see top comments>
+  #
+  CUSTOM_MILITARY:
+    name: "Military Monument Loot"
+    items:
+      COBWEB:
+        amount: 8
+        weight: 10
+      STICKY_PISTON:
+        amount: 4
+        weight: 8
+      TNT:
+        amount: 16
+        weight: 2
+      DIAMOND_AXE:
+        amount: 1
+        weight: 6
+      DIAMOND_SWORD:
+        amount: 1
+        weight: 6
+      SHIELD:
+        amount: 1
+        weight: 10
+      FLINT_AND_STEEL:
+        amount: 1
+        weight: 10
+      IRON_HELMET:
+        amount: 1
+        weight: 10
+      IRON_CHESTPLATE:
+        amount: 1
+        weight: 10
+      IRON_LEGGINGS:
+        amount: 1
+        weight: 10
+      IRON_BOOTS:
+        amount: 1
+        weight: 10
+      IRON_HORSE_ARMOR:
+        amount: 1
+        weight: 8
+      GOLDEN_APPLE:
+        amount: 6
+        weight: 2
+      LAPIS_LAZULI:
+        amount: 16
+        weight: 8
+      DIAMOND:
+        amount: 12
+        weight: 6
+    potions:
+      DAMAGE_RESISTANCE:
+        upgraded: false
+        extended: true
+        weight: 4
+      FIRE_RESISTANCE:
+        upgraded: false
+        extended: false
+        weight: 6
+      REGENERATION:
+        upgraded: false
+        extended: true
+        weight: 4
+    enchanted_books:
+      DAMAGE_ALL:
+        level: 0
+        weight: 4
+      FIRE_ASPECT:
+        level: 0
+        weight: 6
+      KNOCKBACK:
+        level: 0
+        weight: 4
+      SWEEPING_EDGE:
+        level: 0
+        weight: 8
+      PROTECTION_ENVIRONMENTAL:
+        level: 0
+        weight: 4
+      PROTECTION_EXPLOSIONS:
+        level: 0
+        weight: 8
+      PROTECTION_FIRE:
+        level: 0
+        weight: 8
+      PROTECTION_PROJECTILE:
+        level: 0
+        weight: 6
+  CUSTOM_BUILDER:
+    name: "Builder Monument Loot"
+    items:
+      OAK_LOG:
+        amount: 64
+        weight: 5
+      SMOOTH_STONE:
+        amount: 64
+        weight: 5
+      SEA_LANTERN:
+        amount: 16
+        weight: 5
+      CHAIN:
+        amount: 16
+        weight: 5
+      WHITE_STAINED_GLASS:
+        amount: 64
+        weight: 5
+      GRASS_BLOCK:
+        amount: 64
+        weight: 5
+      PACKED_ICE:
+        amount: 64
+        weight: 4
+      SCAFFOLDING:
+        amount: 64
+        weight: 5
+      RAIL:
+        amount: 64
+        weight: 5
+      POWERED_RAIL:
+        amount: 64
+        weight: 5
+      DIAMOND_SHOVEL:
+        amount: 1
+        weight: 4
+      DIAMOND_PICKAXE:
+        amount: 1
+        weight: 2
+    enchanted_books:
+      PROTECTION_FALL:
+        level: 0
+        weight: 4
+      SILK_TOUCH:
+        level: 0
+        weight: 2
+
 # //// RUINS \\\\
-# Ruin chest loot
+# Ruin chest loot, the default loot for all ruins without a custom loot table.
 ruins:
+  name: "Default Ruin Loot"
   items:
     GOLD_BLOCK:
       amount: 5
@@ -231,3 +745,77 @@ ruins:
     PROTECTION_PROJECTILE:
       level: 1
       weight: 4
+
+# //// RUINS_CUSTOM \\\\
+# Ruin chest loot, custom loot tables for specific ruins.
+# Set ruins in-game to use loot from the section names here.
+ruins_custom:
+  # ADD_YOUR_OWN_SECTION_NAME:
+  #   items:
+  #     <put items here, see top comments>
+  #   potions:
+  #     <put potions here, see top comments>
+  #   enchanted_books:
+  #     <put enchantments here, see top comments>
+  #
+  CUSTOM_TEMPLE:
+    name: "Temple Ruin Loot"
+    items:
+      IRON_HELMET:
+        amount: 1
+        weight: 15
+      NETHERITE_HELMET:
+        amount: 1
+        weight: 5
+      LAPIS_BLOCK:
+        amount: 4
+        weight: 15
+      OBSIDIAN:
+        amount: 16
+        weight: 10
+      IRON_INGOT:
+        amount: 8
+        weight: 20
+      MOSSY_COBBLESTONE:
+        amount: 12
+        weight: 15
+      SLIME_BLOCK:
+        amount: 4
+        weight: 10
+    enchanted_books:
+      VANISHING_CURSE:
+        level: 0
+        weight: 5
+      BINDING_CURSE:
+        level: 0
+        weight: 5
+  CUSTOM_MINESHAFT:
+    name: "Mineshaft Ruin Loot"
+    items:
+      COAL:
+        amount: 32
+        weight: 20
+      GOLD_ORE:
+        amount: 10
+        weight: 15
+      LANTERN:
+        amount: 1
+        weight: 10
+      SLIME_BALL:
+        amount: 16
+        weight: 12
+      DIAMOND:
+        amount: 20
+        weight: 15
+      COBWEB:
+        amount: 1
+        weight: 5
+    potions:
+      FAST_DIGGING:
+        upgraded: true
+        extended: true
+        weight: 8
+    enchanted_books:
+      LOOT_BONUS_BLOCKS:
+        level: 2
+        weight: 5

@@ -899,6 +899,7 @@ public class InfoMenu extends StateMenu {
         if (isClickable) {
             if (infoKingdom.hasMonumentTemplate()) {
                 icon = new TemplateIcon(infoKingdom.getMonumentTemplate(), SLOT_MONUMENT, true);
+                icon.addNameValue(MessagePath.LABEL_LOOT_TYPE.getMessage(), getKonquest().getLootManager().getMonumentLootDisplayName(infoKingdom.getMonumentTemplate()));
                 icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
                 icon.setState(MenuState.MONUMENT_INFO);
             } else {
@@ -1042,17 +1043,16 @@ public class InfoMenu extends StateMenu {
         result = new DisplayView(rows, title);
 
         /* Town Icon */
+        String lootTableName = getKonquest().getLootManager().getMonumentLootDisplayName(infoTown);
         int numTownPlayers = infoTown.getNumResidentsOnline();
-        int numTownKnights = infoTown.getPlayerKnightsOnly().size();
-        int numTownResidents = infoTown.getPlayerResidentsOnly().size();
         int maxCriticalHits = getKonquest().getCore().getInt(CorePath.MONUMENTS_DESTROY_AMOUNT.getPath());
         int remainingCriticalHits = maxCriticalHits - infoTown.getMonument().getCriticalHits();
         String townHealth = remainingCriticalHits+"/"+maxCriticalHits;
         String shieldTime = HelperUtil.getTimeFormat(infoTown.getRemainingShieldTimeSeconds(),"");
         int armorBlocks = infoTown.getArmorBlocks();
         icon = new TownIcon(infoTown, contextColor, relation, SLOT_TOWN, false);
+        icon.addNameValue(MessagePath.LABEL_LOOT_TYPE.getMessage(), lootTableName);
         icon.addNameValue(MessagePath.LABEL_ONLINE_PLAYERS.getMessage(), numTownPlayers);
-        icon.addNameValue(MessagePath.LABEL_KNIGHTS.getMessage(), numTownKnights);
         icon.addNameValue(MessagePath.LABEL_HEALTH.getMessage(), townHealth);
         icon.addNameValue(MessagePath.LABEL_SHIELD.getMessage(), shieldTime);
         icon.addNameValue(MessagePath.LABEL_ARMOR.getMessage(), armorBlocks);
@@ -1111,6 +1111,7 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Knights Icon */
+        int numTownKnights = infoTown.getPlayerKnightsOnly().size();
         icon = new InfoIcon(MessagePath.LABEL_KNIGHTS.getMessage(), Material.IRON_HORSE_ARMOR, SLOT_KNIGHTS, true);
         icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTownKnights);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
@@ -1118,6 +1119,7 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Residents Icon */
+        int numTownResidents = infoTown.getPlayerResidentsOnly().size();
         icon = new InfoIcon(MessagePath.LABEL_RESIDENTS.getMessage(), Material.LEATHER_CHESTPLATE, SLOT_RESIDENTS, true);
         icon.addNameValue(MessagePath.LABEL_TOTAL.getMessage(), numTownResidents);
         icon.addHint(MessagePath.MENU_HINT_VIEW.getMessage());
@@ -1222,6 +1224,7 @@ public class InfoMenu extends StateMenu {
         icon = new RuinIcon(infoRuin, SLOT_RUIN, false);
         icon.addNameValue(MessagePath.LABEL_CRITICAL_HITS.getMessage(), infoRuin.getMaxCriticalHits());
         icon.addNameValue(MessagePath.LABEL_GOLEM_SPAWNS.getMessage(), infoRuin.getSpawnLocations().size());
+        icon.addNameValue(MessagePath.LABEL_LOOT_TYPE.getMessage(), getKonquest().getLootManager().getRuinLootDisplayName(infoRuin));
         result.addIcon(icon);
 
         /* Capture Icon */
@@ -1329,6 +1332,7 @@ public class InfoMenu extends StateMenu {
         double totalCost = getKonquest().getKingdomManager().getCostTemplate() + infoTemplate.getCost();
         icon = new TemplateIcon(infoTemplate, SLOT_TEMPLATE, false);
         icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(totalCost));
+        icon.addNameValue(MessagePath.LABEL_LOOT_TYPE.getMessage(), getKonquest().getLootManager().getMonumentLootDisplayName(infoTemplate));
         result.addIcon(icon);
 
         /* Sanctuary Icon */
