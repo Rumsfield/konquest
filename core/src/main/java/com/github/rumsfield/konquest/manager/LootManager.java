@@ -14,7 +14,6 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -116,7 +115,7 @@ public class LootManager implements Timeable{
 			if(status && itemWeight > 0) {
 				// Add loot table entry
 				result.put(new ItemStack(itemType, itemAmount), itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" item "+itemName+" with amount "+itemAmount+", weight "+itemWeight);
+				//ChatUtil.printDebug("  Added loot path "+pathName+" item "+itemName+" with amount "+itemAmount+", weight "+itemWeight);
 			}
 		}
 		return result;
@@ -172,7 +171,7 @@ public class LootManager implements Timeable{
 				assert meta != null;
 				potion.setItemMeta(meta);
 				result.put(potion, itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" potion "+potionType+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
+				//ChatUtil.printDebug("  Added loot path "+pathName+" potion "+potionType+" with extended "+itemExtended+", upgraded "+itemUpgraded+", weight "+itemWeight);
 			}
 		}
 		return result;
@@ -227,7 +226,7 @@ public class LootManager implements Timeable{
 				enchantMeta.addStoredEnchant(bookType, itemLevel, true);
 				enchantBook.setItemMeta(enchantMeta);
 				result.put(enchantBook, itemWeight);
-				ChatUtil.printDebug("  Added loot path "+pathName+" enchant "+bookType.getKey().toString()+" with level "+itemLevel+", weight "+itemWeight);
+				//ChatUtil.printDebug("  Added loot path "+pathName+" enchant "+bookType.getKey().toString()+" with level "+itemLevel+", weight "+itemWeight);
 			}
 		}
 		return result;

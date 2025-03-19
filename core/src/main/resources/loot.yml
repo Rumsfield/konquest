@@ -249,7 +249,7 @@ loot_special:
       BREAD:
         amount: 16
         weight: 10
-      STEAK:
+      COOKED_BEEF:
         amount: 8
         weight: 16
       COOKED_PORKCHOP:
@@ -261,11 +261,11 @@ loot_special:
   CARTOGRAPHER:
     name: "Cartographer Monument Loot"
     items:
-      EMPTY_MAP:
-        amount: 1
+      REDSTONE:
+        amount: 32
         weight: 16
-      COMPASS:
-        amount: 1
+      IRON_INGOT:
+        amount: 16
         weight: 10
       WHITE_BANNER:
         amount: 1
@@ -298,7 +298,7 @@ loot_special:
         amount: 8
         weight: 6
     potions:
-      HEAL:
+      INSTANT_HEAL:
         upgraded: true
         extended: false
         weight: 10
@@ -306,7 +306,7 @@ loot_special:
         upgraded: true
         extended: false
         weight: 6
-      FAST_DIGGING:
+      NIGHT_VISION:
         upgraded: true
         extended: true
         weight: 6
@@ -400,13 +400,13 @@ loot_special:
   LEATHERWORKER:
     name: "Leatherworker Monument Loot"
     items:
-      LEATHER_CAP:
+      LEATHER_HELMET:
         amount: 1
         weight: 5
-      LEATHER_TUNIC:
+      LEATHER_CHESTPLATE:
         amount: 1
         weight: 5
-      LEATHER_PANTS:
+      LEATHER_LEGGINGS:
         amount: 1
         weight: 5
       LEATHER_BOOTS:
@@ -449,7 +449,7 @@ loot_special:
       QUARTZ_PILLAR:
         amount: 64
         weight: 8
-      BLOCK_OF_QUARTZ:
+      QUARTZ_BLOCK:
         amount: 64
         weight: 8
       SMOOTH_STONE:
@@ -477,7 +477,7 @@ loot_special:
         amount: 8
         weight: 10
     potions:
-      DAMAGE_RESISTANCE:
+      INVISIBILITY:
         upgraded: true
         extended: true
         weight: 6
@@ -538,7 +538,7 @@ loot_special:
         amount: 1
         weight: 4
     potions:
-      INCREASE_DAMAGE:
+      STRENGTH:
         upgraded: true
         extended: true
         weight: 16
@@ -611,7 +611,7 @@ loot_custom:
         amount: 12
         weight: 6
     potions:
-      DAMAGE_RESISTANCE:
+      STRENGTH:
         upgraded: false
         extended: true
         weight: 4
@@ -811,7 +811,7 @@ ruins_custom:
         amount: 1
         weight: 5
     potions:
-      FAST_DIGGING:
+      INVISIBILITY:
         upgraded: true
         extended: true
         weight: 8

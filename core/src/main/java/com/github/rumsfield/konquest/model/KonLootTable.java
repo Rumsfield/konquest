@@ -2,13 +2,13 @@ package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.manager.LootManager;
 import com.github.rumsfield.konquest.utility.ChatUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -17,10 +17,12 @@ public class KonLootTable {
 
     private String name;
     private final HashMap<ItemStack,Integer> loot;
+    private final ArrayList<ItemStack> weightedLoot;
 
     public KonLootTable() {
         this.name = LootManager.defaultLootTableName;
         this.loot = new HashMap<>();
+        this.weightedLoot = new ArrayList<>();
     }
 
     public void setName(String name) {
@@ -33,10 +35,20 @@ public class KonLootTable {
 
     public void addLoot(HashMap<ItemStack,Integer> otherLoot) {
         loot.putAll(otherLoot);
+        // Populate weighted loot table
+        weightedLoot.clear();
+        for (ItemStack item : loot.keySet()) {
+            int weight = Math.max(loot.get(item),1);
+            while (weight > 0) {
+                weightedLoot.add(item);
+                weight--;
+            }
+        }
     }
 
     public void clearLoot() {
         loot.clear();
+        weightedLoot.clear();
     }
 
     public boolean isEmptyLoot() {
@@ -44,25 +56,12 @@ public class KonLootTable {
     }
 
     public ItemStack chooseRandomItem() {
-        ItemStack item = new ItemStack(Material.DIRT,1);
-        ItemMeta defaultMeta = item.getItemMeta();
-        defaultMeta.setDisplayName(ChatColor.DARK_RED+"Invalid Loot");
-        item.setItemMeta(defaultMeta);
-        if(!loot.isEmpty()) {
-            // Find total item range
-            int total = 0;
-            for(int p : loot.values()) {
-                total = total + p;
-            }
-            int typeChoice = ThreadLocalRandom.current().nextInt(total);
-            int typeWindow = 0;
-            for(ItemStack i : loot.keySet()) {
-                if(typeChoice < typeWindow + loot.get(i)) {
-                    item = i.clone();
-                    break;
-                }
-                typeWindow = typeWindow + loot.get(i);
-            }
+        ItemStack item;
+        if(!weightedLoot.isEmpty()) {
+            int tableIndex = ThreadLocalRandom.current().nextInt(weightedLoot.size());
+            item = weightedLoot.get(tableIndex).clone();
+        } else {
+            item = new ItemStack(Material.DIRT,1);
         }
         // Check for stored enchantment with level 0
         ItemMeta meta = item.getItemMeta();
