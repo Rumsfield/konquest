@@ -55,6 +55,7 @@ label:
   leaderboard: Leaderboard
   level: Level
   loot-chests: Loot Chests
+  loot-type: Loot Type
   map-color: Map Color
   members: Members
   modified: Modified
@@ -376,6 +377,7 @@ menu:
     hint-special: Click to specialize
     lore-special: Choose this profession for a discount with villagers in this town.
     info-special: Villagers with this profession give discounts in this town.
+    loot-special: This profession gives special loot at the town monument.
     title-join: Join a Town
     title-leave: Leave a Town
     title-list: Town List
@@ -482,6 +484,8 @@ generic:
     prefix-lost: Lost accomplishment prefix
     quest: Quest complete
     loot: New town monument loot is available.
+    loot-show: The chosen loot table is %s.
+    loot-set: Set the loot table to %s.
     absent: You have been absent for too long and have been kicked from all towns.
     force-barbarian: You are now a barbarian!
   error:
@@ -506,6 +510,7 @@ generic:
     disabled: This feature is currently disabled, talk to an admin.
     region: Cannot do this while setting other regions.
     failed: Failed :(
+    loot-unknown: Unknown loot table name, %s.
 # //// PROTECTION \\\\
 # Messages about protecting blocks and land from players.
 protection:
@@ -570,6 +575,7 @@ protection:
     capital-immune: This capital is immune to attacks while %s towns remain in the Kingdom of %s.
     no-allied-build: This town's options do not allow players from allied kingdoms to build.
     template-modify: This monument template is currently being modified and will be available soon.
+    loot-denied: You must be a town knight or lord to get loot.
 # //// COMMAND \\\\
 # Messages used for all commands.
 command:

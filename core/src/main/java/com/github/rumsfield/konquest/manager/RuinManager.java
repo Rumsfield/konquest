@@ -238,6 +238,9 @@ public class RuinManager implements KonquestRuinManager {
 	                		ruin.addSpawnLocation(loc);
 	            		}
 	                	konquest.getTerritoryManager().addAllTerritory(world,ruin.getChunkList());
+						if (ruinSection.contains("loot")) {
+							ruin.setLootTableName(ruinSection.getString("loot",LootManager.defaultLootTableName));
+						}
 						// Set properties
 						ConfigurationSection ruinPropertiesSection = ruinSection.getConfigurationSection("properties");
 						if(ruinPropertiesSection != null) {
@@ -290,6 +293,7 @@ public class RuinManager implements KonquestRuinManager {
 				ruinSection.set("chunks", HelperUtil.formatPointsToString(ruin.getChunkList().keySet()));
 				ruinSection.set("criticals", HelperUtil.formatLocationsToString(ruin.getCriticalLocations()));
 				ruinSection.set("spawns", HelperUtil.formatLocationsToString(ruin.getSpawnLocations()));
+				ruinSection.set("loot", ruin.getLootTableName());
 				// Properties
 				ConfigurationSection ruinPropertiesSection = ruinSection.createSection("properties");
 				for (KonPropertyFlag flag : KonPropertyFlag.values()) {

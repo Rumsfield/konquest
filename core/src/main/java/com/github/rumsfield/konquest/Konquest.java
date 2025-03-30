@@ -340,6 +340,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		shieldManager.initialize();
 		placeholderManager.initialize();
 		plotManager.initialize();
+		lootManager.refreshCustomTableAssignments();
 		offlineTimeoutSeconds = getCore().getInt(CorePath.KINGDOMS_OFFLINE_TIMEOUT_DAYS.getPath(),0)* 86400L;
 		if(offlineTimeoutSeconds > 0 && offlineTimeoutSeconds < 86400) {
 			offlineTimeoutSeconds = 86400;

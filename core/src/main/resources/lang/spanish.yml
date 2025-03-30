@@ -55,6 +55,7 @@ label:
   leaderboard: Tabla de Liderazgo
   level: Nivel
   loot-chests: Cofres de Botin
+  loot-type: Tipo de Botín
   map-color: Color del Mapa
   members: Miembros
   modified: Modificado
@@ -376,6 +377,7 @@ menu:
     hint-special: Haz clic para especializarte
     lore-special: Elige esta profesion para obtener un descuento con los aldeanos en este pueblo.
     info-special: Los aldeanos con esta profesión dan descuentos en este pueblo.
+    loot-special: Esta profesión otorga un botín especial en el monumento del pueblo.
     title-join: Unirse a un Pueblo
     title-leave: Salir de un Pueblo
     title-list: Lista de Pueblos
@@ -482,6 +484,8 @@ generic:
     prefix-lost: Prefijo de logro perdido
     quest: Mision completa
     loot: El botin del nuevo monumento del pueblo esta disponible.
+    loot-show: La tabla de botín elegida es %s.
+    loot-set: Establezca la tabla de botín en %s.
     absent: Has estado ausente durante demasiado tiempo y has sido expulsado de todos los pueblos.
     force-barbarian: ¡Ahora eres un barbaro!
   error:
@@ -506,6 +510,7 @@ generic:
     disabled: Esta caracteristica esta actualmente deshabilitada, habla con un administrador.
     region: No se puede hacer esto mientras se configuran otras regiones.
     failed: ¡Fallo :(
+    loot-unknown: Nombre de tabla de botín desconocido, %s.
 # //// PROTECTION \\\\
 # Mensajes sobre la protección de bloques y tierras por parte de los jugadores.
 protection:
@@ -570,6 +575,7 @@ protection:
     capital-immune: Esta capital es inmune a ataques mientras %s pueblos permanezcan en el Reino de %s.
     no-allied-build: Las opciones de este pueblo no permiten que jugadores de reinos aliados construyan.
     template-modify: Esta plantilla de monumento se está modificando actualmente y estará disponible pronto.
+    loot-denied: Debes ser un caballero o señor del pueblo para obtener botín.
 # //// COMMAND \\\\
 # Mensajes utilizados para todos los comandos.
 command:

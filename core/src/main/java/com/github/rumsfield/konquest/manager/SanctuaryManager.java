@@ -670,6 +670,13 @@ public class SanctuaryManager {
 	        				// Create  & validate template
 							// If it fails validation, it is still loaded into memory, but marked as invalid.
 				        	loadMonumentTemplate(sanctuary, templateName, templateCornerOne, templateCornerTwo, templateTravel, cost);
+							// Update template
+							if (isTemplate(templateName)) {
+								KonMonumentTemplate template = getTemplate(templateName);
+								if (templateSection.contains("loot")) {
+									template.setLootTableName(templateSection.getString("loot",LootManager.defaultLootTableName));
+								}
+							}
 	        			}
 	        			// Done
 	        		} else {
@@ -725,6 +732,7 @@ public class SanctuaryManager {
 		 * 			monuments:
 		 * 				<name>:
 		 *                  cost:
+		 * 					loot:
 		 * 					travel:
 		 * 					- ?
 		 * 					- ?
@@ -778,6 +786,7 @@ public class SanctuaryManager {
 					}
 					ConfigurationSection monumentSection = sanctuaryMonumentsSection.createSection(monumentName);
 					monumentSection.set("cost", template.getCost());
+					monumentSection.set("loot", template.getLootTableName());
 					monumentSection.set("travel", new int[]{template.getTravelPoint().getBlockX(),
 							template.getTravelPoint().getBlockY(),
 							template.getTravelPoint().getBlockZ()});
