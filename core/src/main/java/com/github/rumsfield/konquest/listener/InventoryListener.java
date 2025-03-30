@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
@@ -25,10 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.inventory.*;
-import org.bukkit.inventory.BlockInventoryHolder;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.MerchantInventory;
-import org.bukkit.inventory.SmithingInventory;
+import org.bukkit.inventory.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -140,20 +138,21 @@ public class InventoryListener implements Listener {
 					}
 					// Attempt to put loot into empty chests within the monument
 					if(town.getMonument().isLocInside(openLoc) && event.getInventory().getType().equals(InventoryType.CHEST)) {
+						// Cancel opening this chest
+						event.setCancelled(true);
 						if(town.isPlayerLord(player.getOfflineBukkitPlayer()) || town.isPlayerKnight(player.getOfflineBukkitPlayer())) {
-							// Update loot with default count as defined in core YML
-							boolean result = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town);
-							ChatUtil.printDebug("Attempted to update loot in town "+territory.getName()+", got "+result);
-							if(result) {
-								event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
-								// Execute custom commands from config
-								konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_LOOT_OPEN,player.getBukkitPlayer());
+							// Get new loot inventory (could be null)
+							Inventory lootInventory = konquest.getLootManager().updateMonumentLoot(event.getInventory(), town, player.getBukkitPlayer());
+							if(lootInventory != null) {
+								// Show loot inventory to player instead of the "real" chest
+								player.getBukkitPlayer().openInventory(lootInventory);
 							} else {
-								ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
+								// Invalid loot inventory
+								ChatUtil.sendKonBlockedProtectionTitle(player);
+								return;
 							}
 						} else {
-							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
-							event.setCancelled(true);
+							ChatUtil.sendError(player.getBukkitPlayer(), MessagePath.PROTECTION_ERROR_LOOT_DENIED.getMessage());
 							return;
 						}
 					}
@@ -163,15 +162,17 @@ public class InventoryListener implements Listener {
 				if(territory instanceof KonRuin) {
 					// Attempt to put loot into empty chests within the ruin
 					if(event.getInventory().getType().equals(InventoryType.CHEST)) {
-						// Update loot with default count as defined in core YML
-						boolean result = konquest.getLootManager().updateRuinLoot(event.getInventory(), (KonRuin)territory);
-						ChatUtil.printDebug("Attempted to update loot in ruin "+territory.getName()+", got "+result);
-						if(result) {
-							event.getInventory().getLocation().getWorld().playSound(event.getInventory().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
-							// Execute custom commands from config
-							konquest.executeCustomCommand(CustomCommandPath.RUIN_LOOT_OPEN,player.getBukkitPlayer());
+						// Cancel opening this chest
+						event.setCancelled(true);
+						// Get new loot inventory (could be null)
+						Inventory lootInventory = konquest.getLootManager().updateRuinLoot(event.getInventory(), (KonRuin)territory, player.getBukkitPlayer());
+						if(lootInventory != null) {
+							// Show loot inventory to player instead of the "real" chest
+							player.getBukkitPlayer().openInventory(lootInventory);
 						} else {
-							ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_LOOT_CAPTURE.getMessage());
+							// Invalid loot inventory
+							ChatUtil.sendKonBlockedProtectionTitle(player);
+							return;
 						}
 					}
 				}
@@ -249,10 +250,13 @@ public class InventoryListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onLootChestClick(InventoryClickEvent event) {
 		// Prevent placing items into loot chests
-		if(event.isCancelled()) return;
-		if(event.getClickedInventory() == null) return;
+		if(event.isCancelled() || event.getClickedInventory() == null) return;
 		if(!CompatibilityUtil.getTopInventory(event).getType().equals(InventoryType.CHEST)) return;
-		Location inventoryLocation = CompatibilityUtil.getTopInventory(event).getLocation();
+		Location inventoryLocation = null;
+		InventoryHolder holder = CompatibilityUtil.getTopInventory(event).getHolder();
+		if(holder instanceof Chest) {
+			inventoryLocation = ((Chest)holder).getLocation();
+		}
 		if(inventoryLocation == null) return;
 		// Check for ignored world
 		if(konquest.isWorldIgnored(inventoryLocation)) return;
@@ -260,17 +264,14 @@ public class InventoryListener implements Listener {
 		if(event.getRawSlot() < CompatibilityUtil.getTopInventory(event).getSize()) {
 			// When clicking in the top (chest) inventory, only allow pickup and shift-click of items into bottom.
 			if(event.getAction().equals(InventoryAction.PICKUP_ALL) || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-				//ChatUtil.printDebug("Ignored top inventory");
 				return;
 			}
 		} else {
 			// When clicking in the bottom (player) inventory, allow everything but shift-clicks of items into top.
 			if(!event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-				//ChatUtil.printDebug("Ignored bottom inventory");
 				return;
 			}
 		}
-		//ChatUtil.printDebug("Checking for loot chest...");
 		// Check for loot chest
 		if(isLootChestLocation(inventoryLocation)) {
 			event.setCancelled(true);
@@ -282,7 +283,11 @@ public class InventoryListener implements Listener {
 		// Prevent dragging items into loot chests
 		if(event.isCancelled()) return;
 		if(!CompatibilityUtil.getTopInventory(event).getType().equals(InventoryType.CHEST)) return;
-		Location inventoryLocation = event.getInventory().getLocation();
+		Location inventoryLocation = null;
+		InventoryHolder holder = CompatibilityUtil.getTopInventory(event).getHolder();
+		if(holder instanceof Chest) {
+			inventoryLocation = ((Chest)holder).getLocation();
+		}
 		if(inventoryLocation == null) return;
 		// Check for ignored world
 		if(konquest.isWorldIgnored(inventoryLocation)) return;
@@ -294,14 +299,11 @@ public class InventoryListener implements Listener {
 				break;
 			}
 		}
-		//ChatUtil.printDebug("Inventory dragged in top chest inventory: "+isInTop);
 		// When dragging in the top (chest) inventory, do not allow anything.
 		// When dragging in the bottom (player) inventory, allow everything.
 		if(!isInTop) {
-			//ChatUtil.printDebug("Ignored bottom inventory");
 			return;
 		}
-		//ChatUtil.printDebug("Checking for loot chest...");
 		// Check for territory at inventory location
 		if(isLootChestLocation(inventoryLocation)) {
 			event.setCancelled(true);

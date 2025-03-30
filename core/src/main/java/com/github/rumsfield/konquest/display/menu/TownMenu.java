@@ -686,13 +686,19 @@ public class TownMenu extends StateMenu {
 
         /* Profession Icons */
         MenuIcon icon;
-        for(Villager.Profession profession : CompatibilityUtil.getProfessions()) {
-            if(!CompatibilityUtil.isProfessionEqual(profession,town.getSpecialization())) {
+        for (Villager.Profession profession : CompatibilityUtil.getProfessions()) {
+            if (!CompatibilityUtil.isProfessionEqual(profession,town.getSpecialization())) {
                 icon = new ProfessionIcon(profession,0,true);
-                icon.addDescription(MessagePath.MENU_TOWN_LORE_SPECIAL.getMessage());
-                if(!isAdmin) {
+                icon.addProperty(MessagePath.LABEL_SPECIALIZATION.getMessage());
+                if (!isAdmin) {
                     icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(costSpecial));
                 }
+                KonLootTable specialLoot = getKonquest().getLootManager().getMonumentSpecialLootTable(CompatibilityUtil.getProfessionName(profession));
+                if (specialLoot != null) {
+                    icon.addNameValue(MessagePath.LABEL_LOOT_TYPE.getMessage(), specialLoot.getName());
+                    icon.addDescription(MessagePath.MENU_TOWN_LOOT_SPECIAL.getMessage());
+                }
+                icon.addDescription(MessagePath.MENU_TOWN_LORE_SPECIAL.getMessage());
                 icon.addHint(MessagePath.MENU_TOWN_HINT_SPECIAL.getMessage());
                 icons.add(icon);
             }

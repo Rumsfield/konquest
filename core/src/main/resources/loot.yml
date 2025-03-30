@@ -202,6 +202,7 @@ loot:
 # //// LOOT_SPECIAL \\\\
 # Town monument chest loot, for towns with a trade specialization.
 # Section names must be villager professions.
+# Remove or comment out sections to disable special loot for any profession.
 loot_special:
   ARMORER:
     name: "Armorer Monument Loot"

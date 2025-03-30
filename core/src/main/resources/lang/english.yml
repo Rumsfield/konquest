@@ -377,6 +377,7 @@ menu:
     hint-special: Click to specialize
     lore-special: Choose this profession for a discount with villagers in this town.
     info-special: Villagers with this profession give discounts in this town.
+    loot-special: This profession gives special loot at the town monument.
     title-join: Join a Town
     title-leave: Leave a Town
     title-list: Town List
@@ -574,6 +575,7 @@ protection:
     capital-immune: This capital is immune to attacks while %s towns remain in the Kingdom of %s.
     no-allied-build: This town's options do not allow players from allied kingdoms to build.
     template-modify: This monument template is currently being modified and will be available soon.
+    loot-denied: You must be a town knight or lord to get loot.
 # //// COMMAND \\\\
 # Messages used for all commands.
 command:

@@ -193,7 +193,7 @@ public class MonumentAdminCommand extends CommandBase {
 					return;
 				}
 				template.setLootTableName(newTableName);
-				ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_LOOT_SHOW.getMessage(newTableName));
+				ChatUtil.sendNotice(sender, MessagePath.GENERIC_NOTICE_LOOT_SET.getMessage(newTableName));
 			} else {
 				sendInvalidArgMessage(sender);
 			}

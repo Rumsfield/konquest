@@ -343,6 +343,7 @@ public enum MessagePath {
 	MENU_TOWN_HINT_SPECIAL                 		(0, "menu.town.hint-special"),
 	MENU_TOWN_LORE_SPECIAL                 		(0, "menu.town.lore-special"),
 	MENU_TOWN_INFO_SPECIAL                 		(0, "menu.town.info-special"),
+	MENU_TOWN_LOOT_SPECIAL                 		(0, "menu.town.loot-special"),
 	MENU_TOWN_TITLE_JOIN               			(0, "menu.town.title-join"),
 	MENU_TOWN_TITLE_LEAVE              			(0, "menu.town.title-leave"),
 	MENU_TOWN_TITLE_LIST               			(0, "menu.town.title-list"),
@@ -531,6 +532,7 @@ public enum MessagePath {
 	PROTECTION_ERROR_CAPITAL_IMMUNE             (2, "protection.error.capital-immune"),
 	PROTECTION_ERROR_NO_ALLIED_BUILD            (0, "protection.error.no-allied-build"),
 	PROTECTION_ERROR_TEMPLATE_MODIFY            (0, "protection.error.template-modify"),
+	PROTECTION_ERROR_LOOT_DENIED                (0, "protection.error.loot-denied"),
 
 	COMMAND_ADMIN_CAMP_NOTICE_CREATE            (1, "command.admin.camp.notice.create"),
 	COMMAND_ADMIN_CAMP_NOTICE_DESTROY           (1, "command.admin.camp.notice.destroy"),

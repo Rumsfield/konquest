@@ -480,6 +480,7 @@ public class KingdomMenu extends StateMenu {
 				isClickable = false;
 			}
 			icon = new TemplateIcon(template,0,isClickable);
+			icon.addNameValue(MessagePath.LABEL_LOOT_TYPE.getMessage(), getKonquest().getLootManager().getMonumentLootDisplayName(template));
 			icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(totalCost));
 			if (isClickable) {
 				icon.addHint(MessagePath.MENU_KINGDOM_HINT_TEMPLATE.getMessage());

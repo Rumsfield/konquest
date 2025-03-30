@@ -3,11 +3,15 @@ package com.github.rumsfield.konquest.manager;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -23,6 +27,7 @@ public class LootManager implements Timeable{
 
 	private final Konquest konquest;
 	private final HashMap<Location, Long> lootRefreshLog;
+	private final HashMap<Inventory, Inventory> lootCache;
 	private long refreshTimeSeconds;
 	private long markedRefreshTime;
 	private int monumentLootCount;
@@ -42,6 +47,7 @@ public class LootManager implements Timeable{
 		this.refreshTimeSeconds = 0;
 		this.markedRefreshTime = 0;
 		this.lootRefreshLog = new HashMap<>();
+		this.lootCache = new HashMap<>();
 		this.monumentLootCount = 0;
 		this.lootRefreshTimer = new Timer(this);
 		this.monumentLootTable = new KonLootTable();
@@ -341,10 +347,6 @@ public class LootManager implements Timeable{
 		}
 	}
 
-	public boolean isDefaultKey(String name) {
-		return name.equalsIgnoreCase(defaultLootTableName);
-	}
-
 	/*
 	 * Monument Loot
 	 * When profession trade discounts are enabled, use the special tables if a town specialization is set.
@@ -352,7 +354,7 @@ public class LootManager implements Timeable{
 	 * Lastly, use the default.
 	 */
 
-	private KonLootTable getMonumentSpecialLootTable(String name) {
+	public KonLootTable getMonumentSpecialLootTable(String name) {
 		String tableKey = name.toLowerCase();
 		if (monumentSpecialLootTable.containsKey(tableKey)) {
 			return monumentSpecialLootTable.get(tableKey);
@@ -361,7 +363,7 @@ public class LootManager implements Timeable{
 		return null;
 	}
 
-	private KonLootTable getMonumentCustomLootTable(String name) {
+	public KonLootTable getMonumentCustomLootTable(String name) {
 		String tableKey = name.toLowerCase();
 		if (monumentCustomLootTable.containsKey(tableKey)) {
 			return monumentCustomLootTable.get(tableKey);
@@ -382,9 +384,13 @@ public class LootManager implements Timeable{
 				monumentCustomLootTable.containsKey(name.toLowerCase());
 	}
 
+	public boolean isMonumentSpecialLootTable(String name) {
+		return monumentSpecialLootTable.containsKey(name.toLowerCase());
+	}
+
 	public String getMonumentLootDisplayName(KonMonumentTemplate template) {
 		KonLootTable lootTable = null;
-		if (template.isLootTableDefault()) {
+		if (!template.isLootTableDefault()) {
 			lootTable = getMonumentCustomLootTable(template.getLootTableName());
 		}
 		if (lootTable == null) {
@@ -414,66 +420,87 @@ public class LootManager implements Timeable{
 	}
 
 	/**
-	 * Attempts to fill an inventory with loot
-	 * @param inventory - The inventory to try and fill
-	 * @param town - The town that contains the inventory
-	 * @return true: The inventory was successfully filled with loot
-	 * 		   false: The inventory was not filled, probably due to unexpired refresh time
+	 * Attempts to fill an inventory with loot.
+	 * This method creates a new inventory with loot to display to the player.
+	 * @return The new inventory filled with loot, else null when loot could not be updated,
+	 * 		   probably due to unexpired refresh time.
 	 */
-	public boolean updateMonumentLoot(Inventory inventory, KonTown town) {
+	public Inventory updateMonumentLoot(Inventory chestInventory, KonTown town, Player openPlayer) {
+		if (chestInventory == null) return null;
 		// Get the loot table
 		KonLootTable lootTable = null;
+		Inventory originalInventory = chestInventory;
+		if (chestInventory instanceof DoubleChestInventory) {
+			originalInventory = ((DoubleChestInventory)chestInventory).getRightSide();
+		}
+		Inventory lootInventory = lootCache.get(originalInventory); // can be null
+		ChatUtil.printDebug("Attempting to update loot in town "+town.getName());
+		// Verify refresh time
+		Date now = new Date();
+		Location invLoc = originalInventory.getLocation();
+		if (invLoc == null || invLoc.getWorld() == null) return null;
+		if (lootRefreshLog.containsKey(invLoc)) {
+			long loggedLastFilledTime = lootRefreshLog.get(invLoc);
+			Date lastFilledDate = new Date(loggedLastFilledTime);
+			if(lastFilledDate.after(new Date(markedRefreshTime))) {
+				// Inventory is not yet done refreshing
+				ChatUtil.printDebug("  Failed, refresh time has not expired");
+				ChatUtil.sendNotice(openPlayer, MessagePath.PROTECTION_NOTICE_LOOT_LATER.getMessage());
+				return lootInventory;
+			}
+		}
 		// First, check for town specialization
 		if (konquest.getKingdomManager().getIsDiscountEnable()) {
 			lootTable = getMonumentSpecialLootTable(town.getSpecializationName());
 			if (lootTable != null) {
-				ChatUtil.printDebug("Using special monument loot table "+town.getSpecializationName());
+				ChatUtil.printDebug("  Using special monument loot table "+town.getSpecializationName());
 			}
 		}
 		// Second, check for custom kingdom monument template loot
 		if (lootTable == null && !town.getKingdom().getMonumentTemplate().isLootTableDefault()) {
 			lootTable = getMonumentCustomLootTable(town.getKingdom().getMonumentTemplate().getLootTableName());
 			if (lootTable != null) {
-				ChatUtil.printDebug("Using custom monument loot table "+town.getKingdom().getMonumentTemplate().getLootTableName());
+				ChatUtil.printDebug("  Using custom monument loot table "+town.getKingdom().getMonumentTemplate().getLootTableName());
 			}
 		}
 		// Finally, use the default
 		if (lootTable == null) {
 			lootTable = monumentLootTable;
-			ChatUtil.printDebug("Using default monument loot table");
+			ChatUtil.printDebug("   Using default monument loot table");
 		}
 		if (lootTable == null || lootTable.isEmptyLoot()) {
-			ChatUtil.printDebug("Got missing or empty monument loot table for town "+town.getName());
-			return false;
+			ChatUtil.printDebug("  Failed, got missing or empty monument loot table");
+			return lootInventory;
 		}
+
+		/* Passed all checks */
+
+		// Make loot inventory
+		lootInventory = konquest.getPlugin().getServer().createInventory(originalInventory.getHolder(), originalInventory.getSize(), lootTable.getName());
 		// Get number of loot items
 		int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.LOOT);
 		int upgradedLootCount = monumentLootCount + upgradeLevel;
 		// Update the inventory with loot
-		Date now = new Date();
-		Location invLoc = inventory.getLocation();
-		if (lootRefreshLog.containsKey(invLoc)) {
-			long loggedLastFilledTime = lootRefreshLog.get(invLoc);
-			Date lastFilledDate = new Date(loggedLastFilledTime);
-			if(lastFilledDate.after(new Date(markedRefreshTime))) {
-				// Inventory is not yet done refreshing
-				return false;
-			}
-		}
-		clearUpperInventory(inventory);
+		clearUpperInventory(originalInventory);
 		// Generate new items
+		int finalItemCount = 0;
 		int availableSlot;
 		for (int i=0; i<upgradedLootCount; i++) {
-			availableSlot = inventory.firstEmpty();
-			if(availableSlot == -1) {
-				ChatUtil.printDebug("Failed to find empty slot for generated loot in inventory "+ inventory);
-			} else {
-				inventory.setItem(availableSlot,lootTable.chooseRandomItem());
+			availableSlot = lootInventory.firstEmpty();
+			if(availableSlot != -1) {
+				lootInventory.setItem(availableSlot,lootTable.chooseRandomItem());
+				finalItemCount++;
 			}
 		}
 		long lootLastFilledTime = now.getTime();
 		lootRefreshLog.put(invLoc,lootLastFilledTime);
-		return true;
+		lootCache.put(originalInventory,lootInventory);
+		// Play new loot sound
+		invLoc.getWorld().playSound(invLoc, Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+		// Execute custom commands from config
+		konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_LOOT_OPEN,openPlayer);
+		ChatUtil.printDebug("  Success, updated "+finalItemCount+" items");
+		return lootInventory;
 	}
 
 	/*
@@ -516,57 +543,78 @@ public class LootManager implements Timeable{
 	 * Attempts to fill an inventory with loot under the following conditions:
 	 * - The inventory has not already been emptied
 	 * - The ruin is in capture cooldown state
-	 * @param inventory The inventory to fill with loot
-	 * @param ruin The ruin that contains the inventory
-	 * @return True when loot was updated, else false
+	 * @return The new inventory filled with loot, else null when loot could not be updated,
+	 * 		   probably due to already being captured.
 	 */
-	public boolean updateRuinLoot(Inventory inventory, KonRuin ruin) {
+	public Inventory updateRuinLoot(Inventory chestInventory, KonRuin ruin, Player openPlayer) {
+		if (chestInventory == null) return null;
 		// Get the loot table
 		KonLootTable lootTable = null;
-		// First, check for custom kingdom monument template loot
-		if (!ruin.isLootTableDefault()) {
-			lootTable = getRuinCustomLootTable(ruin.getLootTableName());
-			if (lootTable != null) {
-				ChatUtil.printDebug("Using custom ruin loot table "+ruin.getLootTableName());
-			}
+		Inventory originalInventory = chestInventory;
+		if (chestInventory instanceof DoubleChestInventory) {
+			originalInventory = ((DoubleChestInventory)chestInventory).getRightSide();
 		}
-		// Finally, use the default
-		if (lootTable == null) {
-			lootTable = ruinLootTable;
-			ChatUtil.printDebug("Using default ruin loot table");
-		}
-		if (lootTable == null || lootTable.isEmptyLoot()) {
-			ChatUtil.printDebug("Got missing or empty ruin loot table for ruin "+ruin.getName());
-			return false;
-		}
-		// Update the inventory with loot
-		Location invLoc = inventory.getLocation();
+		Inventory lootInventory = lootCache.get(originalInventory); // can be null
+		ChatUtil.printDebug("Attempting to update loot in ruin "+ruin.getName());
+		// Verify capture status
+		Location invLoc = originalInventory.getLocation();
+		if (invLoc == null || invLoc.getWorld() == null) return null;
 		int count = ruinLootCount;
 		boolean isLootAfterCapture = konquest.getCore().getBoolean(CorePath.RUINS_LOOT_AFTER_CAPTURE.getPath());
 		boolean isRuinCaptured = ruin.isCaptureDisabled();
 		if(isLootAfterCapture && !isRuinCaptured) {
 			// This ruin has not been capture yet
-			return false;
+			ChatUtil.printDebug("  Failed, the ruin has not yet been captured");
+			ChatUtil.sendNotice(openPlayer, MessagePath.PROTECTION_NOTICE_LOOT_CAPTURE.getMessage());
+			return lootInventory;
 		}
-		if(ruinLootEmptiedLog.containsKey(invLoc)) {
-			if(ruinLootEmptiedLog.get(invLoc)) {
-				// Inventory has been emptied already
-				return false;
+		if(ruinLootEmptiedLog.containsKey(invLoc) && ruinLootEmptiedLog.get(invLoc)) {
+			// Inventory has been emptied already
+			ChatUtil.printDebug("  Failed, the inventory has already been updated");
+			ChatUtil.sendNotice(openPlayer, MessagePath.PROTECTION_NOTICE_LOOT_CAPTURE.getMessage());
+			return lootInventory;
+		}
+		// First, check for custom ruin loot
+		if (!ruin.isLootTableDefault()) {
+			lootTable = getRuinCustomLootTable(ruin.getLootTableName());
+			if (lootTable != null) {
+				ChatUtil.printDebug("  Using custom ruin loot table "+ruin.getLootTableName());
 			}
 		}
-		clearUpperInventory(inventory);
+		// Finally, use the default
+		if (lootTable == null) {
+			lootTable = ruinLootTable;
+			ChatUtil.printDebug("  Using default ruin loot table");
+		}
+		if (lootTable == null || lootTable.isEmptyLoot()) {
+			ChatUtil.printDebug("  Failed, got missing or empty ruin loot table");
+			return lootInventory;
+		}
+
+		/* Passed all checks */
+
+		// Make loot inventory
+		lootInventory = konquest.getPlugin().getServer().createInventory(originalInventory.getHolder(), originalInventory.getSize(), lootTable.getName());
+		// Update the inventory with loot
+		clearUpperInventory(originalInventory);
 		// Generate new items
+		int finalItemCount = 0;
 		int availableSlot;
 		for(int i=0;i<count;i++) {
-			availableSlot = inventory.firstEmpty();
-			if(availableSlot == -1) {
-				ChatUtil.printDebug("Failed to find empty slot for generated loot in inventory "+ inventory);
-			} else {
-				inventory.setItem(availableSlot,lootTable.chooseRandomItem());
+			availableSlot = lootInventory.firstEmpty();
+			if(availableSlot != -1) {
+				lootInventory.setItem(availableSlot,lootTable.chooseRandomItem());
+				finalItemCount++;
 			}
 		}
 		ruinLootEmptiedLog.put(invLoc,true); // This inventory has been emptied
-		return true;
+		lootCache.put(originalInventory,lootInventory);
+		// Play new loot sound
+		invLoc.getWorld().playSound(invLoc, Sound.ENTITY_PLAYER_LEVELUP, (float)1.0, (float)1.0);
+		// Execute custom commands from config
+		konquest.executeCustomCommand(CustomCommandPath.RUIN_LOOT_OPEN,openPlayer);
+		ChatUtil.printDebug("  Success, updated "+finalItemCount+" items");
+		return lootInventory;
 	}
 
 	public void resetRuinLoot(KonRuin ruin) {

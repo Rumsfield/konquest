@@ -1085,6 +1085,9 @@ public class InfoMenu extends StateMenu {
         if (getKonquest().getKingdomManager().getIsDiscountEnable()) {
             icon = new ProfessionIcon(infoTown.getSpecialization(), SLOT_SPECIAL, false);
             icon.addProperty(MessagePath.LABEL_SPECIALIZATION.getMessage());
+            if (getKonquest().getLootManager().isMonumentSpecialLootTable(CompatibilityUtil.getProfessionName(infoTown.getSpecialization()))) {
+                icon.addDescription(MessagePath.MENU_TOWN_LOOT_SPECIAL.getMessage());
+            }
             icon.addDescription(MessagePath.MENU_TOWN_INFO_SPECIAL.getMessage());
             result.addIcon(icon);
         }
@@ -1331,8 +1334,8 @@ public class InfoMenu extends StateMenu {
         /* Monument Template Icon */
         double totalCost = getKonquest().getKingdomManager().getCostTemplate() + infoTemplate.getCost();
         icon = new TemplateIcon(infoTemplate, SLOT_TEMPLATE, false);
-        icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(totalCost));
         icon.addNameValue(MessagePath.LABEL_LOOT_TYPE.getMessage(), getKonquest().getLootManager().getMonumentLootDisplayName(infoTemplate));
+        icon.addNameValue(MessagePath.LABEL_COST.getMessage(), KonquestPlugin.getCurrencyFormat(totalCost));
         result.addIcon(icon);
 
         /* Sanctuary Icon */
