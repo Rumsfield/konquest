@@ -692,6 +692,7 @@ command:
       fail-adjacent: Failed to claim, no adjacent territory.
       fail-far: Failed to claim, too far from territory center.
       fail-claimed: Failed to claim, already claimed.
+      resident: You must join %s as a resident to claim land.
   favor:
     notice:
       message: You have %s Favor, costs are...

@@ -367,6 +367,9 @@ core:
     
     # Prevent containers from exploding in claimed land (true/false)
     protect_containers_explode: true
+
+    # Prevent pistons from working inside protected towns/capitals when players are offline (true/false)
+    protect_pistons_use: true
     
     # Prevent enemy players from traveling within Kingdom territory (true/false)
     no_enemy_travel: true
@@ -448,6 +451,9 @@ core:
 
     # Allow town lords to unclaim town land (true/false)
     allow_unclaim: true
+
+    # Allow only the town resident players to claim land for towns, else all kingdom members can claim land for any town (true/false)
+    allow_claim_residents_only: false
 
     # Allow players to use the claim radius sub-command (true/false)
     allow_claim_radius: true

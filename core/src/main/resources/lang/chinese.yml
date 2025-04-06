@@ -692,6 +692,7 @@ command:
       fail-adjacent: 宣佈失敗，無相鄰領土。
       fail-far: 宣佈失敗，距離領土中心太遠。
       fail-claimed: 宣佈失敗，已經被宣佈。
+      resident: 您必須以居民身分加入 %s 才能領取土地。
   favor:
     notice:
       message: 你擁有 %s 的青睞，花費如下...

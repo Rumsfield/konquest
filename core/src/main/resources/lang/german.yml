@@ -692,6 +692,7 @@ command:
       fail-adjacent: Anspruch fehlgeschlagen, kein angrenzendes Gebiet.
       fail-far: Anspruch fehlgeschlagen, zu weit vom Gebietszentrum entfernt.
       fail-claimed: Anspruch fehlgeschlagen, bereits beansprucht.
+      resident: Sie müssen %s als Einwohner beitreten, um Land zu beanspruchen.
   favor:
     notice:
       message: Sie haben %s Gunst, die Kosten betragen...

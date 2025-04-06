@@ -1022,6 +1022,7 @@ public class BlockListener implements Listener {
 				checkLocs.add(pushTo);
 			}
 		}
+		boolean isPistonProtect = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_PISTONS_USE.getPath(),true);
 		// Review the list of affected blocks
 		for(Location extendLoc : checkLocs) {
 			// Check for territory edits
@@ -1049,7 +1050,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// Check if block is inside an offline kingdom
-					if(town.getKingdom().isOfflineProtected()) {
+					if(isPistonProtect && town.getKingdom().isOfflineProtected()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -1105,6 +1106,7 @@ public class BlockListener implements Listener {
 				checkLocs.add(pullTo);
 			}
 		}
+		boolean isPistonProtect = konquest.getCore().getBoolean(CorePath.KINGDOMS_PROTECT_PISTONS_USE.getPath(),true);
 		// Review the list of affected blocks
 		for(Location retractLoc : checkLocs) {
 			// Check for territory edits
@@ -1132,7 +1134,7 @@ public class BlockListener implements Listener {
 						return;
 					}
 					// Check if block is inside an offline kingdom
-					if(town.getKingdom().isOfflineProtected()) {
+					if(isPistonProtect && town.getKingdom().isOfflineProtected()) {
 						event.setCancelled(true);
 						return;
 					}

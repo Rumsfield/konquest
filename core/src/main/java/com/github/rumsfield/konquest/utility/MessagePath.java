@@ -608,6 +608,7 @@ public enum MessagePath {
 	COMMAND_CLAIM_ERROR_FAIL_ADJACENT           (0, "command.claim.error.fail-adjacent"),
 	COMMAND_CLAIM_ERROR_FAIL_FAR                (0, "command.claim.error.fail-far"),
 	COMMAND_CLAIM_ERROR_FAIL_CLAIMED            (0, "command.claim.error.fail-claimed"),
+	COMMAND_CLAIM_ERROR_RESIDENT                (1, "command.claim.error.resident"),
 	COMMAND_FAVOR_NOTICE_MESSAGE                (1, "command.favor.notice.message"),
 	COMMAND_FAVOR_NOTICE_COST_SPY               (0, "command.favor.notice.cost-spy"),
 	COMMAND_FAVOR_NOTICE_COST_TRAVEL            (0, "command.favor.notice.cost-travel"),

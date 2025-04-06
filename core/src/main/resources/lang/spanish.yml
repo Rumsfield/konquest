@@ -692,6 +692,7 @@ command:
       fail-adjacent: Fallo al reclamar, no hay territorio adyacente.
       fail-far: Fallo al reclamar, demasiado lejos del centro del territorio.
       fail-claimed: Fallo al reclamar, ya reclamado.
+      resident: Debes unirte a %s como residente para reclamar tierras.
   favor:
     notice:
       message: Tienes %s Favor, los costos son...
