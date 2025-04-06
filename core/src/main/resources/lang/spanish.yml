@@ -150,6 +150,7 @@ map:
   golem-spawns: Aparicion de Golems
   sanctuary: Santuario
   templates: Plantillas de Monumento
+  cooldown: Tiempo de Enfriamiento
 # //// MENU \\\\
 # Texto utilizado en todos los menús de inventario.
 menu:

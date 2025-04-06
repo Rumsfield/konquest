@@ -150,6 +150,7 @@ map:
   golem-spawns: Golem Doğum Yeri
   sanctuary: Koruma Alanı
   templates: Anıt Şablonları
+  cooldown: Soğuma Süresi
 # //// MENU \\\\
 # Tüm envanter menülerinde kullanılan metin.
 menu:
