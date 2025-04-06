@@ -838,7 +838,11 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public String getCaptureCooldownString() {
-		return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
+		if (captureTimer.isRunning()) {
+			return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
+		} else {
+			return "00:00";
+		}
 	}
 
 	/**

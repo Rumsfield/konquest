@@ -264,7 +264,11 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	}
 	
 	public String getCaptureCooldownString() {
-		return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
+		if (captureTimer.isRunning()) {
+			return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
+		} else {
+			return "00:00";
+		}
 	}
 
 	public String getCaptureTime() {

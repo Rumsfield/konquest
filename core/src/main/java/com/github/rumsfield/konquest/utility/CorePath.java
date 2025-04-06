@@ -59,6 +59,7 @@ public enum CorePath {
 	INTEGRATION_MAP_OPTIONS_ENABLE_CAMPS                  ("core.integration.map_options.enable_camps"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_SANCTUARIES            ("core.integration.map_options.enable_sanctuaries"),
 	INTEGRATION_MAP_OPTIONS_ENABLE_RUINS                  ("core.integration.map_options.enable_ruins"),
+	INTEGRATION_MAP_OPTIONS_SHOW_BANNERS                  ("core.integration.map_options.show_banners"),
 	INTEGRATION_DISCORDSRV                                ("core.integration.discordsrv"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_DIRECT      ("core.integration.discordsrv_options.raid_alert_direct"),
 	INTEGRATION_DISCORDSRV_OPTIONS_RAID_ALERT_CHANNEL     ("core.integration.discordsrv_options.raid_alert_channel"),

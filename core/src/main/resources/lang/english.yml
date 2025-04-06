@@ -150,6 +150,7 @@ map:
   golem-spawns: Golem Spawns
   sanctuary: Sanctuary
   templates: Monument Templates
+  cooldown: Cooldown Time
 # //// MENU \\\\
 # Text used in all inventory menus.
 menu:
