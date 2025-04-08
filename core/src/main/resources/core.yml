@@ -214,8 +214,9 @@ core:
       # (*) Render ruins on the web-based map view (true/false)
       enable_ruins: true
 
-      # (*) Display banner images from the Konquest/banners/ folder on the web-based map view (true/false)
-      show_banners: true
+      # (*) Display banner images in territory labels on the web-based map view (true/false)
+      # See instructions in the Konquest/banners/ folder.
+      show_banners: false
     
     # (*) Enable plugin integration with DiscordSRV (true/false)
     discordsrv: true

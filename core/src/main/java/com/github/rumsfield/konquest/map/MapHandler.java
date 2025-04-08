@@ -41,6 +41,7 @@ public class MapHandler {
 	static boolean isShowBanners = true;
 
 	private static final HashMap<String,String> imageBase64Cache = new HashMap<>();
+	private static final HashMap<String,String> imageRelativeCache = new HashMap<>();
 
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
@@ -114,16 +115,22 @@ public class MapHandler {
 	}
 
 	private void loadBannerImages() {
+		String relativeBasePath = "/images/";
+		String localBasePath = "banners/";
 		imageBase64Cache.clear();
+		imageRelativeCache.clear();
 		ArrayList<String> bannerNames = new ArrayList<>();
 		bannerNames.add("default");
 		bannerNames.add("sanctuary");
 		bannerNames.add("ruin");
 		bannerNames.add("camp");
 		bannerNames.addAll(konquest.getKingdomManager().getKingdomNames());
-		// Add image files from plugins folder
 		for (String bannerKey : bannerNames) {
-			String imagePath = "banners/"+bannerKey+".png";
+			// Add relative paths
+			String relativePath = relativeBasePath+bannerKey+".png";
+			imageRelativeCache.put(bannerKey,relativePath);
+			// Add image files from plugins folder
+			String imagePath = localBasePath+bannerKey+".png";
 			File imageFile = new File(konquest.getPlugin().getDataFolder(), imagePath);
 			if (imageFile.exists() && imageFile.isFile()) {
 				// A banner image exists, verify size
@@ -136,7 +143,7 @@ public class MapHandler {
 				// File is under size limit, add to cache as Base64 encoded string
 				String imageData = "";
 				try {
-					imageData = Base64.getEncoder().encodeToString(Files.readAllBytes(imageFile.toPath()));
+					imageData = "data:image/png;base64,"+Base64.getEncoder().encodeToString(Files.readAllBytes(imageFile.toPath()));
 				} catch (IOException exc) {
 					ChatUtil.printConsoleError("Failed to load banner image file \""+imagePath+"\", problem reading file, check read permissions.");
 				}
@@ -153,7 +160,7 @@ public class MapHandler {
 			if (defaultResource != null) {
 				String imageData = "";
 				try {
-					imageData = Base64.getEncoder().encodeToString(defaultResource.readAllBytes());
+					imageData = "data:image/png;base64,"+Base64.getEncoder().encodeToString(defaultResource.readAllBytes());
 				} catch (IOException exc) {
 					ChatUtil.printConsoleError("Failed to load default banner image resource, problem reading file, check read permissions.");
 				}
@@ -400,33 +407,43 @@ public class MapHandler {
 		return result;
 	}
 
-	private static String getImageData(String bannerKey) {
+	private static String getImageSource(String bannerKey, boolean isImageRelative) {
 		String result = "";
-		if (imageBase64Cache.containsKey(bannerKey)) {
-			result = imageBase64Cache.get(bannerKey);
-		} else if (imageBase64Cache.containsKey("default")) {
-			result = imageBase64Cache.get("default");
+		if (isImageRelative) {
+			// Specify image source as relative path
+			if (imageRelativeCache.containsKey(bannerKey)) {
+				result = imageRelativeCache.get(bannerKey);
+			} else if (imageRelativeCache.containsKey("default")) {
+				result = imageRelativeCache.get("default");
+			}
+		} else {
+			// Specify image source as Base64 data
+			if (imageBase64Cache.containsKey(bannerKey)) {
+				result = imageBase64Cache.get(bannerKey);
+			} else if (imageBase64Cache.containsKey("default")) {
+				result = imageBase64Cache.get("default");
+			}
 		}
 		return result;
 	}
 
-	static String getAreaLabel(KonTerritory territory) {
+	static String getAreaLabel(KonTerritory territory, boolean isImageRelative) {
 		String result = "Konquest";
 		String bodyBegin = "<body style=\"background-color:#fff0cc;font-family:Helvetica;\">";
 		String nameHeaderFormat = "<h2 style=\"text-align:center;color:#de791b;\">%s</h2>";
 		String typeHeaderFormat = "<h3 style=\"color:#8048b8;\">%s</h3>";
 		String propertyLineFormat = "<b>%s:</b> %s <br>";
-		String bannerImageFormat = "<div align=\"center\"><img src=\"data:image/png;base64,%s\" alt=\"Banner\" height=\"96\"></div>";
-		String imageData;
+		String bannerImageFormat = "<div align=\"center\"><img src=\"%s\" alt=\"Banner\" height=\"96\"></div>";
+		String imageSource;
 		StringBuilder labelMaker = new StringBuilder();
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
 				KonSanctuary sanctuary = (KonSanctuary)territory;
 				labelMaker.append(bodyBegin);
 				if (isShowBanners) {
-					imageData = getImageData("sanctuary");
-					if (!imageData.isEmpty()) {
-						labelMaker.append(String.format(bannerImageFormat, imageData));
+					imageSource = getImageSource("sanctuary", isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
 					}
 				}
 				labelMaker.append(String.format(nameHeaderFormat, sanctuary.getName()))
@@ -443,9 +460,9 @@ public class MapHandler {
 				KonRuin ruin = (KonRuin)territory;
 				labelMaker.append(bodyBegin);
 				if (isShowBanners) {
-					imageData = getImageData("ruin");
-					if (!imageData.isEmpty()) {
-						labelMaker.append(String.format(bannerImageFormat, imageData));
+					imageSource = getImageSource("ruin", isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
 					}
 				}
 				labelMaker.append(String.format(nameHeaderFormat, ruin.getName()))
@@ -464,9 +481,9 @@ public class MapHandler {
 				KonCamp camp = (KonCamp)territory;
 				labelMaker.append(bodyBegin);
 				if (isShowBanners) {
-					imageData = getImageData("camp");
-					if (!imageData.isEmpty()) {
-						labelMaker.append(String.format(bannerImageFormat, imageData));
+					imageSource = getImageSource("camp", isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
 					}
 				}
 				labelMaker.append(String.format(bannerImageFormat, "camp"))
@@ -499,9 +516,9 @@ public class MapHandler {
 				}
 				labelMaker.append(bodyBegin);
 				if (isShowBanners) {
-					imageData = getImageData(capital.getKingdom().getName());
-					if (!imageData.isEmpty()) {
-						labelMaker.append(String.format(bannerImageFormat, imageData));
+					imageSource = getImageSource(capital.getKingdom().getName(), isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
 					}
 				}
 				labelMaker.append(String.format(nameHeaderFormat, capital.getName()))
@@ -534,9 +551,9 @@ public class MapHandler {
 				}
 				labelMaker.append(bodyBegin);
 				if (isShowBanners) {
-					imageData = getImageData(town.getKingdom().getName());
-					if (!imageData.isEmpty()) {
-						labelMaker.append(String.format(bannerImageFormat, imageData));
+					imageSource = getImageSource(town.getKingdom().getName(), isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
 					}
 				}
 				labelMaker.append(String.format(nameHeaderFormat, town.getName()))

@@ -81,7 +81,7 @@ public class DynmapRender implements Renderable {
         String groupId = getGroupId(territory);
         String groupLabel = MapHandler.getGroupLabel(territory);
         String areaId = getAreaId(territory);
-        String areaLabel = MapHandler.getAreaLabel(territory);
+        String areaLabel = MapHandler.getAreaLabel(territory,true);
         int areaColor = getAreaColor(territory);
         int lineColor = getLineColor(territory);
         String iconId = getIconId(territory);
@@ -200,7 +200,7 @@ public class DynmapRender implements Renderable {
         KonTerritory territory = area.getTerritory();
 
         String groupId = getGroupId(territory);
-        String areaLabel = MapHandler.getAreaLabel(territory);
+        String areaLabel = MapHandler.getAreaLabel(territory,true);
         MarkerSet territoryGroup = dapi.getMarkerAPI().getMarkerSet(groupId);
         if (territoryGroup != null) {
             // Update all area point labels
