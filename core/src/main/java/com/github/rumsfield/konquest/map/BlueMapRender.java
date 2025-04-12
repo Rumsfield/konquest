@@ -39,6 +39,8 @@ public class BlueMapRender implements Renderable {
                 isEnabled = false;
                 ChatUtil.printDebug("Failed to initialize BlueMapRender with null API reference.");
             }
+        } else {
+            ChatUtil.printDebug("Failed to initialize BlueMapRender with disabled API.");
         }
     }
 
@@ -77,7 +79,7 @@ public class BlueMapRender implements Renderable {
         String areaId = getAreaId(territory);
         String groupLabel = MapHandler.getGroupLabel(territory); // The display name of the group
         String areaLabel = MapHandler.getIconLabel(territory); // The display name of the area (icon)
-        String areaDetail = MapHandler.getAreaLabel(territory); // The display details of the area
+        String areaDetail = MapHandler.getAreaLabel(territory,false); // The display details of the area
         Color areaColor = getAreaColor(territory);
         Color lineColor = getLineColor(territory);
 
@@ -172,7 +174,7 @@ public class BlueMapRender implements Renderable {
 
         String groupId = getGroupId(territory);
         String areaId = getAreaId(territory);
-        String areaDetail = MapHandler.getAreaLabel(territory);
+        String areaDetail = MapHandler.getAreaLabel(territory,false);
         // Get territory group
         if(bapi.getWorld(territory.getWorld()).isPresent()) {
             BlueMapWorld world = bapi.getWorld(territory.getWorld()).get();

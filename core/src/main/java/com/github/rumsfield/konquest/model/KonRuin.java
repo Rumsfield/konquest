@@ -145,6 +145,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				spawnAllGolems();
 			}
 			getKonquest().getLootManager().resetRuinLoot(this);
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 		} else if(taskID == captureCountdownTimer.getTaskID()) {
 			// Update capture countdown title
 			String remainingTime = HelperUtil.getTimeFormat(captureTimer.getTime(),ChatColor.RED);
@@ -201,6 +202,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		regenCriticalBlocks();
 		respawnAllGolems();
 		getKonquest().getLootManager().resetRuinLoot(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 	}
 	
 	public void regenCriticalBlocks() {
@@ -233,6 +235,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 			captureCountdownTimer.stopTimer();
 			captureCountdownTimer.setTime(0);
 			captureCountdownTimer.startLoopTimer();
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 		}
 	}
 
@@ -264,7 +267,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	}
 	
 	public String getCaptureCooldownString() {
-		return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
+		return isCaptureDisabled ? String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds()) : "00:00";
 	}
 
 	public String getCaptureTime() {

@@ -133,6 +133,8 @@ public enum MessagePath {
     MAP_GOLEM_SPAWNS                        	(0, "map.golem-spawns"),
 	MAP_SANCTUARY                               (0, "map.sanctuary"),
 	MAP_TEMPLATES                               (0, "map.templates"),
+	MAP_CAPTURE                                 (0, "map.capture"),
+	MAP_LOOT_TYPE                               (0, "map.loot-type"),
 
 	MENU_HINT_DISABLE                           (0, "menu.hint.disable"),
 	MENU_HINT_APPLY                             (0, "menu.hint.apply"),
@@ -607,6 +609,7 @@ public enum MessagePath {
 	COMMAND_CLAIM_ERROR_FAIL_ADJACENT           (0, "command.claim.error.fail-adjacent"),
 	COMMAND_CLAIM_ERROR_FAIL_FAR                (0, "command.claim.error.fail-far"),
 	COMMAND_CLAIM_ERROR_FAIL_CLAIMED            (0, "command.claim.error.fail-claimed"),
+	COMMAND_CLAIM_ERROR_RESIDENT                (1, "command.claim.error.resident"),
 	COMMAND_FAVOR_NOTICE_MESSAGE                (1, "command.favor.notice.message"),
 	COMMAND_FAVOR_NOTICE_COST_SPY               (0, "command.favor.notice.cost-spy"),
 	COMMAND_FAVOR_NOTICE_COST_TRAVEL            (0, "command.favor.notice.cost-travel"),

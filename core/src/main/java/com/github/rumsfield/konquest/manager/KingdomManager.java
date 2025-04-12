@@ -398,22 +398,24 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 				minDistance = searchDistance;
 			}
 		}
-		// Verify max distance
-		int maxLimit = konquest.getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath(),0);
-		if(maxLimit > 0 && minDistance > maxLimit) {
-			ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
-			return 3;
-		}
-		// Verify no overlapping init chunks
-		int radius = konquest.getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath(),2);
-		if(radius < 1) {
-			radius = 1;
-		}
-		ChatUtil.printDebug("Checking for chunk conflicts with radius "+radius);
-		for(Point point : HelperUtil.getAreaPoints(loc, radius)) {
-			if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld())) {
-				ChatUtil.printDebug("Found a chunk conflict");
-				return 4;
+		if (minDistance != Integer.MAX_VALUE) {
+			// Verify max distance
+			int maxLimit = konquest.getCore().getInt(CorePath.TOWNS_MAX_DISTANCE_ALL.getPath(), 0);
+			if (maxLimit > 0 && minDistance > maxLimit) {
+				ChatUtil.printDebug("Failed to add town, too far from other towns and capitals");
+				return 3;
+			}
+			// Verify no overlapping init chunks
+			int radius = konquest.getCore().getInt(CorePath.TOWNS_INIT_RADIUS.getPath(), 2);
+			if (radius < 1) {
+				radius = 1;
+			}
+			ChatUtil.printDebug("Checking for chunk conflicts with radius " + radius);
+			for (Point point : HelperUtil.getAreaPoints(loc, radius)) {
+				if (konquest.getTerritoryManager().isChunkClaimed(point, loc.getWorld())) {
+					ChatUtil.printDebug("Found a chunk conflict");
+					return 4;
+				}
 			}
 		}
 		// Return successfully
