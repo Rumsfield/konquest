@@ -150,7 +150,8 @@ map:
   golem-spawns: Golem Doğum Yeri
   sanctuary: Koruma Alanı
   templates: Anıt Şablonları
-  cooldown: Soğuma Süresi
+  capture: Yakalama İzin Verildi
+  loot-type: Yağma Türü
 # //// MENU \\\\
 # Tüm envanter menülerinde kullanılan metin.
 menu:

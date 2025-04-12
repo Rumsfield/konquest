@@ -58,6 +58,8 @@ public class SquaremapRender implements Renderable {
                     }
                 }
             }
+        } else {
+            ChatUtil.printDebug("Failed to initialize SquaremapRender with disabled API.");
         }
     }
 
@@ -121,7 +123,7 @@ public class SquaremapRender implements Renderable {
         // Get the layer provider
         MapWorld mapWorld = api.getWorldIfEnabled(BukkitAdapter.worldIdentifier(territory.getWorld())).orElse(null);
         if (mapWorld == null) {
-            ChatUtil.printDebug("Could not draw territory "+territory.getName()+" with invalid world, "+territory.getWorld().getName());
+            ChatUtil.printDebug("Could not draw squaremap territory "+territory.getName()+" with invalid world, "+territory.getWorld().getName());
             return;
         }
 
@@ -207,7 +209,7 @@ public class SquaremapRender implements Renderable {
         // Get the layer provider
         MapWorld mapWorld = api.getWorldIfEnabled(BukkitAdapter.worldIdentifier(territory.getWorld())).orElse(null);
         if (mapWorld == null) {
-            ChatUtil.printDebug("Could not remove territory "+territory.getName()+" from invalid world, "+territory.getWorld().getName());
+            ChatUtil.printDebug("Could not remove squaremap territory "+territory.getName()+" from invalid world, "+territory.getWorld().getName());
             return;
         }
 
@@ -249,7 +251,7 @@ public class SquaremapRender implements Renderable {
         // Get the layer provider
         MapWorld mapWorld = api.getWorldIfEnabled(BukkitAdapter.worldIdentifier(territory.getWorld())).orElse(null);
         if (mapWorld == null) {
-            ChatUtil.printDebug("Could not label territory "+territory.getName()+" from invalid world, "+territory.getWorld().getName());
+            ChatUtil.printDebug("Could not label squaremap territory "+territory.getName()+" from invalid world, "+territory.getWorld().getName());
             return;
         }
         // Get territory group

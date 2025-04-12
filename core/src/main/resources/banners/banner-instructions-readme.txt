@@ -1,6 +1,7 @@
 # Banner Instructions
 The banners folder is for image PNG files to display in web maps for every kingdom, camp, ruin, and sanctuary.
 The file extension must be PNG, not JPG!
+Any changes to image files requires a server restart!
 
 Each kingdom in the server can have its own PNG file for its banner.
 The name of the PNG file must match the kingdom name.

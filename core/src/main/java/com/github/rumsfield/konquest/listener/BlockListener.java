@@ -1449,13 +1449,7 @@ public class BlockListener implements Listener {
 					ChatUtil.printDebug("Monument conversion in Town "+capturedTown.getName());
 					ChatUtil.sendNotice(player.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAPTURE.getMessage(capturedTown.getName(),player.getKingdom().getName()));
 					// Start Capture disable timer for target town
-					int townCaptureTimeSeconds = konquest.getCore().getInt(CorePath.TOWNS_CAPTURE_COOLDOWN.getPath());
-					Timer captureTimer = capturedTown.getCaptureTimer();
-					capturedTown.setIsCaptureDisabled(true);
-					captureTimer.stopTimer();
-					captureTimer.setTime(townCaptureTimeSeconds);
-					captureTimer.startTimer();
-					ChatUtil.printDebug("Starting capture timer for "+townCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID());
+					capturedTown.setIsCaptureDisabled(true); // includes cooldown timer
 					// Execute custom commands from config
 					konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_CAPTURE,player.getBukkitPlayer());
 					// Update directive progress

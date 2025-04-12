@@ -150,7 +150,8 @@ map:
   golem-spawns: 鐵傀儡生成
   sanctuary: 聖所
   templates: 紀念碑模板
-  cooldown: 冷卻時間
+  capture: 允許捕獲
+  loot-type: 戰利品類型
 # //// MENU \\\\
 # 所有庫存選單中使用的文字。
 menu:

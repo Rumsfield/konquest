@@ -800,6 +800,17 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public void setIsCaptureDisabled(boolean val) {
 		isCaptureDisabled = val;
+		if (val) {
+			int townCaptureTimeSeconds = getKonquest().getCore().getInt(CorePath.TOWNS_CAPTURE_COOLDOWN.getPath());
+			// Start full timer
+			captureTimer.stopTimer();
+			captureTimer.setTime(townCaptureTimeSeconds);
+			captureTimer.startTimer();
+			ChatUtil.printDebug("Starting capture timer for "+townCaptureTimeSeconds+" seconds with taskID "+captureTimer.getTaskID());
+			getKonquest().getMapHandler().drawLabelTerritory(this);
+		} else {
+			captureTimer.stopTimer();
+		}
 	}
 	
 	public boolean isRaidAlertDisabled() {
@@ -838,11 +849,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public String getCaptureCooldownString() {
-		if (captureTimer.isRunning()) {
-			return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
-		} else {
-			return "00:00";
-		}
+		return isCaptureDisabled ? String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds()) : "00:00";
 	}
 
 	/**
@@ -869,6 +876,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			ChatUtil.printDebug("Capture Timer ended with taskID: "+taskID);
 			// When a capture cool-down timer ends
 			isCaptureDisabled = false;
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 		} else if(taskID == raidAlertTimer.getTaskID()) {
 			ChatUtil.printDebug("Raid Alert Timer ended with taskID: "+taskID);
 			// When a raid alert cool-down timer ends
@@ -901,10 +909,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public Timer getMonumentTimer() {
 		return monumentTimer;
-	}
-	
-	public Timer getCaptureTimer() {
-		return captureTimer;
 	}
 	
 	public Timer getRaidAlertTimer() {
@@ -1079,7 +1083,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		String armor = MessagePath.LABEL_ARMOR.getMessage();
 		String shield = MessagePath.LABEL_SHIELD.getMessage();
 		String critical = MessagePath.LABEL_CRITICAL_HITS.getMessage();
-		
+
 		// Set title conditions
 		if(isShielded && isArmored) {
 			remainingSeconds = getRemainingShieldTimeSeconds();

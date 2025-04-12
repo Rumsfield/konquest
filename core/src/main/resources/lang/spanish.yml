@@ -150,7 +150,8 @@ map:
   golem-spawns: Aparicion de Golems
   sanctuary: Santuario
   templates: Plantillas de Monumento
-  cooldown: Tiempo de Enfriamiento
+  capture: Captura Permitida
+  loot-type: Tipo de Botín
 # //// MENU \\\\
 # Texto utilizado en todos los menús de inventario.
 menu:

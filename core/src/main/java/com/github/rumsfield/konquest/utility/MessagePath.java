@@ -133,7 +133,8 @@ public enum MessagePath {
     MAP_GOLEM_SPAWNS                        	(0, "map.golem-spawns"),
 	MAP_SANCTUARY                               (0, "map.sanctuary"),
 	MAP_TEMPLATES                               (0, "map.templates"),
-	MAP_COOLDOWN                                (0, "map.cooldown"),
+	MAP_CAPTURE                                 (0, "map.capture"),
+	MAP_LOOT_TYPE                               (0, "map.loot-type"),
 
 	MENU_HINT_DISABLE                           (0, "menu.hint.disable"),
 	MENU_HINT_APPLY                             (0, "menu.hint.apply"),

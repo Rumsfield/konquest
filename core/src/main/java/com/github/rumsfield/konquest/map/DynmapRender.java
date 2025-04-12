@@ -16,7 +16,7 @@ public class DynmapRender implements Renderable {
     private final Konquest konquest;
     private boolean isEnabled;
     private static DynmapAPI dapi = null;
-    private HashMap<KonTerritory,ArrayList<String>> areaCache;
+    private final HashMap<KonTerritory,ArrayList<String>> areaCache;
 
     public DynmapRender(Konquest konquest) {
         this.konquest = konquest;
@@ -30,6 +30,8 @@ public class DynmapRender implements Renderable {
         isEnabled = konquest.getIntegrationManager().getDynmap().isEnabled();
         if(isEnabled) {
             dapi = konquest.getIntegrationManager().getDynmap().getAPI();
+        } else {
+            ChatUtil.printDebug("Failed to initialize DynmapRender with disabled API.");
         }
     }
 
@@ -107,6 +109,7 @@ public class DynmapRender implements Renderable {
                     areaMarker.deleteMarker();
                 }
             }
+            ChatUtil.printDebug("Cleared previously rendered Dynmap territory "+territory.getName());
         }
 
         // Set all contour lines and area points
@@ -148,6 +151,7 @@ public class DynmapRender implements Renderable {
             areaIdList.add(pointId);
         }
         areaCache.put(territory,areaIdList);
+        ChatUtil.printDebug("Updated Dynmap territory "+territory.getName());
         Marker territoryIcon = territoryGroup.findMarker(iconId);
         if (territoryIcon == null) {
             // Icon does not exist, create new
@@ -179,7 +183,7 @@ public class DynmapRender implements Renderable {
                     }
                 }
             } else {
-                ChatUtil.printDebug("Failed to erase un-rendered territory "+territory.getName());
+                ChatUtil.printDebug("Failed to erase un-rendered Dynmap territory "+territory.getName());
             }
             Marker territoryIcon = territoryGroup.findMarker(iconId);
             if (territoryIcon != null) {
@@ -209,12 +213,12 @@ public class DynmapRender implements Renderable {
                 for (String previousAreaId : areaCache.get(territory)) {
                     AreaMarker areaMarker = territoryGroup.findAreaMarker(previousAreaId);
                     if (areaMarker != null) {
-                        // Delete area from group
+                        // Set the new label
                         areaMarker.setLabel(areaLabel,true);
                     }
                 }
             } else {
-                ChatUtil.printDebug("Failed to label un-rendered territory "+territory.getName());
+                ChatUtil.printDebug("Failed to label un-rendered Dynmap territory "+territory.getName());
             }
         }
     }

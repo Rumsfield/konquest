@@ -150,7 +150,8 @@ map:
   golem-spawns: Golem-Spawns
   sanctuary: Heiligtum
   templates: Monument-Vorlagen
-  cooldown: Abkühlzeit
+  capture: Erfassen Erlaubt
+  loot-type: Beutetyp
 # //// MENU \\\\
 # Text, der in allen Inventarmenüs verwendet wird.
 menu:

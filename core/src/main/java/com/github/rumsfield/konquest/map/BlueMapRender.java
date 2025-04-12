@@ -39,6 +39,8 @@ public class BlueMapRender implements Renderable {
                 isEnabled = false;
                 ChatUtil.printDebug("Failed to initialize BlueMapRender with null API reference.");
             }
+        } else {
+            ChatUtil.printDebug("Failed to initialize BlueMapRender with disabled API.");
         }
     }
 

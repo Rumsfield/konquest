@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 //TODO: Make this class into a listener, make events for territory updates, deletes, etc
@@ -49,14 +51,17 @@ public class MapHandler {
 	}
 	
 	public void initialize() {
-		if (konquest.getIntegrationManager().getDynmap().isEnabled()) {
-			renderers.put("Dynmap",new DynmapRender(konquest));
+        String dynmapKey = "Dynmap";
+        if (konquest.getIntegrationManager().getDynmap().isEnabled() && !renderers.containsKey(dynmapKey)) {
+			renderers.put(dynmapKey,new DynmapRender(konquest));
 		}
-		if (konquest.getIntegrationManager().getBlueMap().isEnabled()) {
-			renderers.put("BlueMap",new BlueMapRender(konquest));
+		String bluemapKey = "BlueMap";
+		if (konquest.getIntegrationManager().getBlueMap().isEnabled() && !renderers.containsKey(bluemapKey)) {
+			renderers.put(bluemapKey,new BlueMapRender(konquest));
 		}
-		if (konquest.getIntegrationManager().getSquaremap().isEnabled()) {
-			renderers.put("squaremap",new SquaremapRender(konquest));
+		String squaremapKey = "squaremap";
+		if (konquest.getIntegrationManager().getSquaremap().isEnabled() && !renderers.containsKey(squaremapKey)) {
+			renderers.put(squaremapKey,new SquaremapRender(konquest));
 		}
 		for(Renderable ren : renderers.values()) {
 			ren.initialize();
@@ -115,6 +120,16 @@ public class MapHandler {
 	}
 
 	private void loadBannerImages() {
+		// Check for Dynmap, need to copy files into its images folder
+		boolean doCopyImages = false;
+		File dynmapImagePath = null;
+		if (konquest.getIntegrationManager().getDynmap().isEnabled()) {
+			dynmapImagePath = konquest.getIntegrationManager().getDynmap().getWebImagesFolder();
+			if (dynmapImagePath.exists() && dynmapImagePath.isDirectory()) {
+				doCopyImages = true;
+			}
+		}
+		// Load images
 		String relativeBasePath = "/images/";
 		String localBasePath = "banners/";
 		imageBase64Cache.clear();
@@ -126,18 +141,17 @@ public class MapHandler {
 		bannerNames.add("camp");
 		bannerNames.addAll(konquest.getKingdomManager().getKingdomNames());
 		for (String bannerKey : bannerNames) {
-			// Add relative paths
-			String relativePath = relativeBasePath+bannerKey+".png";
-			imageRelativeCache.put(bannerKey,relativePath);
 			// Add image files from plugins folder
-			String imagePath = localBasePath+bannerKey+".png";
-			File imageFile = new File(konquest.getPlugin().getDataFolder(), imagePath);
+			String fileName = bannerKey+".png";
+			String relativeFilePath = relativeBasePath+fileName;
+			String localFilePath = localBasePath+fileName;
+			File imageFile = new File(konquest.getPlugin().getDataFolder(), localFilePath);
 			if (imageFile.exists() && imageFile.isFile()) {
 				// A banner image exists, verify size
 				long fileSizeBytes = imageFile.length();
                 long IMAGE_MAX_BYTES = 100000;
                 if (fileSizeBytes > IMAGE_MAX_BYTES) {
-					ChatUtil.printConsoleError("Failed to load banner image file \""+imagePath+"\", file size "+fileSizeBytes+" exceeds maximum limit of "+ IMAGE_MAX_BYTES +" bytes.");
+					ChatUtil.printConsoleError("Failed to load banner image file \""+localFilePath+"\", file size "+fileSizeBytes+" exceeds maximum limit of "+ IMAGE_MAX_BYTES +" bytes.");
 					continue;
 				}
 				// File is under size limit, add to cache as Base64 encoded string
@@ -145,11 +159,24 @@ public class MapHandler {
 				try {
 					imageData = "data:image/png;base64,"+Base64.getEncoder().encodeToString(Files.readAllBytes(imageFile.toPath()));
 				} catch (IOException exc) {
-					ChatUtil.printConsoleError("Failed to load banner image file \""+imagePath+"\", problem reading file, check read permissions.");
+					ChatUtil.printConsoleError("Failed to load banner image file \""+localFilePath+"\", problem reading file, check read permissions.");
 				}
 				if (!imageData.isEmpty()) {
 					// Image data is valid
 					imageBase64Cache.put(bannerKey,imageData);
+				}
+				// Copy file to Dynmap images folder
+				if (doCopyImages) {
+					Path source = imageFile.toPath();
+					Path destination = (new File(dynmapImagePath,fileName)).toPath();
+					try {
+						Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+						imageRelativeCache.put(bannerKey,relativeFilePath);
+						ChatUtil.printDebug("Copied banner image file to Dynmap path: "+destination);
+					} catch (Exception e) {
+						e.printStackTrace();
+						ChatUtil.printConsoleError("Failed to copy image file " + source + " to " + destination);
+					}
 				}
 			}
 		}
@@ -433,7 +460,7 @@ public class MapHandler {
 		String nameHeaderFormat = "<h2 style=\"text-align:center;color:#de791b;\">%s</h2>";
 		String typeHeaderFormat = "<h3 style=\"color:#8048b8;\">%s</h3>";
 		String propertyLineFormat = "<b>%s:</b> %s <br>";
-		String bannerImageFormat = "<div align=\"center\"><img src=\"%s\" alt=\"Banner\" height=\"96\"></div>";
+		String bannerImageFormat = "<div style=\"text-align:center\"><img src=\"%s\" alt=\"Banner\" height=\"96\"></div>";
 		String imageSource;
 		StringBuilder labelMaker = new StringBuilder();
 		switch (territory.getTerritoryType()) {
@@ -472,7 +499,8 @@ public class MapHandler {
 						.append(String.format(propertyLineFormat, MessagePath.MAP_CRITICAL_HITS.getMessage(), ruin.getMaxCriticalHits()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_GOLEM_SPAWNS.getMessage(), ruin.getSpawnLocations().size()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), ruin.getChunkList().size()))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_COOLDOWN.getMessage(), ruin.getCaptureCooldownString()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LOOT_TYPE.getMessage(), ruin.getKonquest().getLootManager().getRuinLootDisplayName(ruin)))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CAPTURE.getMessage(), !ruin.isCaptureDisabled()))
 						.append("</p>")
 						.append("</body>");
 				result = labelMaker.toString();
@@ -530,7 +558,8 @@ public class MapHandler {
 						.append(String.format(propertyLineFormat, MessagePath.MAP_KNIGHTS.getMessage(), capital.getPlayerKnightsOnly().size()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_RESIDENTS.getMessage(), capital.getNumResidents()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), capital.getNumLand()))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_COOLDOWN.getMessage(), capital.getCaptureCooldownString()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LOOT_TYPE.getMessage(), capital.getKonquest().getLootManager().getMonumentLootDisplayName(capital)))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CAPTURE.getMessage(), !capital.isCaptureDisabled()))
 						.append("</p>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_KINGDOM.getMessage()))
 						.append("<p>")
@@ -565,7 +594,8 @@ public class MapHandler {
 						.append(String.format(propertyLineFormat, MessagePath.MAP_KNIGHTS.getMessage(), town.getPlayerKnightsOnly().size()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_RESIDENTS.getMessage(), town.getNumResidents()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), town.getNumLand()))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_COOLDOWN.getMessage(), town.getCaptureCooldownString()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LOOT_TYPE.getMessage(), town.getKonquest().getLootManager().getMonumentLootDisplayName(town)))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CAPTURE.getMessage(), !town.isCaptureDisabled()))
 						.append("</p>")
 						.append("</body>");
 				result = labelMaker.toString();
