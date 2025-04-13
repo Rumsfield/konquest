@@ -412,6 +412,7 @@ public class CompatibilityUtil {
      * @param name The name of the enchantment, either old or new names
      * @return The Enchantment appropriate for the current version
      */
+    @SuppressWarnings("deprecation")
     public static Enchantment getEnchantment(String name) {
         EnchantComp enchant = EnchantComp.getFromName(name);
         if (enchant == null) {
@@ -578,7 +579,9 @@ public class CompatibilityUtil {
         assert meta != null;
         meta.addAttributeModifier(getAttribute("damage"), new AttributeModifier("foo",0,AttributeModifier.Operation.MULTIPLY_SCALAR_1)); // This is necessary as of 1.20.6
         for(ItemFlag flag : ItemFlag.values()) {
-            meta.addItemFlags(flag);
+            if(!flag.toString().equalsIgnoreCase("HIDE_LORE")) { // Added for 1.21.5
+                meta.addItemFlags(flag);
+            }
         }
         if (hasProtection) {
             Enchantment protectionEnchant = CompatibilityUtil.getEnchantment("protection_environmental");
