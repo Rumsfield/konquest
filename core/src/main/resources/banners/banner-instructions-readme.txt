@@ -24,10 +24,12 @@ Allowed image file names are:
 To enable showing banner images, you must set the Konquest core.yml setting:
 core.integration.map_options.show_banners: true
 
-## When Using Dynmap...
-You must place your PNG files inside of the dynmap web images folder, like:
-<your server folder>/plugins/dynmap/web/images/
-
-## When Using BlueMap or Squaremap...
+## Where to Place Banner Images
 You must place your PNG files inside this banners folder, like:
 <your server folder>/plugins/Konquest/banners/
+
+## When Using Dynmap...
+The images will be automatically copied into the Dynmap web images folder, like:
+<your server folder>/plugins/dynmap/web/images/
+You may want to double-check the files in Dynmap's directory to make sure they are correct.
+Konquest does not delete files, so when kingdoms are renamed, the old images will stay there.
