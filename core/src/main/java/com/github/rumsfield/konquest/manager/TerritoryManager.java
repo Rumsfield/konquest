@@ -228,7 +228,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				closestAdjTerr.addChunk(addPoint);
 				addTerritory(loc.getWorld(),addPoint,closestAdjTerr);
 				konquest.getMapHandler().drawUpdateTerritory(closestAdjTerr);
-				konquest.getMapHandler().drawLabel(closestAdjTerr.getKingdom().getCapital());
+				konquest.getMapHandler().drawLabelTerritory(closestAdjTerr.getKingdom().getCapital());
 				// Display town info to players in the newly claimed chunk
 	    		for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 	    			if(occupant.getBukkitPlayer().getLocation().getChunk().equals(loc.getChunk())) {
@@ -298,12 +298,19 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				return false;
 			}
 		}
-		// Verify no surrounding territory from other kingdoms
-    	for(Point point : HelperUtil.getAreaPoints(claimLoc,2)) {
-			if(isChunkClaimed(point,claimWorld)) {
+		// Check surrounding territory
+		boolean isClaimResidentOnly = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_CLAIM_RESIDENTS_ONLY.getPath(),false);
+    	for (Point point : HelperUtil.getAreaPoints(claimLoc,2)) {
+			if (isChunkClaimed(point,claimWorld)) {
 				KonTerritory territory = getChunkTerritory(point,claimWorld);
-				if(territory != null && !player.getKingdom().equals(territory.getKingdom())) {
+				// Check for other kingdoms
+				if (territory != null && !player.getKingdom().equals(territory.getKingdom())) {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
+					return false;
+				}
+				// Check for allowed residents of towns (optional)
+				if (isClaimResidentOnly && territory instanceof KonTown && !((KonTown)territory).isPlayerResident(player.getBukkitPlayer())) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_RESIDENT.getMessage(territory.getName()));
 					return false;
 				}
 			}
@@ -416,7 +423,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 			}
 	    	// Update map render
 			konquest.getMapHandler().drawUpdateTerritory(closestTerritory);
-			konquest.getMapHandler().drawLabel(closestTerritory.getKingdom().getCapital());
+			konquest.getMapHandler().drawLabelTerritory(closestTerritory.getKingdom().getCapital());
 			// Display territory info to players in the newly claimed chunks
 			for(KonPlayer occupant : konquest.getPlayerManager().getPlayersOnline()) {
 				//if(occupant.getBukkitPlayer().getWorld().equals(claimWorld) && claimedChunks.contains(Konquest.toPoint(occupant.getBukkitPlayer().getLocation()))) {
@@ -495,12 +502,19 @@ public class TerritoryManager implements KonquestTerritoryManager {
 		Player bukkitPlayer = player.getBukkitPlayer();
 		World claimWorld = claimLoc.getWorld();
 		assert claimWorld != null;
-		// Verify no surrounding territory from other kingdoms
-		for(Point point : HelperUtil.getAreaPoints(claimLoc,radius+1)) {
-			if(isChunkClaimed(point,claimWorld)) {
+		// Check surrounding territory
+		boolean isClaimResidentOnly = konquest.getCore().getBoolean(CorePath.TOWNS_ALLOW_CLAIM_RESIDENTS_ONLY.getPath(),false);
+		for (Point point : HelperUtil.getAreaPoints(claimLoc,radius+1)) {
+			if (isChunkClaimed(point,claimWorld)) {
 				KonTerritory territory = getChunkTerritory(point,claimWorld);
-				if(territory != null && !player.getKingdom().equals(territory.getKingdom())) {
+				// Check for other kingdoms
+				if (territory != null && !player.getKingdom().equals(territory.getKingdom())) {
 					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_PROXIMITY.getMessage());
+					return false;
+				}
+				// Check for allowed residents of towns (optional)
+				if (isClaimResidentOnly && territory instanceof KonTown && !((KonTown)territory).isPlayerResident(player.getBukkitPlayer())) {
+					ChatUtil.sendError(bukkitPlayer, MessagePath.COMMAND_CLAIM_ERROR_RESIDENT.getMessage(territory.getName()));
 					return false;
 				}
 			}
@@ -637,7 +651,7 @@ public class TerritoryManager implements KonquestTerritoryManager {
 				((KonBarDisplayer)territory).updateBarPlayers();
 			}
 			konquest.getMapHandler().drawUpdateTerritory(territory);
-			konquest.getMapHandler().drawLabel(territory.getKingdom().getCapital());
+			konquest.getMapHandler().drawLabelTerritory(territory.getKingdom().getCapital());
 		}
 
 		return doUpdates;

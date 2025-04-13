@@ -1,13 +1,25 @@
 package com.github.rumsfield.konquest.map;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.CorePath;
+import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.dynmap.markers.MarkerIcon;
 
-import java.util.Date;
-import java.util.HashMap;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
 //TODO: Make this class into a listener, make events for territory updates, deletes, etc
 
@@ -18,7 +30,7 @@ public class MapHandler {
 	private final Konquest konquest;
 	private final HashMap<String,Renderable> renderers;
 
-	static final int sanctuaryColor = 0x646464;
+    static final int sanctuaryColor = 0x646464;
 	static final int ruinColor = 0x242424;
 	static final int campColor = 0xa3a10a;
 	static final int lineDefaultColor = 0x000000;
@@ -28,6 +40,10 @@ public class MapHandler {
 	static boolean isEnableCamps = true;
 	static boolean isEnableSanctuaries = true;
 	static boolean isEnableRuins = true;
+	static boolean isShowBanners = true;
+
+	private static final HashMap<String,String> imageBase64Cache = new HashMap<>();
+	private static final HashMap<String,String> imageRelativeCache = new HashMap<>();
 
 	public MapHandler(Konquest konquest) {
 		this.konquest = konquest;
@@ -35,11 +51,17 @@ public class MapHandler {
 	}
 	
 	public void initialize() {
-		if (konquest.getIntegrationManager().getDynmap().isEnabled()) {
-			renderers.put("Dynmap",new DynmapRender(konquest));
+        String dynmapKey = "Dynmap";
+        if (konquest.getIntegrationManager().getDynmap().isEnabled() && !renderers.containsKey(dynmapKey)) {
+			renderers.put(dynmapKey,new DynmapRender(konquest));
 		}
-		if (konquest.getIntegrationManager().getBlueMap().isEnabled()) {
-			renderers.put("BlueMap",new BlueMapRender(konquest));
+		String bluemapKey = "BlueMap";
+		if (konquest.getIntegrationManager().getBlueMap().isEnabled() && !renderers.containsKey(bluemapKey)) {
+			renderers.put(bluemapKey,new BlueMapRender(konquest));
+		}
+		String squaremapKey = "squaremap";
+		if (konquest.getIntegrationManager().getSquaremap().isEnabled() && !renderers.containsKey(squaremapKey)) {
+			renderers.put(squaremapKey,new SquaremapRender(konquest));
 		}
 		for(Renderable ren : renderers.values()) {
 			ren.initialize();
@@ -48,97 +70,267 @@ public class MapHandler {
 		isEnableCamps = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_CAMPS.getPath());
 		isEnableSanctuaries = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_SANCTUARIES.getPath());
 		isEnableRuins = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_ENABLE_RUINS.getPath());
+		isShowBanners = konquest.getCore().getBoolean(CorePath.INTEGRATION_MAP_OPTIONS_SHOW_BANNERS.getPath());
+
+		if (isShowBanners) {
+			loadBannerImages();
+		}
+
+		printMapFeatures();
+	}
+
+	private void printMapFeatures() {
+		String lineTemplate = "%-30s -> %s";
+		String unavailable = ChatColor.GRAY+"Unavailable";
+		String statusKingdoms = ChatUtil.boolean2enable(isEnableKingdoms);
+		String statusCamps = ChatUtil.boolean2enable(isEnableCamps);
+		String statusSanctuaries = ChatUtil.boolean2enable(isEnableSanctuaries);
+		String statusRuins = ChatUtil.boolean2enable(isEnableRuins);
+		String statusBanners = ChatUtil.boolean2enable(isShowBanners);
+		StringBuilder availableMaps = new StringBuilder();
+		if (renderers.isEmpty()) {
+			availableMaps.append("None");
+			statusKingdoms = unavailable;
+			statusCamps = unavailable;
+			statusSanctuaries = unavailable;
+			statusRuins = unavailable;
+			statusBanners = unavailable;
+		} else {
+			Iterator<Renderable> renderIterator = renderers.values().iterator();
+			while (renderIterator.hasNext()) {
+				availableMaps.append(renderIterator.next().getMapName());
+				if (renderIterator.hasNext()) {
+					availableMaps.append(", ");
+				}
+			}
+		}
+		String [] status = {
+				String.format(lineTemplate,"Available Maps", availableMaps),
+				String.format(lineTemplate,"Show Kingdoms",statusKingdoms),
+				String.format(lineTemplate,"Show Barbarian Camps",statusCamps),
+				String.format(lineTemplate,"Show Sanctuaries",statusSanctuaries),
+				String.format(lineTemplate,"Show Ruins",statusRuins),
+				String.format(lineTemplate,"Display Banners",statusBanners),
+		};
+		ChatUtil.printConsoleAlert("Map Summary...");
+		for (String row : status) {
+			String line = ChatColor.GOLD+"> "+ChatColor.RESET + row;
+			Bukkit.getServer().getConsoleSender().sendMessage(line);
+		}
+	}
+
+	private void loadBannerImages() {
+		// Check for Dynmap, need to copy files into its images folder
+		boolean doCopyImages = false;
+		File dynmapImagePath = null;
+		if (konquest.getIntegrationManager().getDynmap().isEnabled()) {
+			dynmapImagePath = konquest.getIntegrationManager().getDynmap().getWebImagesFolder();
+			if (dynmapImagePath.exists() && dynmapImagePath.isDirectory()) {
+				doCopyImages = true;
+			}
+		}
+		// Load images
+		String relativeBasePath = "/images/";
+		String localBasePath = "banners/";
+		imageBase64Cache.clear();
+		imageRelativeCache.clear();
+		ArrayList<String> bannerNames = new ArrayList<>();
+		bannerNames.add("default");
+		bannerNames.add("sanctuary");
+		bannerNames.add("ruin");
+		bannerNames.add("camp");
+		bannerNames.addAll(konquest.getKingdomManager().getKingdomNames());
+		for (String bannerKey : bannerNames) {
+			// Add image files from plugins folder
+			String fileName = bannerKey+".png";
+			String relativeFilePath = relativeBasePath+fileName;
+			String localFilePath = localBasePath+fileName;
+			File imageFile = new File(konquest.getPlugin().getDataFolder(), localFilePath);
+			if (imageFile.exists() && imageFile.isFile()) {
+				// A banner image exists, verify size
+				long fileSizeBytes = imageFile.length();
+                long IMAGE_MAX_BYTES = 100000;
+                if (fileSizeBytes > IMAGE_MAX_BYTES) {
+					ChatUtil.printConsoleError("Failed to load banner image file \""+localFilePath+"\", file size "+fileSizeBytes+" exceeds maximum limit of "+ IMAGE_MAX_BYTES +" bytes.");
+					continue;
+				}
+				// File is under size limit, add to cache as Base64 encoded string
+				String imageData = "";
+				try {
+					imageData = "data:image/png;base64,"+Base64.getEncoder().encodeToString(Files.readAllBytes(imageFile.toPath()));
+				} catch (IOException exc) {
+					ChatUtil.printConsoleError("Failed to load banner image file \""+localFilePath+"\", problem reading file, check read permissions.");
+				}
+				if (!imageData.isEmpty()) {
+					// Image data is valid
+					imageBase64Cache.put(bannerKey,imageData);
+				}
+				// Copy file to Dynmap images folder
+				if (doCopyImages) {
+					Path source = imageFile.toPath();
+					Path destination = (new File(dynmapImagePath,fileName)).toPath();
+					try {
+						Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+						imageRelativeCache.put(bannerKey,relativeFilePath);
+						ChatUtil.printDebug("Copied banner image file to Dynmap path: "+destination);
+					} catch (Exception e) {
+						e.printStackTrace();
+						ChatUtil.printConsoleError("Failed to copy image file " + source + " to " + destination);
+					}
+				}
+			}
+		}
+		// Ensure default image exists
+		if (!imageBase64Cache.containsKey("default")) {
+			// Add plugin resource
+			InputStream defaultResource = konquest.getPlugin().getResource("banners/default.png");
+			if (defaultResource != null) {
+				String imageData = "";
+				try {
+					imageData = "data:image/png;base64,"+Base64.getEncoder().encodeToString(defaultResource.readAllBytes());
+				} catch (IOException exc) {
+					ChatUtil.printConsoleError("Failed to load default banner image resource, problem reading file, check read permissions.");
+				}
+				if (!imageData.isEmpty()) {
+					// Image data is valid
+					imageBase64Cache.put("default",imageData);
+				}
+			} else {
+				ChatUtil.printConsoleError("Failed to load default banner image from plugin resources.");
+			}
+		}
+		// Display loaded results
+		ChatUtil.printConsoleAlert("Loaded Map Banner Images...");
+		ArrayList<String> loadedBannerNames = new ArrayList<>();
+		for (String bannerName : bannerNames) {
+			if (imageBase64Cache.containsKey(bannerName)) {
+				loadedBannerNames.add(bannerName);
+			}
+		}
+		String line = ChatColor.GOLD+"> "+ChatColor.RESET + HelperUtil.formatCommaSeparatedList(loadedBannerNames);
+		Bukkit.getServer().getConsoleSender().sendMessage(line);
 	}
 
 	/* Rendering Methods */
 
 	public void drawUpdateTerritory(KonKingdom kingdom) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawUpdate(kingdom);
+		drawUpdateTerritory(kingdom,"");
+	}
+
+	public void drawUpdateTerritory(KonKingdom kingdom, String rendererName) {
+		for (KonTown town : kingdom.getCapitalTowns()) {
+			drawUpdateTerritory(town, rendererName);
 		}
 	}
 
 	public void drawUpdateTerritory(KonTerritory territory) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawUpdate(territory);
+		drawUpdateTerritory(territory,"");
+	}
+
+	public void drawUpdateTerritory(KonTerritory territory, String rendererName) {
+		if (isTerritoryDisabled(territory) || isTerritoryInvalid(territory)) return;
+		AreaTerritory area = new AreaTerritory(territory);
+		// Draw updates
+		for (Renderable render : getRenderers(rendererName)) {
+			try {
+				render.drawUpdate(area);
+			} catch (Exception | Error problem) {
+				ChatUtil.printConsoleError(render.getMapName()+" encountered a problem while trying to draw territory "+territory.getName());
+				problem.printStackTrace();
+			}
 		}
 	}
 
 	public void drawRemoveTerritory(KonTerritory territory) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawRemove(territory);
+		drawRemoveTerritory(territory,"");
+	}
+
+	public void drawRemoveTerritory(KonTerritory territory, String rendererName) {
+		if (isTerritoryDisabled(territory) || isTerritoryInvalid(territory)) return;
+		AreaTerritory area = new AreaTerritory(territory);
+		// Draw removes
+		for (Renderable render : getRenderers(rendererName)) {
+			try {
+				render.drawRemove(area);
+			} catch (Exception | Error problem) {
+				ChatUtil.printConsoleError(render.getMapName()+" encountered a problem while trying to remove territory "+territory.getName());
+				problem.printStackTrace();
+			}
 		}
 	}
+
+	public void drawLabelTerritory(KonTerritory territory) {
+		drawLabelTerritory(territory,"");
+	}
 	
-	public void drawLabel(KonTerritory territory) {
-		for(Renderable ren : renderers.values()) {
-			ren.drawLabel(territory);
+	public void drawLabelTerritory(KonTerritory territory, String rendererName) {
+		if (isTerritoryDisabled(territory) || isTerritoryInvalid(territory)) return;
+		AreaTerritory area = new AreaTerritory(territory);
+		// Draw labels
+		for (Renderable render : getRenderers(rendererName)) {
+			try {
+				render.drawLabel(area);
+			} catch (Exception | Error problem) {
+				ChatUtil.printConsoleError(render.getMapName()+" encountered a problem while trying to label territory "+territory.getName());
+				problem.printStackTrace();
+			}
 		}
 	}
 	
 	public void postBroadcast(String message) {
-		for(Renderable ren : renderers.values()) {
-			ren.postBroadcast(message);
-		}
-	}
-	
-	public void drawAllTerritories() {
-		Date start = new Date();
-		// Sanctuaries
-		for (KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(sanctuary);
+		for(Renderable render : renderers.values()) {
+			try {
+				render.postBroadcast(message);
+			} catch (Exception | Error problem) {
+				ChatUtil.printConsoleError(render.getMapName()+" encountered a problem while trying to broadcast a message");
+				problem.printStackTrace();
 			}
 		}
-		// Ruins
-		for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(ruin);
-			}
-		}
-		// Camps
-		for (KonCamp camp : konquest.getCampManager().getCamps()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(camp);
-			}
-		}
-		// Kingdoms
-		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			for(Renderable ren : renderers.values()) {
-				ren.drawUpdate(kingdom);
-			}
-		}
-		Date end = new Date();
-		int time = (int)(end.getTime() - start.getTime());
-		ChatUtil.printDebug("Rendering all territories in maps took "+time+" ms");
 	}
 
+	public void drawAllTerritories() {
+		drawAllTerritories("");
+	}
+	
 	public void drawAllTerritories(String rendererName) {
 		Date start = new Date();
-		Renderable renderer = renderers.get(rendererName);
-		if(renderer == null) {
-			ChatUtil.printDebug("Failed to draw with unknown renderer "+rendererName);
-			return;
-		}
 		// Sanctuaries
 		for (KonSanctuary sanctuary : konquest.getSanctuaryManager().getSanctuaries()) {
-			renderer.drawUpdate(sanctuary);
+			drawUpdateTerritory(sanctuary, rendererName);
 		}
 		// Ruins
 		for (KonRuin ruin : konquest.getRuinManager().getRuins()) {
-			renderer.drawUpdate(ruin);
+			drawUpdateTerritory(ruin, rendererName);
 		}
 		// Camps
 		for (KonCamp camp : konquest.getCampManager().getCamps()) {
-			renderer.drawUpdate(camp);
+			drawUpdateTerritory(camp, rendererName);
 		}
 		// Kingdoms
 		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
-			renderer.drawUpdate(kingdom);
+			drawUpdateTerritory(kingdom, rendererName);
 		}
 		Date end = new Date();
 		int time = (int)(end.getTime() - start.getTime());
-		ChatUtil.printDebug("Rendering all territories with "+rendererName+" took "+time+" ms");
+		if (rendererName.isEmpty()) {
+			ChatUtil.printDebug("Rendering all territories in maps took "+time+" ms");
+		} else {
+			ChatUtil.printDebug("Rendering all territories with "+rendererName+" took "+time+" ms");
+		}
+	}
+
+	/* Helper Methods */
+
+	private ArrayList<Renderable> getRenderers(String name) {
+		ArrayList<Renderable> renderList = new ArrayList<>();
+		if(name.isEmpty() || !renderers.containsKey(name)) {
+			// Include all renderers
+			renderList.addAll(renderers.values());
+		} else {
+			// Only include the specified renderer
+			renderList.add(renderers.get(name));
+		}
+		return renderList;
 	}
 
 	public static int getWebColor(KonTerritory territory) {
@@ -153,7 +345,7 @@ public class MapHandler {
 		return result;
 	}
 
-	static boolean isTerritoryInvalid(KonTerritory territory) {
+	private boolean isTerritoryInvalid(KonTerritory territory) {
 		boolean isValid = false;
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
@@ -174,7 +366,7 @@ public class MapHandler {
 		return !isValid;
 	}
 
-	static boolean isTerritoryDisabled(KonTerritory territory) {
+	private boolean isTerritoryDisabled(KonTerritory territory) {
 		boolean result = false;
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
@@ -242,50 +434,96 @@ public class MapHandler {
 		return result;
 	}
 
-	static String getAreaLabel(KonTerritory territory) {
+	private static String getImageSource(String bannerKey, boolean isImageRelative) {
+		String result = "";
+		if (isImageRelative) {
+			// Specify image source as relative path
+			if (imageRelativeCache.containsKey(bannerKey)) {
+				result = imageRelativeCache.get(bannerKey);
+			} else if (imageRelativeCache.containsKey("default")) {
+				result = imageRelativeCache.get("default");
+			}
+		} else {
+			// Specify image source as Base64 data
+			if (imageBase64Cache.containsKey(bannerKey)) {
+				result = imageBase64Cache.get(bannerKey);
+			} else if (imageBase64Cache.containsKey("default")) {
+				result = imageBase64Cache.get("default");
+			}
+		}
+		return result;
+	}
+
+	static String getAreaLabel(KonTerritory territory, boolean isImageRelative) {
 		String result = "Konquest";
-		String bodyBegin = "<body style=\"background-color:#fff0cc;font-family:Georgia;\">";
-		String nameHeaderFormat = "<h2 style=\"color:#de791b;\">%s</h2>";
+		String bodyBegin = "<body style=\"background-color:#fff0cc;font-family:Helvetica;\">";
+		String nameHeaderFormat = "<h2 style=\"text-align:center;color:#de791b;\">%s</h2>";
 		String typeHeaderFormat = "<h3 style=\"color:#8048b8;\">%s</h3>";
-		String propertyLineFormat = "%s: %s <br>";
+		String propertyLineFormat = "<b>%s:</b> %s <br>";
+		String bannerImageFormat = "<div style=\"text-align:center\"><img src=\"%s\" alt=\"Banner\" height=\"96\"></div>";
+		String imageSource;
 		StringBuilder labelMaker = new StringBuilder();
 		switch (territory.getTerritoryType()) {
 			case SANCTUARY:
 				KonSanctuary sanctuary = (KonSanctuary)territory;
-				int numTemplates = sanctuary.getTemplates().size();
-				result = labelMaker.append(bodyBegin)
-						.append(String.format(nameHeaderFormat, sanctuary.getName()))
+				labelMaker.append(bodyBegin);
+				if (isShowBanners) {
+					imageSource = getImageSource("sanctuary", isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
+					}
+				}
+				labelMaker.append(String.format(nameHeaderFormat, sanctuary.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_SANCTUARY.getMessage()))
 						.append("<p>")
-						.append(String.format(propertyLineFormat, MessagePath.MAP_TEMPLATES.getMessage(), numTemplates))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_TEMPLATES.getMessage(), sanctuary.getTemplates().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), sanctuary.getChunkList().size()))
 						.append("</p>")
-						.append("</body>")
-						.toString();
+						.append("</body>");
+				result = labelMaker.toString();
 				break;
 			case RUIN:
 				KonRuin ruin = (KonRuin)territory;
-				int numCriticals = ruin.getMaxCriticalHits();
-				int numSpawns = ruin.getSpawnLocations().size();
-				result = labelMaker.append(bodyBegin)
-						.append(String.format(nameHeaderFormat, ruin.getName()))
+				labelMaker.append(bodyBegin);
+				if (isShowBanners) {
+					imageSource = getImageSource("ruin", isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
+					}
+				}
+				labelMaker.append(String.format(nameHeaderFormat, ruin.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_RUIN.getMessage()))
 						.append("<p>")
-						.append(String.format(propertyLineFormat, MessagePath.MAP_CRITICAL_HITS.getMessage(), numCriticals))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_GOLEM_SPAWNS.getMessage(), numSpawns))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CRITICAL_HITS.getMessage(), ruin.getMaxCriticalHits()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_GOLEM_SPAWNS.getMessage(), ruin.getSpawnLocations().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), ruin.getChunkList().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LOOT_TYPE.getMessage(), ruin.getKonquest().getLootManager().getRuinLootDisplayName(ruin)))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CAPTURE.getMessage(), !ruin.isCaptureDisabled()))
 						.append("</p>")
-						.append("</body>")
-						.toString();
+						.append("</body>");
+				result = labelMaker.toString();
 				break;
 			case CAMP:
 				KonCamp camp = (KonCamp)territory;
-				result = labelMaker.append(bodyBegin)
+				labelMaker.append(bodyBegin);
+				if (isShowBanners) {
+					imageSource = getImageSource("camp", isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
+					}
+				}
+				labelMaker.append(String.format(bannerImageFormat, "camp"))
 						.append(String.format(nameHeaderFormat, camp.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_BARBARIANS.getMessage()))
 						.append("<p>")
-						.append(String.format(propertyLineFormat, MessagePath.LABEL_PLAYER.getMessage(), camp.getOwner().getName()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_OWNER.getMessage(), camp.getOwner().getName()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), camp.getChunkList().size()))
 						.append("</p>")
-						.append("</body>")
-						.toString();
+						.append("</body>");
+				result = labelMaker.toString();
 				break;
 			case CAPITAL:
 				KonCapital capital = (KonCapital)territory;
@@ -293,29 +531,46 @@ public class MapHandler {
 				if(capital.getPlayerLord() != null) {
 					capitalLordName = capital.getPlayerLord().getName();
 				}
+				String kingdomMasterName = "-";
+				if(capital.getKingdom().isMasterValid()) {
+					kingdomMasterName = capital.getKingdom().getPlayerMaster().getName();
+				}
+				int numKingdomOfficers = capital.getKingdom().getPlayerOfficersOnly().size();
 				int numAllKingdomPlayers = territory.getKingdom().getNumMembers();
 				int numKingdomTowns = territory.getKingdom().getTowns().size();
 				int numKingdomLand = 0;
 				for(KonTown town : territory.getKingdom().getCapitalTowns()) {
 					numKingdomLand += town.getNumLand();
 				}
-				result = labelMaker.append(bodyBegin)
-						.append(String.format(nameHeaderFormat, capital.getName()))
+				labelMaker.append(bodyBegin);
+				if (isShowBanners) {
+					imageSource = getImageSource(capital.getKingdom().getName(), isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
+					}
+				}
+				labelMaker.append(String.format(nameHeaderFormat, capital.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_CAPITAL.getMessage()))
 						.append("<p>")
 						.append(String.format(propertyLineFormat, MessagePath.MAP_KINGDOM.getMessage(), capital.getKingdom().getName()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LORD.getMessage(), capitalLordName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_KNIGHTS.getMessage(), capital.getPlayerKnightsOnly().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_RESIDENTS.getMessage(), capital.getNumResidents()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), capital.getNumLand()))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_POPULATION.getMessage(), capital.getNumResidents()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LOOT_TYPE.getMessage(), capital.getKonquest().getLootManager().getMonumentLootDisplayName(capital)))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CAPTURE.getMessage(), !capital.isCaptureDisabled()))
 						.append("</p>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_KINGDOM.getMessage()))
 						.append("<p>")
+						.append(String.format(propertyLineFormat, MessagePath.MAP_MASTER.getMessage(), kingdomMasterName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_OFFICERS.getMessage(), numKingdomOfficers))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_MEMBERS.getMessage(), numAllKingdomPlayers))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_TOWNS.getMessage(), numKingdomTowns))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), numKingdomLand))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_PLAYERS.getMessage(), numAllKingdomPlayers))
 						.append("</p>")
-						.append("</body>")
-						.toString();
+						.append("</body>");
+				result = labelMaker.toString();
 				break;
 			case TOWN:
 				KonTown town = (KonTown)territory;
@@ -323,17 +578,27 @@ public class MapHandler {
 				if(town.getPlayerLord() != null) {
 					townLordName = town.getPlayerLord().getName();
 				}
-				result = labelMaker.append(bodyBegin)
-						.append(String.format(nameHeaderFormat, town.getName()))
+				labelMaker.append(bodyBegin);
+				if (isShowBanners) {
+					imageSource = getImageSource(town.getKingdom().getName(), isImageRelative);
+					if (!imageSource.isEmpty()) {
+						labelMaker.append(String.format(bannerImageFormat, imageSource));
+					}
+				}
+				labelMaker.append(String.format(nameHeaderFormat, town.getName()))
+						.append("<hr>")
 						.append(String.format(typeHeaderFormat, MessagePath.MAP_TOWN.getMessage()))
 						.append("<p>")
 						.append(String.format(propertyLineFormat, MessagePath.MAP_KINGDOM.getMessage(), town.getKingdom().getName()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LORD.getMessage(), townLordName))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_KNIGHTS.getMessage(), town.getPlayerKnightsOnly().size()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_RESIDENTS.getMessage(), town.getNumResidents()))
 						.append(String.format(propertyLineFormat, MessagePath.MAP_LAND.getMessage(), town.getNumLand()))
-						.append(String.format(propertyLineFormat, MessagePath.MAP_POPULATION.getMessage(), town.getNumResidents()))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_LOOT_TYPE.getMessage(), town.getKonquest().getLootManager().getMonumentLootDisplayName(town)))
+						.append(String.format(propertyLineFormat, MessagePath.MAP_CAPTURE.getMessage(), !town.isCaptureDisabled()))
 						.append("</p>")
-						.append("</body>")
-						.toString();
+						.append("</body>");
+				result = labelMaker.toString();
 				break;
 			default:
 				break;

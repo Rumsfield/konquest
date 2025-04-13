@@ -55,6 +55,7 @@ label:
   leaderboard: Bestenliste
   level: Level
   loot-chests: Beutetruhen
+  loot-type: Beutetyp
   map-color: Kartenfarbe
   members: Mitglieder
   modified: Geändert
@@ -137,14 +138,20 @@ map:
   town: Stadt
   towns: Städte
   land: Land
-  players: Spieler
+  owner: Besitzer
   lord: Lord
-  population: Bevölkerung
+  knights: Ritter
+  residents: Bewohner
+  master: Meister
+  officers: Offiziere
+  members: Mitglieder
   ruin: Ruine
   critical-hits: Kritische Treffer
   golem-spawns: Golem-Spawns
   sanctuary: Heiligtum
   templates: Monument-Vorlagen
+  capture: Erfassen Erlaubt
+  loot-type: Beutetyp
 # //// MENU \\\\
 # Text, der in allen Inventarmenüs verwendet wird.
 menu:
@@ -372,6 +379,7 @@ menu:
     hint-special: Klicken, um zu spezialisieren
     lore-special: Wählen Sie diesen Beruf für einen Rabatt bei den Dorfbewohnern dieser Stadt.
     info-special: Dorfbewohner mit diesem Beruf gewähren in dieser Stadt Rabatte.
+    loot-special: Dieser Beruf gewährt besondere Beute am Stadtdenkmal.
     title-join: Einer Stadt beitreten
     title-leave: Eine Stadt verlassen
     title-list: Städteliste
@@ -478,6 +486,8 @@ generic:
     prefix-lost: Errungenschaftspräfix verloren
     quest: Quest abgeschlossen
     loot: Neue Beute für Stadtdenkmäler verfügbar.
+    loot-show: Die gewählte Beutetabelle ist %s.
+    loot-set: Setzen Sie die Beutetabelle auf %s.
     absent: Du warst zu lange abwesend und wurdest aus allen Städten geworfen.
     force-barbarian: Du bist jetzt ein Barbar!
   error:
@@ -502,6 +512,7 @@ generic:
     disabled: Diese Funktion ist derzeit deaktiviert, sprechen Sie mit einem Administrator.
     region: Dies kann nicht getan werden, während andere Regionen festgelegt werden.
     failed: Fehlgeschlagen :(
+    loot-unknown: Unbekannter Beutetabellenname, %s.
 # //// PROTECTION \\\\
 # Nachrichten zum Schutz von Blöcken und Land vor Spielern.
 protection:
@@ -566,6 +577,7 @@ protection:
     capital-immune: Diese Hauptstadt ist immun gegen Angriffe, solange sich %s Städte im Königreich %s befinden.
     no-allied-build: Die Optionen dieser Stadt erlauben es Spielern aus verbündeten Königreichen nicht, zu bauen.
     template-modify: Diese Denkmalvorlage wird derzeit geändert und wird bald verfügbar sein.
+    loot-denied: Sie müssen ein Stadtritter oder -lord sein, um Beute zu machen.
 # //// COMMAND \\\\
 # Für alle Befehle verwendete Nachrichten.
 command:
@@ -681,6 +693,7 @@ command:
       fail-adjacent: Anspruch fehlgeschlagen, kein angrenzendes Gebiet.
       fail-far: Anspruch fehlgeschlagen, zu weit vom Gebietszentrum entfernt.
       fail-claimed: Anspruch fehlgeschlagen, bereits beansprucht.
+      resident: Sie müssen %s als Einwohner beitreten, um Land zu beanspruchen.
   favor:
     notice:
       message: Sie haben %s Gunst, die Kosten betragen...

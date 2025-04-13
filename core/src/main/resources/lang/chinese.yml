@@ -55,6 +55,7 @@ label:
   leaderboard: 排行榜
   level: 等級
   loot-chests: 戰利品箱
+  loot-type: 戰利品類型
   map-color: 地圖顏色
   members: 成員
   modified: 修改
@@ -137,14 +138,20 @@ map:
   town: 城鎮
   towns: 城鎮
   land: 土地
-  players: 玩家
+  owner: 擁有者
   lord: 領主
-  population: 人口
+  knights: 騎士
+  residents: 居民
+  master: 王國大師
+  officers: 官員
+  members: 成員
   ruin: 遺跡
   critical-hits: 致命打擊
   golem-spawns: 鐵傀儡生成
   sanctuary: 聖所
   templates: 紀念碑模板
+  capture: 允許捕獲
+  loot-type: 戰利品類型
 # //// MENU \\\\
 # 所有庫存選單中使用的文字。
 menu:
@@ -372,6 +379,7 @@ menu:
     hint-special: 點擊以專業化
     lore-special: 選擇此專業以獲得此城鎮村民的折扣。
     info-special: 從事這項職業的村民在這個鎮上給予折扣。
+    loot-special: 這個職業會在城鎮紀念碑處提供特殊戰利品。
     title-join: 加入城鎮
     title-leave: 離開城鎮
     title-list: 城鎮列表
@@ -478,6 +486,8 @@ generic:
     prefix-lost: 失去成就前綴
     quest: 任務完成
     loot: 現在可以獲得新的城鎮紀念碑戰利品。
+    loot-show: 選定的戰利品表是 %s。
+    loot-set: 將戰利品表設定為 %s。
     absent: 您已經離開太長時間，已被從所有城鎮中踢出。
     force-barbarian: 您現在是一名蠻族！
   error:
@@ -502,6 +512,7 @@ generic:
     disabled: 目前已禁用此功能，請與管理員聯繫。
     region: 在設定其他區域時無法執行此操作。
     failed: 失敗 :(
+    loot-unknown: 未知的戰利品表名稱，%s。
 # //// PROTECTION \\\\
 # 關於保護方塊和土地不受玩家幹擾的資訊。
 protection:
@@ -566,6 +577,7 @@ protection:
     capital-immune: 在 %s 鎮保持在 %s 王國中時，這個首都免受攻擊。
     no-allied-build: 該城鎮的選項不允許來自同盟王國的玩家建造。
     template-modify: 該紀念碑模板目前正在修改，即將發布。
+    loot-denied: 您必須是城鎮騎士或領主才能獲得戰利品。
 # //// COMMAND \\\\
 # 用於所有命令的訊息。
 command:
@@ -681,6 +693,7 @@ command:
       fail-adjacent: 宣佈失敗，無相鄰領土。
       fail-far: 宣佈失敗，距離領土中心太遠。
       fail-claimed: 宣佈失敗，已經被宣佈。
+      resident: 您必須以居民身分加入 %s 才能領取土地。
   favor:
     notice:
       message: 你擁有 %s 的青睞，花費如下...

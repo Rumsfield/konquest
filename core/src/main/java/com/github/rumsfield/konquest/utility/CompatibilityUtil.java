@@ -47,6 +47,22 @@ public class CompatibilityUtil {
         professionMaterial.put(Villager.Profession.WEAPONSMITH,     Material.GRINDSTONE);
     }
 
+    private static final HashMap<String,String> potionTypeAlternates = new HashMap<>();
+    static {
+        // pre-1.20.6
+        potionTypeAlternates.put("INSTANT_DAMAGE","HARMING");
+        potionTypeAlternates.put("INSTANT_HEAL","HEALING");
+        potionTypeAlternates.put("JUMP","LEAPING");
+        potionTypeAlternates.put("REGEN","REGENERATION");
+        potionTypeAlternates.put("SPEED","SWIFTNESS");
+        // post-1.20.6
+        potionTypeAlternates.put("HARMING","INSTANT_DAMAGE");
+        potionTypeAlternates.put("HEALING","INSTANT_HEAL");
+        potionTypeAlternates.put("LEAPING","JUMP");
+        potionTypeAlternates.put("REGENERATION","REGEN");
+        potionTypeAlternates.put("SWIFTNESS","SPEED");
+    }
+
     /**
      * Map old attribute namespaces to new ones
      */
@@ -250,57 +266,62 @@ public class CompatibilityUtil {
 
     private static PotionType lookupPotionType(PotionType type, boolean isExtended, boolean isUpgraded) {
         // Try to change type to LONG or STRONG variant
-        switch (type) {
-            case FIRE_RESISTANCE:
+        switch (type.toString()) {
+            case "FIRE_RESISTANCE":
                 if (isExtended) return PotionType.LONG_FIRE_RESISTANCE;
                 break;
-            case INVISIBILITY:
+            case "INVISIBILITY":
                 if (isExtended) return PotionType.LONG_INVISIBILITY;
                 break;
-            case LEAPING:
+            case "LEAPING":
+            case "JUMP":
                 if (isExtended) return PotionType.LONG_LEAPING;
                 if (isUpgraded) return PotionType.STRONG_LEAPING;
                 break;
-            case NIGHT_VISION:
+            case "NIGHT_VISION":
                 if (isExtended) return PotionType.LONG_NIGHT_VISION;
                 break;
-            case POISON:
+            case "POISON":
                 if (isExtended) return PotionType.LONG_POISON;
                 if (isUpgraded) return PotionType.STRONG_POISON;
                 break;
-            case REGENERATION:
+            case "REGENERATION":
+            case "REGEN":
                 if (isExtended) return PotionType.LONG_REGENERATION;
                 if (isUpgraded) return PotionType.STRONG_REGENERATION;
                 break;
-            case SLOW_FALLING:
+            case "SLOW_FALLING":
                 if (isExtended) return PotionType.LONG_SLOW_FALLING;
                 break;
-            case SLOWNESS:
+            case "SLOWNESS":
+            case "SPEED":
                 if (isExtended) return PotionType.LONG_SLOWNESS;
                 if (isUpgraded) return PotionType.STRONG_SLOWNESS;
                 break;
-            case STRENGTH:
+            case "STRENGTH":
                 if (isExtended) return PotionType.LONG_STRENGTH;
                 if (isUpgraded) return PotionType.STRONG_STRENGTH;
                 break;
-            case SWIFTNESS:
+            case "SWIFTNESS":
                 if (isExtended) return PotionType.LONG_SWIFTNESS;
                 if (isUpgraded) return PotionType.STRONG_SWIFTNESS;
                 break;
-            case TURTLE_MASTER:
+            case "TURTLE_MASTER":
                 if (isExtended) return PotionType.LONG_TURTLE_MASTER;
                 if (isUpgraded) return PotionType.STRONG_TURTLE_MASTER;
                 break;
-            case WATER_BREATHING:
+            case "WATER_BREATHING":
                 if (isExtended) return PotionType.LONG_WATER_BREATHING;
                 break;
-            case WEAKNESS:
+            case "WEAKNESS":
                 if (isExtended) return PotionType.LONG_WEAKNESS;
                 break;
-            case HARMING:
+            case "HARMING":
+            case "INSTANT_DAMAGE":
                 if (isUpgraded) return PotionType.STRONG_HARMING;
                 break;
-            case HEALING:
+            case "HEALING":
+            case "INSTANT_HEAL":
                 if (isUpgraded) return PotionType.STRONG_HEALING;
                 break;
             default:
@@ -412,6 +433,7 @@ public class CompatibilityUtil {
      * @param name The name of the enchantment, either old or new names
      * @return The Enchantment appropriate for the current version
      */
+    @SuppressWarnings("deprecation")
     public static Enchantment getEnchantment(String name) {
         EnchantComp enchant = EnchantComp.getFromName(name);
         if (enchant == null) {
@@ -526,18 +548,78 @@ public class CompatibilityUtil {
     /* Utility Operations */
 
     @SuppressWarnings({"removal","deprecation"})
-    public static PotionMeta setPotionData(PotionMeta meta, PotionType type, boolean isExtended, boolean isUpgraded) {
+    public static PotionMeta setPotionMeta(PotionMeta meta, String potionName, boolean isExtended, boolean isUpgraded) {
+        // Get the correct PotionType enum for the current version
+        /* The following enums have known name changes in 1.20.6+
+         * INSTANT_DAMAGE -> HARMING
+         * INSTANT_HEAL -> HEALING
+         * JUMP -> LEAPING
+         * REGEN -> REGENERATION
+         * SPEED -> SWIFTNESS
+         *
+         * The following enums are only present in 1.20.6+
+         * INFESTED
+         * OOZING
+         * WEAVING
+         * WIND_CHARGED
+         *
+         * The following enums are variants of other base enums, present in 1.20.4+
+         * LONG_FIRE_RESISTANCE
+         * LONG_INVISIBILITY
+         * LONG_LEAPING
+         * LONG_NIGHT_VISION
+         * LONG_POISON
+         * LONG_REGENERATION
+         * LONG_SLOW_FALLING
+         * LONG_SLOWNESS
+         * LONG_STRENGTH
+         * LONG_SWIFTNESS
+         * LONG_TURTLE_MASTER
+         * LONG_WATER_BREATHING
+         * LONG_WEAKNESS
+         */
+        PotionType potionType = null;
+        try {
+            potionType = PotionType.valueOf(potionName);
+        } catch (IllegalArgumentException ignored1) {
+            // The type name does not exist in this version.
+            // Check for alternates
+            if (potionTypeAlternates.containsKey(potionName)) {
+                String alternateName = potionTypeAlternates.get(potionName);
+                try {
+                    potionType = PotionType.valueOf(alternateName);
+                } catch (IllegalArgumentException ignored2) {}
+            }
+        }
+        if (potionType == null) {
+            ChatUtil.printConsoleError("Invalid loot potion \""+potionName+"\" given in loot.yml config file, skipping this potion. Accepted potion types are as follows.");
+            for (PotionType type : PotionType.values()) {
+                ChatUtil.printConsole(type.toString());
+            }
+            return meta;
+        }
+
+        // Apply modifiers
+        if (isExtended && !potionType.isExtendable()) {
+            ChatUtil.printConsoleWarning("Invalid loot potion \""+potionName+"\" with extended: true. This potion cannot be extended, ignoring extended modifier.");
+        }
+        if (isUpgraded && !potionType.isUpgradeable()) {
+            ChatUtil.printConsoleWarning("Invalid loot potion \""+potionName+"\" with upgraded: true. This potion cannot be upgraded, ignoring upgraded modifier.");
+        }
+        boolean isExtendedValid = potionType.isExtendable() && isExtended;
+        boolean isUpgradedValid = potionType.isUpgradeable() && isUpgraded;
+
         // First, try the latest API approach
         try {
             // Latest versions
-            meta.setBasePotionType(lookupPotionType(type, isExtended, isUpgraded));
+            meta.setBasePotionType(lookupPotionType(potionType, isExtendedValid, isUpgradedValid));
         } catch (NoSuchMethodError | NoSuchFieldError ignored) {
             // Older versions
             try {
-                meta.setBasePotionData(new org.bukkit.potion.PotionData(type, isExtended, isUpgraded));
+                meta.setBasePotionData(new org.bukkit.potion.PotionData(potionType, isExtended, isUpgraded));
             } catch (IllegalArgumentException e) {
-                meta.setBasePotionData(new org.bukkit.potion.PotionData(type, false, false));
-                ChatUtil.printConsoleError("Invalid options extended=" + isExtended + ", upgraded=" + isUpgraded + " for potion " + type.name() + " in loot.yml");
+                meta.setBasePotionData(new org.bukkit.potion.PotionData(potionType, false, false));
+                ChatUtil.printConsoleError("Invalid options extended=" + isExtended + ", upgraded=" + isUpgraded + " for potion " + potionType.name() + " in loot.yml");
             }
         }
         return meta;
@@ -578,7 +660,9 @@ public class CompatibilityUtil {
         assert meta != null;
         meta.addAttributeModifier(getAttribute("damage"), new AttributeModifier("foo",0,AttributeModifier.Operation.MULTIPLY_SCALAR_1)); // This is necessary as of 1.20.6
         for(ItemFlag flag : ItemFlag.values()) {
-            meta.addItemFlags(flag);
+            if(!flag.toString().equalsIgnoreCase("HIDE_LORE")) { // Added for 1.21.5
+                meta.addItemFlags(flag);
+            }
         }
         if (hasProtection) {
             Enchantment protectionEnchant = CompatibilityUtil.getEnchantment("protection_environmental");

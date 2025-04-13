@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest.model;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.model.KonquestRuin;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
+import com.github.rumsfield.konquest.manager.LootManager;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.*;
 import org.bukkit.boss.BarColor;
@@ -26,6 +27,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	private final Map<KonPropertyFlag,Boolean> properties;
 	private final HashMap<Location,Boolean> criticalLocations; // Block location, enabled flag
 	private final HashMap<Location,KonRuinGolem> spawnLocations; // Block location, Ruin Golem
+	private String lootTableName;
 
 	/*
 	 * Ruin Golem Behavior:
@@ -49,6 +51,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		this.ruinBarAll.setVisible(true);
 		this.criticalLocations = new HashMap<>();
 		this.spawnLocations = new HashMap<>();
+		this.lootTableName = LootManager.defaultLootTableName;
 	}
 
 	public static java.util.List<KonPropertyFlag> getProperties() {
@@ -142,6 +145,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 				spawnAllGolems();
 			}
 			getKonquest().getLootManager().resetRuinLoot(this);
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 		} else if(taskID == captureCountdownTimer.getTaskID()) {
 			// Update capture countdown title
 			String remainingTime = HelperUtil.getTimeFormat(captureTimer.getTime(),ChatColor.RED);
@@ -198,6 +202,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		regenCriticalBlocks();
 		respawnAllGolems();
 		getKonquest().getLootManager().resetRuinLoot(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 	}
 	
 	public void regenCriticalBlocks() {
@@ -230,7 +235,24 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 			captureCountdownTimer.stopTimer();
 			captureCountdownTimer.setTime(0);
 			captureCountdownTimer.startLoopTimer();
+			getKonquest().getMapHandler().drawLabelTerritory(this);
 		}
+	}
+
+	public String getLootTableName() {
+		return lootTableName.isEmpty() ? LootManager.defaultLootTableName : lootTableName;
+	}
+
+	public void setLootTableName(String name) {
+		lootTableName = name.isEmpty() ? LootManager.defaultLootTableName : name;
+	}
+
+	public boolean isLootTableDefault() {
+		return lootTableName.equalsIgnoreCase(LootManager.defaultLootTableName);
+	}
+
+	public void setLootTableDefault() {
+		lootTableName = LootManager.defaultLootTableName;
 	}
 	
 	private void startCaptureTimer() {
@@ -245,7 +267,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 	}
 	
 	public String getCaptureCooldownString() {
-		return String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds());
+		return isCaptureDisabled ? String.format("%02d:%02d", captureTimer.getMinutes(), captureTimer.getSeconds()) : "00:00";
 	}
 
 	public String getCaptureTime() {
@@ -305,7 +327,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		// Check that the location is inside of this ruin
 		if(!this.isLocInside(loc)) return;
 		criticalLocations.put(loc, true);
-		getKonquest().getMapHandler().drawLabel(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 	}
 
 	public boolean addCriticalLocation(Location loc) {
@@ -314,7 +336,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		// Check that the block at the location is a critical type
 		if(!loc.getBlock().getType().equals(getKonquest().getRuinManager().getRuinCriticalBlock())) return false;
 		criticalLocations.put(loc, true);
-		getKonquest().getMapHandler().drawLabel(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 		return true;
 	}
 	
@@ -331,7 +353,7 @@ public class KonRuin extends KonTerritory implements KonquestRuin, KonBarDisplay
 		// Check that the location is inside of this ruin
 		if(!this.isLocInside(loc)) return false;
 		spawnLocations.put(loc, new KonRuinGolem(loc, this));
-		getKonquest().getMapHandler().drawLabel(this);
+		getKonquest().getMapHandler().drawLabelTerritory(this);
 		return true;
 	}
 	

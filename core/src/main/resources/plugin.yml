@@ -17,6 +17,7 @@ softdepend:
   - PlaceholderAPI
   - dynmap
   - BlueMap
+  - squaremap
   - EconomyPlus
   - Economy
   - XConomy

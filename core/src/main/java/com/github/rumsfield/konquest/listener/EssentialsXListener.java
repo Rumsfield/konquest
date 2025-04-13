@@ -94,6 +94,7 @@ public class EssentialsXListener implements Listener {
         Location teleportOrigin = teleportUser.getBase().getLocation();
         KonPlayer player = konquest.getPlayerManager().getPlayer(teleportUser.getBase());
         if (player == null) return;
+        if (player.isAdminBypassActive()) return;
 
         /*
          * Summary of teleport protections:

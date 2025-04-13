@@ -72,6 +72,10 @@ public class ConfigManager{
 		// Backup Readme
 		Konquest.getInstance().getPlugin().saveResource("backup-instructions-readme.txt", true);
 
+		// Banners
+		Konquest.getInstance().getPlugin().saveResource("banners/banner-instructions-readme.txt", true);
+		Konquest.getInstance().getPlugin().saveResource("banners/default.png", false);
+
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
 		updateConfigVersion("lang_english");

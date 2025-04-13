@@ -13,12 +13,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class SettleCommand extends CommandBase {
@@ -153,8 +150,8 @@ public class SettleCommand extends CommandBase {
         		konquest.getAccomplishmentManager().modifyPlayerStat(player,KonStatsType.SETTLED,1);
         		konquest.getKingdomManager().updatePlayerMembershipStats(player);
         		// Update labels
-        		konquest.getMapHandler().drawLabel(town);
-        		konquest.getMapHandler().drawLabel(town.getKingdom().getCapital());
+        		konquest.getMapHandler().drawLabelTerritory(town);
+        		konquest.getMapHandler().drawLabelTerritory(town.getKingdom().getCapital());
         		
         		// Fire post event
         		KonquestTownSettleEvent invokePostEvent = new KonquestTownSettleEvent(konquest, town, player, town.getKingdom());

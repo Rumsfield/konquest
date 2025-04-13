@@ -8,11 +8,14 @@ import org.bukkit.plugin.Plugin;
 import org.dynmap.DynmapAPI;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+
 public class DynmapHook implements PluginHook {
 
     private final Konquest konquest;
     private boolean isEnabled;
     private DynmapAPI dAPI;
+    private File webImagesFolder;
 
     public DynmapHook(Konquest konquest) {
         this.konquest = konquest;
@@ -44,6 +47,7 @@ public class DynmapHook implements PluginHook {
             ChatUtil.printConsoleError("Failed to register Dynmap. Is it disabled?");
             return -1;
         }
+        webImagesFolder = new File(dynmap.getDataFolder(), "web/images");
         isEnabled = true;
         return 0;
     }
@@ -54,5 +58,9 @@ public class DynmapHook implements PluginHook {
     @Nullable
     public DynmapAPI getAPI() {
         return dAPI;
+    }
+
+    public File getWebImagesFolder() {
+        return webImagesFolder;
     }
 }

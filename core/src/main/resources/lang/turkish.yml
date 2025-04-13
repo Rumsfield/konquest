@@ -55,6 +55,7 @@ label:
   leaderboard: Liderlik Tablosu
   level: Seviye
   loot-chests: Ganimet Sandığı
+  loot-type: Yağma Türü
   map-color: Harita Rengi
   members: Üyeler
   modified: Değiştirildi
@@ -137,14 +138,20 @@ map:
   town: Kasaba
   towns: Kasabalar
   land: Alan
-  players: Oyuncular
+  owner: Mal sahibi
   lord: Lord
-  population: Nüfus
+  knights: Şovalyeler
+  residents: Oturan Kişiler
+  master: Usta
+  officers: Memurlar
+  members: Üyeler
   ruin: Kalıntı
   critical-hits: Kritik Vuruşlar
   golem-spawns: Golem Doğum Yeri
   sanctuary: Koruma Alanı
   templates: Anıt Şablonları
+  capture: Yakalama İzin Verildi
+  loot-type: Yağma Türü
 # //// MENU \\\\
 # Tüm envanter menülerinde kullanılan metin.
 menu:
@@ -372,6 +379,7 @@ menu:
     hint-special: Uzmanlık seçmek için tıklayın
     lore-special: Bu mesleği seçerek bu kasabadaki köylülerden indirim alın.
     info-special: Bu meslekten köylüler, bu kasabada indirimler sunar.
+    loot-special: Bu meslek kasaba anıtında özel ganimet verir.
     title-join: Kasabaya Katıl
     title-leave: Kasabayı Bırak
     title-list: Kasaba Listesi
@@ -478,6 +486,8 @@ generic:
     prefix-lost: Başarı lakabı kayboldu
     quest: Görev tamamlandı
     loot: Yeni kasaba anıtı ganimeti mevcut.
+    loot-show: Seçilen ganimet tablosu %s.
+    loot-set: Ganimet tablosunu %s olarak ayarlayın.
     absent: Çok uzun süre yoktunuz ve tüm kasabalardan atıldınız.
     force-barbarian: Artık bir barbar oldunuz!
   error:
@@ -502,6 +512,7 @@ generic:
     disabled: Bu özellik şu anda devre dışı, bir admin ile konuşun.
     region: Diğer bölgeleri ayarlarken bunu yapamazsınız.
     failed: Başarısız :(
+    loot-unknown: Bilinmeyen ganimet tablosu adı, %s.
 # //// PROTECTION \\\\
 # Blok ve arazilerin oyunculardan korunmasına dair mesajlar.
 protection:
@@ -566,6 +577,7 @@ protection:
     capital-immune: Bu başkent, %s Krallığı'nda %s kasaba kaldığı sürece saldırılara karşı bağışıktır.
     no-allied-build: Bu kasabanın seçenekleri, müttefik krallıklardan oyuncuların inşaat yapmasına izin vermiyor.
     template-modify: Bu anıt şablonu şu anda değiştiriliyor ve yakında kullanıma sunulacak.
+    loot-denied: Ganimet elde etmek için bir kasaba şövalyesi veya lordu olmanız gerekir.
 # //// COMMAND \\\\
 # Tüm komutlar için kullanılan mesajlar.
 command:
@@ -681,6 +693,7 @@ command:
       fail-adjacent: Talep edilemedi, komşu bölge yok.
       fail-far: Talep edilemedi, bölge merkezinden çok uzak.
       fail-claimed: Talep edilemedi, zaten talep edilmiş.
+      resident: Araziyi talep edebilmek için %s'ye ikamet eden olarak katılmanız gerekir.
   favor:
     notice:
       message: "%s para'ınız var, maliyetler..."

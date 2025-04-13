@@ -15,6 +15,7 @@ import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.awt.*;
 import java.util.List;
@@ -151,9 +152,11 @@ public class RuinManager implements KonquestRuinManager {
 	public boolean renameRuin(String name, String newName) {
 		boolean result = false;
 		if(isRuin(name) && konquest.validateNameConstraints(newName) == 0) {
+			konquest.getMapHandler().drawRemoveTerritory(ruinMap.get(name.toLowerCase()));
 			ruinMap.get(name.toLowerCase()).setName(newName);
 			KonRuin ruin = ruinMap.remove(name.toLowerCase());
 			ruinMap.put(newName.toLowerCase(), ruin);
+			konquest.getMapHandler().drawUpdateTerritory(ruin);
 			ruin.updateBarTitle();
 			ruin.updateBarPlayers();
 			result = true;
@@ -235,6 +238,9 @@ public class RuinManager implements KonquestRuinManager {
 	                		ruin.addSpawnLocation(loc);
 	            		}
 	                	konquest.getTerritoryManager().addAllTerritory(world,ruin.getChunkList());
+						if (ruinSection.contains("loot")) {
+							ruin.setLootTableName(ruinSection.getString("loot",LootManager.defaultLootTableName));
+						}
 						// Set properties
 						ConfigurationSection ruinPropertiesSection = ruinSection.getConfigurationSection("properties");
 						if(ruinPropertiesSection != null) {
@@ -273,26 +279,38 @@ public class RuinManager implements KonquestRuinManager {
 			ChatUtil.printConsoleError("Aborted saving ruin data because a problem was encountered while loading data from ruins.yml");
 			return;
 		}
-		FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
-		ruinsConfig.set("ruins", null); // reset ruins config
-		ConfigurationSection root = ruinsConfig.createSection("ruins");
-		for(String name : ruinMap.keySet()) {
-			KonRuin ruin = ruinMap.get(name);
-			ConfigurationSection ruinSection = root.createSection(ruin.getName());
-			ruinSection.set("world", ruin.getWorld().getName());
-			ruinSection.set("center", new int[] {ruin.getCenterLoc().getBlockX(),
-					ruin.getCenterLoc().getBlockY(),
-					ruin.getCenterLoc().getBlockZ()});
-			ruinSection.set("chunks", HelperUtil.formatPointsToString(ruin.getChunkList().keySet()));
-			ruinSection.set("criticals", HelperUtil.formatLocationsToString(ruin.getCriticalLocations()));
-			ruinSection.set("spawns", HelperUtil.formatLocationsToString(ruin.getSpawnLocations()));
-			// Properties
-			ConfigurationSection ruinPropertiesSection = ruinSection.createSection("properties");
-			for(KonPropertyFlag flag : KonPropertyFlag.values()) {
-				if(ruin.hasPropertyValue(flag)) {
-					ruinPropertiesSection.set(flag.toString(), ruin.getPropertyValue(flag));
+		// Create new config entries
+		FileConfiguration newSaveConfig = new YamlConfiguration();
+		ConfigurationSection root = newSaveConfig.createSection("ruins");
+		try {
+			for (String name : ruinMap.keySet()) {
+				KonRuin ruin = ruinMap.get(name);
+				ConfigurationSection ruinSection = root.createSection(ruin.getName());
+				ruinSection.set("world", ruin.getWorld().getName());
+				ruinSection.set("center", new int[]{ruin.getCenterLoc().getBlockX(),
+						ruin.getCenterLoc().getBlockY(),
+						ruin.getCenterLoc().getBlockZ()});
+				ruinSection.set("chunks", HelperUtil.formatPointsToString(ruin.getChunkList().keySet()));
+				ruinSection.set("criticals", HelperUtil.formatLocationsToString(ruin.getCriticalLocations()));
+				ruinSection.set("spawns", HelperUtil.formatLocationsToString(ruin.getSpawnLocations()));
+				ruinSection.set("loot", ruin.getLootTableName());
+				// Properties
+				ConfigurationSection ruinPropertiesSection = ruinSection.createSection("properties");
+				for (KonPropertyFlag flag : KonPropertyFlag.values()) {
+					if (ruin.hasPropertyValue(flag)) {
+						ruinPropertiesSection.set(flag.toString(), ruin.getPropertyValue(flag));
+					}
 				}
 			}
+			// Save to file
+			FileConfiguration ruinsConfig = konquest.getConfigManager().getConfig("ruins");
+			ruinsConfig.set("ruins", newSaveConfig.get("ruins")); // apply new save data
+			if(!ruinMap.isEmpty()) {
+				ChatUtil.printConsole("Saved Ruins");
+			}
+		} catch (Exception | Error internalError) {
+			ChatUtil.printConsoleError("Failed to save ruins, report this as a bug to the plugin author!");
+			internalError.printStackTrace();
 		}
 	}
 	

@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.model;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.manager.LootManager;
 import com.github.rumsfield.konquest.utility.HelperUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,12 +21,12 @@ public class KonMonumentTemplate {
 	private int numCriticals;
 	private int numBlocks;
 	private int numLootChests;
-
 	private Location shadowCorner1;
 	private Location shadowCorner2;
 	private Location shadowTravelPoint;
 	private double shadowCost;
-	
+	private String lootTableName;
+
 	public KonMonumentTemplate(String name, Location corner1, Location corner2, Location travelPoint, double cost) {
 		this.name = name;
 		this.corner1 = corner1;
@@ -42,6 +43,7 @@ public class KonMonumentTemplate {
 		this.shadowCorner2 = null;
 		this.shadowTravelPoint = null;
 		this.shadowCost = 0;
+		this.lootTableName = LootManager.defaultLootTableName;
 	}
 	
 	public int getNumCriticals() {
@@ -157,6 +159,22 @@ public class KonMonumentTemplate {
 	
 	public boolean hasLoot() {
 		return hasLoot;
+	}
+
+	public String getLootTableName() {
+		return lootTableName.isEmpty() ? LootManager.defaultLootTableName : lootTableName;
+	}
+
+	public void setLootTableName(String name) {
+		lootTableName = name.isEmpty() ? LootManager.defaultLootTableName : name;
+	}
+
+	public boolean isLootTableDefault() {
+		return lootTableName.equalsIgnoreCase(LootManager.defaultLootTableName);
+	}
+
+	public void setLootTableDefault() {
+		lootTableName = LootManager.defaultLootTableName;
 	}
 	
 	public boolean isLocInside(Location loc) {

@@ -193,6 +193,9 @@ core:
     # (*) Enable plugin integration with BlueMap (true/false)
     bluemap: true
 
+    # (*) Enable plugin integration with squaremap (true/false)
+    squaremap: true
+
     # (*) Enable plugin integration with WorldGuard (true/false)
     worldguard: true
 
@@ -210,6 +213,10 @@ core:
 
       # (*) Render ruins on the web-based map view (true/false)
       enable_ruins: true
+
+      # (*) Display banner images in territory labels on the web-based map view (true/false)
+      # See instructions in the Konquest/banners/ folder.
+      show_banners: false
     
     # (*) Enable plugin integration with DiscordSRV (true/false)
     discordsrv: true
@@ -361,6 +368,9 @@ core:
     
     # Prevent containers from exploding in claimed land (true/false)
     protect_containers_explode: true
+
+    # Prevent pistons from working inside protected towns/capitals when players are offline (true/false)
+    protect_pistons_use: true
     
     # Prevent enemy players from traveling within Kingdom territory (true/false)
     no_enemy_travel: true
@@ -442,6 +452,9 @@ core:
 
     # Allow town lords to unclaim town land (true/false)
     allow_unclaim: true
+
+    # Allow only the town resident players to claim land for towns, else all kingdom members can claim land for any town (true/false)
+    allow_claim_residents_only: false
 
     # Allow players to use the claim radius sub-command (true/false)
     allow_claim_radius: true
