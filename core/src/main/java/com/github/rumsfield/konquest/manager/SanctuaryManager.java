@@ -802,7 +802,7 @@ public class SanctuaryManager {
 			FileConfiguration sanctuariesConfig = konquest.getConfigManager().getConfig("sanctuaries");
 			sanctuariesConfig.set("sanctuaries", newSaveConfig.get("sanctuaries")); // apply new save data
 			if(!sanctuaryMap.isEmpty()) {
-				ChatUtil.printConsole("Saved Sanctuaries");
+				ChatUtil.printConsole("Saved Sanctuaries and Monument Templates");
 			}
 		} catch (Exception | Error internalError) {
 			ChatUtil.printConsoleError("Failed to save sanctuaries, report this as a bug to the plugin author!");
