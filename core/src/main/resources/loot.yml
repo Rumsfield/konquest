@@ -308,7 +308,7 @@ loot_special:
         extended: false
         weight: 6
       NIGHT_VISION:
-        upgraded: true
+        upgraded: false
         extended: true
         weight: 6
     enchanted_books:
@@ -360,7 +360,7 @@ loot_special:
         weight: 8
     potions:
       WATER_BREATHING:
-        upgraded: true
+        upgraded: false
         extended: true
         weight: 5
     enchanted_books:
@@ -479,11 +479,11 @@ loot_special:
         weight: 10
     potions:
       INVISIBILITY:
-        upgraded: true
+        upgraded: false
         extended: true
         weight: 6
       FIRE_RESISTANCE:
-        upgraded: true
+        upgraded: false
         extended: true
         weight: 6
   TOOLSMITH:
@@ -541,7 +541,7 @@ loot_special:
     potions:
       STRENGTH:
         upgraded: true
-        extended: true
+        extended: false
         weight: 16
     enchanted_books:
       DAMAGE_ALL:
@@ -813,7 +813,7 @@ ruins_custom:
         weight: 5
     potions:
       INVISIBILITY:
-        upgraded: true
+        upgraded: false
         extended: true
         weight: 8
     enchanted_books:

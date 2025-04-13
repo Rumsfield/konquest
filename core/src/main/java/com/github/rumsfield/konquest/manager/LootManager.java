@@ -132,19 +132,12 @@ public class LootManager implements Timeable{
 		if(potionsSection == null) return result;
 		boolean status;
 		ConfigurationSection lootEntry;
-		PotionType potionType = null;
 		String pathName = potionsSection.getCurrentPath();
 		for(String potionName : potionsSection.getKeys(false)) {
 			status = true;
 			boolean itemUpgraded = false;
 			boolean itemExtended = false;
 			int itemWeight = 0;
-			try {
-				potionType = PotionType.valueOf(potionName);
-			} catch(IllegalArgumentException e) {
-				ChatUtil.printConsoleError("Invalid loot potion \""+potionName+"\" given in loot.yml path "+pathName+", skipping this potion.");
-				status = false;
-			}
 			lootEntry = potionsSection.getConfigurationSection(potionName);
 			if(lootEntry != null) {
 				if(lootEntry.contains("upgraded")) {
@@ -173,7 +166,7 @@ public class LootManager implements Timeable{
 			if(status && itemWeight > 0) {
 				// Add loot table entry
 				ItemStack potion = new ItemStack(Material.POTION, 1);
-				PotionMeta meta = CompatibilityUtil.setPotionData((PotionMeta) potion.getItemMeta(), potionType, itemExtended, itemUpgraded);
+				PotionMeta meta = CompatibilityUtil.setPotionMeta((PotionMeta) potion.getItemMeta(), potionName, itemExtended, itemUpgraded);
 				assert meta != null;
 				potion.setItemMeta(meta);
 				result.put(potion, itemWeight);
