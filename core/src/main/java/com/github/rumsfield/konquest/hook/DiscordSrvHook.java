@@ -81,7 +81,11 @@ public class DiscordSrvHook implements PluginHook {
 			return 3;
 		}
 		try {
+			// Subscribe listener
 			DiscordSRV.api.subscribe(discordSrvListener);
+			// Check for ready
+			isDiscordReady = DiscordSRV.isReady;
+			// Enable hook
 			isEnabled = true;
 			reloadSettings();
 			return 0;
