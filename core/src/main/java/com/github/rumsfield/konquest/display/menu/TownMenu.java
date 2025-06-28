@@ -373,7 +373,7 @@ public class TownMenu extends StateMenu {
 
             /* Plots Icon (Can be disabled) */
             if (getKonquest().getPlotManager().isEnabled()) {
-                boolean isPlotsClickable = town.hasPropertyValue(KonPropertyFlag.PLOTS) && town.getPropertyValue(KonPropertyFlag.PLOTS);
+                boolean isPlotsClickable = isAdmin || (town.hasPropertyValue(KonPropertyFlag.PLOTS) && town.getPropertyValue(KonPropertyFlag.PLOTS));
                 icon = new InfoIcon(MessagePath.MENU_TOWN_PLOTS.getMessage(), Material.GRASS_BLOCK, ROOT_SLOT_PLOTS, isPlotsClickable);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_PLOTS.getMessage());
                 icon.addProperty(MessagePath.RELATIONSHIP_ROLE_KNIGHT.getMessage());
@@ -469,7 +469,7 @@ public class TownMenu extends StateMenu {
 
             /* Upgrades Icon (Can be disabled) */
             if (getKonquest().getUpgradeManager().isEnabled()) {
-                boolean isUpgradesClickable = town.hasPropertyValue(KonPropertyFlag.UPGRADE) && town.getPropertyValue(KonPropertyFlag.UPGRADE);
+                boolean isUpgradesClickable = isAdmin || (town.hasPropertyValue(KonPropertyFlag.UPGRADE) && town.getPropertyValue(KonPropertyFlag.UPGRADE));
                 icon = new InfoIcon(MessagePath.MENU_TOWN_UPGRADES.getMessage(), Material.GOLDEN_APPLE, ROOT_SLOT_UPGRADES, isUpgradesClickable);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_UPGRADES.getMessage());
                 icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
@@ -492,11 +492,16 @@ public class TownMenu extends StateMenu {
 
             /* Specialization Icon (Can be disabled) */
             if (getKonquest().getKingdomManager().getIsDiscountEnable()) {
-                icon = new InfoIcon(MessagePath.MENU_TOWN_SPECIAL.getMessage(), Material.EMERALD, ROOT_SLOT_SPECIALIZATION, true);
+                boolean isSpecializationClickable = isAdmin || (town.hasPropertyValue(KonPropertyFlag.SPECIALIZE) && town.getPropertyValue(KonPropertyFlag.SPECIALIZE));
+                icon = new InfoIcon(MessagePath.MENU_TOWN_SPECIAL.getMessage(), Material.EMERALD, ROOT_SLOT_SPECIALIZATION, isSpecializationClickable);
                 icon.addDescription(MessagePath.MENU_TOWN_DESCRIPTION_SPECIAL.getMessage());
                 icon.addProperty(MessagePath.RELATIONSHIP_ROLE_LORD.getMessage());
                 icon.addNameValue(MessagePath.LABEL_SPECIALIZATION.getMessage(), town.getSpecializationName());
-                icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
+                if (isSpecializationClickable) {
+                    icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
+                } else {
+                    icon.addAlert(MessagePath.LABEL_DISABLED.getMessage());
+                }
                 icon.setState(MenuState.B_SPECIALIZATION);
                 result.addIcon(icon);
             }

@@ -1917,8 +1917,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 */
 	public boolean menuChangeTownSpecialization(KonTown town, Villager.Profession profession, KonPlayer payPlayer, CommandSender messageSender, boolean isAdmin) {
 		if (town == null || profession == null) return false;
-		double costSpecial = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
+		// Check property flag
+		if (!isAdmin && town.hasPropertyValue(KonPropertyFlag.SPECIALIZE) && !town.getPropertyValue(KonPropertyFlag.SPECIALIZE)) {
+			// Non-admin tried to change specialization while SPECIALIZE flag is false
+			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		// Check cost
+		double costSpecial = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
 		if(costSpecial > 0 && !isAdmin && payPlayer != null) {
 			if(KonquestPlugin.getBalance(payPlayer.getBukkitPlayer()) < costSpecial) {
 				ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costSpecial));

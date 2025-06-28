@@ -1198,6 +1198,8 @@ properties:
   mobs: Allow mobs to spawn
   portals-name: Portals
   portals: Allow players to use portals
+  specialize-name: Specialize
+  specialize: Allow changing trade specialization
   enter-name: Enter
   enter: Allow players to enter
   exit-name: Exit
