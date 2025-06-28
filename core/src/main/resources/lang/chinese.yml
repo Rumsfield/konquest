@@ -1212,6 +1212,8 @@ properties:
   upgrade: 允許玩家升級這個城鎮
   plots-name: 土地劃分
   plots: 允許玩家設置城鎮地塊
+  specialize-name: 專業化
+  specialize: 允許改變貿易專業化
   peaceful-name: 和平
   peaceful: 使王國只能和平
   golems-name: 鐵傀儡

@@ -1212,6 +1212,8 @@ properties:
   upgrade: Oyuncuların bu şehri yükseltmesine izin ver
   plots-name: Alanlar
   plots: Oyuncuların şehir alanlarını belirlemesine izin ver
+  specialize-name: Uzmanlaşmak
+  specialize: Ticaret uzmanlığının değişmesine izin verin
   peaceful-name: Barışçıl
   peaceful: Bir krallığı sadece barışçıl hale getir
   golems-name: Golem

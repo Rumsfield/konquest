@@ -1212,6 +1212,8 @@ properties:
   upgrade: Permitir que los jugadores mejoren este pueblo
   plots-name: Parcelas
   plots: Permitir que los jugadores establezcan parcelas del pueblo
+  specialize-name: Especializarse
+  specialize: Permitir cambiar la especialización comercial
   peaceful-name: Pacifico
   peaceful: Hacer un reino solo pacifico
   golems-name: Golems
