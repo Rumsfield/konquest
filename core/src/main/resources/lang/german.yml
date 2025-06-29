@@ -1212,6 +1212,8 @@ properties:
   upgrade: Erlaubt Spielern diese Stadt aufzuwerten
   plots-name: Grundstücke
   plots: Erlaubt Spielern Stadtgrundstücke zu setzen
+  specialize-name: Spezialisieren
+  specialize: Ändern der Handelsspezialisierung zulassen
   peaceful-name: Friedlich
   peaceful: Erstellt nur ein Königreich friedlich
   golems-name: Golems

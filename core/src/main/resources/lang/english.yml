@@ -1212,6 +1212,8 @@ properties:
   upgrade: Allow players to upgrade this town
   plots-name: Plots
   plots: Allow players to set town plots
+  specialize-name: Specialize
+  specialize: Allow changing trade specialization
   peaceful-name: Peaceful
   peaceful: Make a kingdom only peaceful
   golems-name: Golems

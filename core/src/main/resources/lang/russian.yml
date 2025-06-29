@@ -1212,6 +1212,8 @@ properties:
   upgrade: Разрешить игрокам улучшать этот город
   plots-name: Plots
   plots: Разрешить игрокам устанавливать городские участки
+  specialize-name: Специализироваться
+  specialize: Разрешить изменение торговой специализации
   peaceful-name: Peaceful
   peaceful: Сделать королевство только мирным
   golems-name: Golems
