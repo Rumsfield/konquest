@@ -255,6 +255,17 @@ public enum CorePath {
 	COMBAT_ENEMY_DAMAGE_COOLDOWN_SECONDS                  ("core.combat.enemy_damage_cooldown_seconds"),
 	COMBAT_PREVENT_COMMAND_LIST                           ("core.combat.prevent_command_list"),
 
+	SCORE_KINGDOM_TOWNS                                   ("core.score.kingdom.towns"),
+	SCORE_KINGDOM_LAND                                    ("core.score.kingdom.land"),
+	SCORE_KINGDOM_FAVOR                                   ("core.score.kingdom.favor"),
+	SCORE_KINGDOM_POPULATION                              ("core.score.kingdom.population"),
+	SCORE_PLAYER_TOWN_LORDS                               ("core.score.player.town_lords"),
+	SCORE_PLAYER_TOWN_KNIGHTS                             ("core.score.player.town_knights"),
+	SCORE_PLAYER_TOWN_RESIDENTS                           ("core.score.player.town_residents"),
+	SCORE_PLAYER_LAND_LORDS                               ("core.score.player.land_lords"),
+	SCORE_PLAYER_LAND_KNIGHTS                             ("core.score.player.land_knights"),
+	SCORE_PLAYER_LAND_RESIDENTS                           ("core.score.player.land_residents"),
+
 	NONE									  ("");
 
 

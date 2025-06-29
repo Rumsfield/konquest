@@ -3849,6 +3849,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public KonLeaderboard getKingdomLeaderboard(KonKingdom kingdom) {
 		KonLeaderboard leaderboard = new KonLeaderboard();
 		if(kingdom.equals(barbarians)) return leaderboard;
+		// Gather weights
+		int weight_town_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_LORDS.getPath());
+		int weight_town_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_KNIGHTS.getPath());
+		int weight_town_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_RESIDENTS.getPath());
+		int weight_land_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_LORDS.getPath());
+		int weight_land_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_KNIGHTS.getPath());
+		int weight_land_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_RESIDENTS.getPath());
 		// Determine scores for all players within towns
 		HashMap<OfflinePlayer,KonPlayerScoreAttributes> memberScores = new HashMap<>();
 		int numTownLords;
@@ -3886,6 +3893,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					KonOfflinePlayer validPlayer = konquest.getPlayerManager().getOfflinePlayer(offlinePlayer);
 					if(validPlayer != null && validPlayer.getKingdom().equals(kingdom)) {
 						KonPlayerScoreAttributes newMemberAttributes = new KonPlayerScoreAttributes();
+						// Set weights
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, weight_town_lords);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, weight_town_knights);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, weight_town_residents);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_LORDS, weight_land_lords);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_KNIGHTS, weight_land_knights);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_RESIDENTS, weight_land_residents);
+						// Set attributes
 						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, numTownLords);
 						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, numTownKnights);
 						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, numTownResidents);
@@ -3939,12 +3954,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
 	    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
 	    	}
-	    	// Gather favor costs
-	    	int cost_settle = (int)konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
-	    	int cost_claim = (int)konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
-	    	// Set attributes
-	    	scoreAttributes.setAttributeWeight(ScoreAttribute.TOWNS, cost_settle+2);
-	    	scoreAttributes.setAttributeWeight(ScoreAttribute.LAND, cost_claim+1);
+	    	// Gather weights
+			int weight_towns 		= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_TOWNS.getPath());
+			int weight_land 		= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_LAND.getPath());
+			int weight_favor 		= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_FAVOR.getPath());
+			int weight_population 	= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_POPULATION.getPath());
+	    	// Set weights
+	    	scoreAttributes.setAttributeWeight(ScoreAttribute.TOWNS, weight_towns);
+	    	scoreAttributes.setAttributeWeight(ScoreAttribute.LAND, weight_land);
+			scoreAttributes.setAttributeWeight(ScoreAttribute.FAVOR, weight_favor);
+			scoreAttributes.setAttributeWeight(ScoreAttribute.POPULATION, weight_population);
+			// Set attributes
 	    	scoreAttributes.setAttribute(ScoreAttribute.TOWNS, numKingdomTowns);
 	    	scoreAttributes.setAttribute(ScoreAttribute.LAND, numKingdomLand);
 	    	scoreAttributes.setAttribute(ScoreAttribute.FAVOR, numKingdomFavor);
@@ -3980,6 +4000,21 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					numResidentLand += town.getChunkList().size();
 				}
 			}
+			// Gather weights
+			int weight_town_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_LORDS.getPath());
+			int weight_town_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_KNIGHTS.getPath());
+			int weight_town_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_RESIDENTS.getPath());
+			int weight_land_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_LORDS.getPath());
+			int weight_land_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_KNIGHTS.getPath());
+			int weight_land_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_RESIDENTS.getPath());
+			// Set weights
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, weight_town_lords);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, weight_town_knights);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, weight_town_residents);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_LORDS, weight_land_lords);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_KNIGHTS, weight_land_knights);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_RESIDENTS, weight_land_residents);
+			// Set attributes
 			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, numTownLords);
 			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, numTownKnights);
 			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, numTownResidents);
