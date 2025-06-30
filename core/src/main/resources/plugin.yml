@@ -5,8 +5,6 @@ version: @version@
 api-version: 1.16
 load: POSTWORLD
 main: com.github.rumsfield.konquest.KonquestPlugin
-libraries:
-  - org.apache.commons:commons-lang3:3.14.0
 depend: [Vault]
 softdepend:
   - ProtocolLib
@@ -346,3 +344,19 @@ permissions:
   konquest.chatcolor:
     description: Allows players to use color format codes in chat messages
     default: false
+
+  konquest.raid.entry:
+    description: Enables raid alerts upon entering enemy territory
+    default: true
+
+  konquest.raid.critical1:
+    description: Enables raid alerts on first critical block break
+    default: true
+
+  konquest.raid.critical2:
+    description: Enables raid alerts on half of total critical block break
+    default: true
+
+  konquest.raid.critical3:
+    description: Enables raid alerts on second to last critical block break
+    default: true

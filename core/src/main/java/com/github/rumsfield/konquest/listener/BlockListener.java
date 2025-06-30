@@ -1489,7 +1489,8 @@ public class BlockListener implements Listener {
 			// Execute custom commands from config
 			konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_CRITICAL,player.getBukkitPlayer());
 			// Alert all players of enemy Kingdom when the first critical block is broken
-			if(town.getMonument().getCriticalHits() == 1) {
+			boolean isPerm1 = player.getBukkitPlayer().hasPermission("konquest.raid.critical1");
+			if(town.getMonument().getCriticalHits() == 1 && isPerm1) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_1.getMessage(town.getName(),town.getTravelName(),defendReward),ChatColor.DARK_RED);
@@ -1501,14 +1502,16 @@ public class BlockListener implements Listener {
 				}
 			}
 			// Alert all players of enemy Kingdom when half of critical blocks are broken
-			if(town.getMonument().getCriticalHits() == maxCriticalhits/2) {
+			boolean isPerm2 = player.getBukkitPlayer().hasPermission("konquest.raid.critical2");
+			if(town.getMonument().getCriticalHits() == maxCriticalhits/2 && isPerm2) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_2.getMessage(town.getName(),town.getTravelName(),defendReward),ChatColor.DARK_RED);
 				}
 			}
 			// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
-			if(town.getMonument().getCriticalHits() == maxCriticalhits-1) {
+			boolean isPerm3 = player.getBukkitPlayer().hasPermission("konquest.raid.critical3");
+			if(town.getMonument().getCriticalHits() == maxCriticalhits-1 && isPerm3) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
 					ChatUtil.sendNotice(kingdomPlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_RAID_CAPTURE_3.getMessage(town.getName(),town.getTravelName(),defendReward),ChatColor.DARK_RED);
