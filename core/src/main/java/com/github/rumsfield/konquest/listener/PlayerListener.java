@@ -1312,7 +1312,8 @@ public class PlayerListener implements Listener {
 		} else if(territoryTo instanceof KonCamp) {
 			KonCamp camp = (KonCamp)territoryTo;
 			// Attempt to start a raid alert
-			if(!camp.isRaidAlertDisabled() && !player.isAdminBypassActive() && !player.getKingdom().isPeaceful()) {
+			boolean isPerm = player.getBukkitPlayer().hasPermission("konquest.raid.entry");
+			if(!camp.isRaidAlertDisabled() && !player.isAdminBypassActive() && !player.getKingdom().isPeaceful() && isPerm) {
 				// Verify online player
 				if(camp.isOwnerOnline()) {
 					boolean isMember = false;
