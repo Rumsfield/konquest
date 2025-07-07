@@ -74,7 +74,10 @@ public class ConfigManager{
 
 		// Banners
 		Konquest.getInstance().getPlugin().saveResource("banners/banner-instructions-readme.txt", true);
-		Konquest.getInstance().getPlugin().saveResource("banners/default.png", false);
+		File defaultBannerFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), "banners/default.png");
+		if (!defaultBannerFile.exists()) {
+			Konquest.getInstance().getPlugin().saveResource("banners/default.png", false);
+		}
 
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));
