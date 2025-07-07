@@ -846,3 +846,42 @@ core:
     - k travel
     - k settle
     - k claim
+
+  # //// CORE.SCORE \\\\
+  score:
+
+    # //// CORE.SCORE.KINGDOM \\\\
+    kingdom:
+
+      # The amount of score points per town used for kingdom score (Any integer)
+      towns: 105
+
+      # The amount of score points per claimed land chunk used for kingdom score (Any integer)
+      land: 12
+
+      # The amount of score points per Favor held by all members used for kingdom score (Any integer)
+      favor: 1
+
+      # The amount of score points per member player used for kingdom score (Any integer)
+      population: 50
+
+    # //// CORE.SCORE.PLAYER \\\\
+    player:
+
+      # The amount of score points per town lordship used for player score (Any integer)
+      town_lords: 20
+
+      # The amount of score points per town knight used for player score (Any integer)
+      town_knights: 10
+
+      # The amount of score points per town resident used for player score (Any integer)
+      town_residents: 5
+
+      # The amount of score points per claimed land chunk of town lords used for player score (Any integer)
+      land_lords: 4
+
+      # The amount of score points per claimed land chunk of town knights used for player score (Any integer)
+      land_knights: 2
+
+      # The amount of score points per claimed land chunk of town residents used for player score (Any integer)
+      land_residents: 1

@@ -23,12 +23,19 @@ public class KonPlayerScoreAttributes {
 	}
 	
 	private final HashMap<ScoreAttribute,Integer> attributeMap;
+	private final HashMap<ScoreAttribute,Integer> attributeWeights;
 	
 	public KonPlayerScoreAttributes() {
 		this.attributeMap = new HashMap<>();
+		this.attributeWeights = new HashMap<>();
 		for(ScoreAttribute attribute : ScoreAttribute.values()) {
 			attributeMap.put(attribute, 0);
+			attributeWeights.put(attribute, attribute.getWeight());
 		}
+	}
+
+	public void setAttributeWeight(ScoreAttribute attribute, int value) {
+		attributeWeights.put(attribute, value);
 	}
 	
 	public void setAttribute(ScoreAttribute attribute, int value) {
@@ -53,7 +60,7 @@ public class KonPlayerScoreAttributes {
 	public int getAttributeScore(ScoreAttribute attribute) {
 		int result = 0;
 		if(attributeMap.containsKey(attribute)) {
-			result = attributeMap.get(attribute)*attribute.getWeight();
+			result = attributeMap.get(attribute)*attributeWeights.get(attribute);
 		}
 		return result;
 	}
@@ -61,7 +68,7 @@ public class KonPlayerScoreAttributes {
 	public int getScore() {
 		int result = 0;
 		for(ScoreAttribute attribute : attributeMap.keySet()) {
-			result += (attributeMap.get(attribute)*attribute.getWeight());
+			result += (attributeMap.get(attribute)*attributeWeights.get(attribute));
 		}
 		return result;
 	}
