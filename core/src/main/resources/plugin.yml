@@ -349,14 +349,14 @@ permissions:
     description: Enables raid alerts upon entering enemy territory
     default: true
 
-  konquest.raid.critical1:
-    description: Enables raid alerts on first critical block break
+  konquest.raid.first:
+    description: Enables raid alerts on first critical block break in town monuments
     default: true
 
-  konquest.raid.critical2:
-    description: Enables raid alerts on half of total critical block break
+  konquest.raid.half:
+    description: Enables raid alerts on half of total critical block break in town monuments
     default: true
 
-  konquest.raid.critical3:
-    description: Enables raid alerts on second to last critical block break
+  konquest.raid.last:
+    description: Enables raid alerts on second to last critical block break in town monuments
     default: true

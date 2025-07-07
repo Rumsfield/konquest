@@ -1489,7 +1489,7 @@ public class BlockListener implements Listener {
 			// Execute custom commands from config
 			konquest.executeCustomCommand(CustomCommandPath.TOWN_MONUMENT_CRITICAL,player.getBukkitPlayer());
 			// Alert all players of enemy Kingdom when the first critical block is broken
-			boolean isPerm1 = player.getBukkitPlayer().hasPermission("konquest.raid.critical1");
+			boolean isPerm1 = player.getBukkitPlayer().hasPermission("konquest.raid.first");
 			if(town.getMonument().getCriticalHits() == 1 && isPerm1) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
@@ -1502,7 +1502,7 @@ public class BlockListener implements Listener {
 				}
 			}
 			// Alert all players of enemy Kingdom when half of critical blocks are broken
-			boolean isPerm2 = player.getBukkitPlayer().hasPermission("konquest.raid.critical2");
+			boolean isPerm2 = player.getBukkitPlayer().hasPermission("konquest.raid.half");
 			if(town.getMonument().getCriticalHits() == maxCriticalhits/2 && isPerm2) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
@@ -1510,7 +1510,7 @@ public class BlockListener implements Listener {
 				}
 			}
 			// Alert all players of enemy Kingdom when all but 1 critical blocks are broken
-			boolean isPerm3 = player.getBukkitPlayer().hasPermission("konquest.raid.critical3");
+			boolean isPerm3 = player.getBukkitPlayer().hasPermission("konquest.raid.last");
 			if(town.getMonument().getCriticalHits() == maxCriticalhits-1 && isPerm3) {
 				for(KonPlayer kingdomPlayer : playerManager.getPlayersInKingdom(kingdomName)) {
 					ChatUtil.sendKonPriorityTitle(kingdomPlayer, ChatColor.DARK_RED+MessagePath.PROTECTION_NOTICE_RAID_ALERT.getMessage(), ChatColor.DARK_RED+""+town.getName(), 60, 1, 10);
