@@ -68,6 +68,7 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
 		addConfig("sanctuaries", new KonConfig("data/sanctuaries"));
+		addConfig("global-events", new KonConfig("data/global-events"));
 
 		// Backup Readme
 		Konquest.getInstance().getPlugin().saveResource("backup-instructions-readme.txt", true);

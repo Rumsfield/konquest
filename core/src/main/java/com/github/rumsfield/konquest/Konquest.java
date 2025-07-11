@@ -94,7 +94,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	private final TravelManager travelManager;
 	private final SanctuaryManager sanctuaryManager;
 	private final TerritoryManager territoryManager;
-	
+	private final GlobalEventManager globalEventManager;
+
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
     private Team enemyTeam;
@@ -155,6 +156,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		this.sanctuaryManager = new SanctuaryManager(this);
 		this.territoryManager = new TerritoryManager(this);
 		this.placeholderManager = new PlaceholderManager(this);
+		this.globalEventManager = new GlobalEventManager(this);
 
 		this.versionHandler = null;
 		
@@ -190,6 +192,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		kingdomManager.initialize(); // Load all kingdoms + towns
 		sanctuaryManager.refresh(); // Update sanctuary references to neutrals kingdom
 		ruinManager.initialize();
+		globalEventManager.initialize();
 		initManagers();
 		initWorlds();
 		kingdomManager.updateKingdomOfflineProtection(true);
@@ -237,6 +240,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void disable() {
 		integrationManager.disable();
+		globalEventManager.saveEvents();
 		sanctuaryManager.saveSanctuaries();
 		kingdomManager.saveKingdoms();
 		campManager.saveCamps();
@@ -644,6 +648,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void save() {
 		// Save config files
+		globalEventManager.saveEvents();
 		sanctuaryManager.saveSanctuaries();
 		kingdomManager.saveKingdoms();
 		campManager.saveCamps();
@@ -824,6 +829,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	public TravelManager getTravelManager() {
 		return travelManager;
 	}
+
+	public GlobalEventManager getGlobalEventManager() {
+		return globalEventManager;
+	}
 	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
@@ -896,7 +905,9 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			7 - Error, name is a guild [deprecated]
 	 * 			8 - Error, name is a sanctuary
 	 * 			9 - Error, name is a template
-	 * 			10 - Error, name is reserved word
+	 * 		    10 - Error, name is a global event
+	 * 			11 - Error, name is a travel destination
+	 * 		    12 - Error, name is reserved word
 	 */
 	public int validateNameConstraints(String name) {
 		if(name == null || name.equals("") || name.contains(" ") || !StringUtils.isAlphanumeric(name.replace("_",""))) {
@@ -925,9 +936,12 @@ public class Konquest implements KonquestAPI, Timeable {
 		if(sanctuaryManager.isTemplate(name)) {
 			return 9;
 		}
+		if(globalEventManager.isEvent(name)) {
+			return 10;
+		}
 		for(TravelDestination keyword : TravelDestination.values()) {
 			if(name.equalsIgnoreCase(keyword.toString())) {
-				return 10;
+				return 11;
 			}
 		}
 		List<String> reservedWords = new ArrayList<>();
@@ -940,10 +954,11 @@ public class Konquest implements KonquestAPI, Timeable {
 		reservedWords.add("templates");
 		reservedWords.add("template");
 		reservedWords.add("monument");
+		reservedWords.add("event");
 		reservedWords.add("all");
 		for(String word : reservedWords) {
 			if(name.equalsIgnoreCase(word)) {
-				return 10;
+				return 12;
 			}
 		}
 		return 0;
