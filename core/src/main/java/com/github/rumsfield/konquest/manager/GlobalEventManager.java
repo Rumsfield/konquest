@@ -10,23 +10,38 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class GlobalEventManager implements Timeable {
 
     private final Konquest konquest;
     private final ArrayList<KonGlobalEvent> events;
+    private final HashSet<KonGlobalEventEffect> validEffects;
     private final Timer eventTimer;
     private final int eventTimerInterval = 1200; // one minute in ticks, probably should be core.yml setting
     private boolean isEventDataNull;
+    private final Comparator<KonGlobalEvent> eventComparator;
 
     public GlobalEventManager(Konquest konquest) {
         this.konquest = konquest;
         this.events = new ArrayList<>();
+        this.validEffects = new HashSet<>();
         this.eventTimer = new Timer(this);
         this.isEventDataNull = false;
+
+        this.eventComparator = (eventOne, eventTwo) -> {
+            // sort by start date
+            int result = 0;
+            long s1 = eventOne.getStartTime();
+            long s2 = eventTwo.getStartTime();
+            if(s1 < s2) {
+                result = 1;
+            } else if(s1 > s2) {
+                result = -1;
+            }
+            return result;
+        };
     }
 
     public void initialize() {
@@ -51,36 +66,56 @@ public class GlobalEventManager implements Timeable {
     }
 
     private void refreshAllEvents() {
+        HashSet<KonGlobalEventEffect> eventEffects = new HashSet<>();
         // Refresh active events
         for (KonGlobalEvent event : events) {
             boolean wasActive = event.isActive();
             boolean nowActive = event.refreshActive();
-            if (event.isBroadcast()) {
-                // Broadcast start and end
-                // TODO use message paths
-                if (!wasActive && nowActive) {
-                    // Event started
-                    ChatUtil.sendBroadcast("Global Event "+event.getName()+" has started! Use /k events for details.");
-                } else if (wasActive && !nowActive) {
-                    // Event ended
-                    ChatUtil.sendBroadcast("Global Event "+event.getName()+" has ended! Use /k events for details.");
-                    // Remove events without repetition
-                    if (!event.isRepeating()) {
-                        removeEvent(event);
-                    }
+            // TODO use message paths
+            if (!wasActive && nowActive) {
+                // Event started
+                if (event.isEnabled()) {
+                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has started! Use /k events for details.");
                 }
+            } else if (wasActive && !nowActive) {
+                // Event ended
+                if (event.isEnabled()) {
+                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has ended! Use /k events for details.");
+                }
+                // Remove events without repetition
+                if (!event.isRepeating()) {
+                    removeEvent(event);
+                }
+            }
+            if (event.isActive() && event.isEnabled()) {
+                eventEffects.addAll(event.getEffects());
+            }
+        }
+        // Update valid effects
+        validEffects.clear();
+        // Filter out lower priority group effects
+        for (KonGlobalEventEffect effect : eventEffects) {
+            boolean isHighestPriorityEffect = true;
+            for (KonGlobalEventEffect otherEffect : eventEffects) {
+                if (effect.isHigherPriority(otherEffect)) {
+                    isHighestPriorityEffect = false;
+                    break;
+                }
+            }
+            if (isHighestPriorityEffect) {
+                validEffects.add(effect);
             }
         }
     }
 
-    public boolean isEffectActive(KonGlobalEventEffect effect) {
+    public boolean isEffectValid(KonGlobalEventEffect effect) {
         // Check whether an effect is currently active in any enabled event
-        for (KonGlobalEvent event : events) {
-            if (event.isActive() && event.isEnabled() && event.hasEffect(effect)) {
-                return true;
-            }
-        }
-        return false;
+        return validEffects.contains(effect);
+    }
+
+    public ArrayList<KonGlobalEventEffect> getValidEffects() {
+        // Return all effects in active, enabled events with group priority filtered
+        return new ArrayList<>(validEffects);
     }
 
     public ArrayList<KonGlobalEvent> getEvents(boolean isActive) {
@@ -98,7 +133,37 @@ public class GlobalEventManager implements Timeable {
         return result;
     }
 
-    public KonGlobalEvent getEvent(String name) {
+    public @Nullable KonGlobalEvent getNextEvent() {
+        // Get the event with the next closest start time to now
+        KonGlobalEvent nextEvent = null;
+        Date nextStart = null;
+        for (KonGlobalEvent event : events) {
+            Date eventNextStart = event.getNextStart();
+            if (eventNextStart != null && (nextStart == null || eventNextStart.before(nextStart))) {
+                nextStart = eventNextStart;
+                nextEvent = event;
+            }
+        }
+        return nextEvent;
+    }
+
+    public ArrayList<KonGlobalEvent> getSortedEvents() {
+        // Get all events, sorted by start time
+        ArrayList<KonGlobalEvent> result = new ArrayList<>(events);
+        result.sort(eventComparator);
+        return result;
+    }
+
+    public ArrayList<String> getEventNames() {
+        // Get all event names
+        ArrayList<String> result = new ArrayList<>();
+        for (KonGlobalEvent event : events) {
+            result.add(event.getName());
+        }
+        return result;
+    }
+
+    public @Nullable KonGlobalEvent getEvent(String name) {
         for (KonGlobalEvent event : events) {
             if (event.getName().equals(name)) {
                 return event;
@@ -117,13 +182,12 @@ public class GlobalEventManager implements Timeable {
         return false;
     }
 
-    public boolean createEvent(String name, boolean isBroadcast, boolean isEnabled, long start, long duration, long repetition, List<KonGlobalEventEffect> effects) {
+    public boolean createEvent(String name, boolean isEnabled, long start, long duration, long repetition, List<KonGlobalEventEffect> effects) {
         // Make a new event
         if (konquest.validateNameConstraints(name) != 0) {
             return false;
         }
         KonGlobalEvent globalEvent = new KonGlobalEvent(name);
-        globalEvent.setBroadcast(isBroadcast);
         globalEvent.setEnabled(isEnabled);
         globalEvent.setStart(start);
         globalEvent.setDuration(duration);
@@ -134,23 +198,27 @@ public class GlobalEventManager implements Timeable {
         return addEvent(globalEvent);
     }
 
-    public void modifyEventBroadcast(String name, boolean isBroadcast) {
-        KonGlobalEvent globalEvent = getEvent(name);
-        if (globalEvent == null) return;
-        globalEvent.setEnabled(isBroadcast);
-    }
-
     public void modifyEventEnable(String name, boolean isEnabled) {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
         globalEvent.setEnabled(isEnabled);
     }
 
-    public void modifyEventDates(String name, long start, long duration, long repetition) {
+    public void modifyEventStart(String name, Date startDate) {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
-        globalEvent.setStart(start);
+        globalEvent.setStart(startDate);
+    }
+
+    public void modifyEventDuration(String name, long duration) {
+        KonGlobalEvent globalEvent = getEvent(name);
+        if (globalEvent == null) return;
         globalEvent.setDuration(duration);
+    }
+
+    public void modifyEventRepetition(String name, long repetition) {
+        KonGlobalEvent globalEvent = getEvent(name);
+        if (globalEvent == null) return;
         globalEvent.setRepetition(repetition);
     }
 
@@ -211,7 +279,7 @@ public class GlobalEventManager implements Timeable {
             isEventDataNull = true;
             return;
         }
-        boolean isEnabled, isBroadcast;
+        boolean isEnabled;
         long startTime, durationTime, repetitionTime;
         List<String> eventEffects;
         KonGlobalEvent globalEvent;
@@ -221,7 +289,6 @@ public class GlobalEventManager implements Timeable {
             ConfigurationSection eventSection = eventsSection.getConfigurationSection(eventName);
             // Gather data
             isEnabled = eventSection.getBoolean("enabled");
-            isBroadcast = eventSection.getBoolean("broadcast");
             startTime = eventSection.getLong("start");
             durationTime = eventSection.getLong("duration");
             repetitionTime = eventSection.getLong("repetition");
@@ -229,7 +296,6 @@ public class GlobalEventManager implements Timeable {
             // Create event
             globalEvent = new KonGlobalEvent(eventName);
             globalEvent.setEnabled(isEnabled);
-            globalEvent.setBroadcast(isBroadcast);
             globalEvent.setStart(startTime);
             globalEvent.setDuration(durationTime);
             globalEvent.setRepetition(repetitionTime);
@@ -261,7 +327,6 @@ public class GlobalEventManager implements Timeable {
             for (KonGlobalEvent event : events) {
                 ConfigurationSection eventSection = root.createSection(event.getName());
                 eventSection.set("enabled", event.isEnabled());
-                eventSection.set("broadcast", event.isBroadcast());
                 eventSection.set("start", event.getStartTime());
                 eventSection.set("duration", event.getDurationTime());
                 eventSection.set("repetition", event.getRepetitionTime());

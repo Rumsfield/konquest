@@ -22,6 +22,7 @@ public enum AdminCommandType {
 	TRAVEL      (Material.COMPASS,				"konquest.admin.travel",       new TravelAdminCommand(),       MessagePath.DESCRIPTION_ADMIN_TRAVEL.getMessage()),
 	SETTRAVEL   (Material.OAK_SIGN,				"konquest.admin.settravel",    new SetTravelAdminCommand(),    MessagePath.DESCRIPTION_ADMIN_SETTRAVEL.getMessage()),
 	FLAG        (Material.ORANGE_BANNER,		"konquest.admin.flag",         new FlagAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_FLAG.getMessage()),
+	EVENT       (Material.CLOCK,			    "konquest.admin.event",        new EventAdminCommand(),        MessagePath.DESCRIPTION_ADMIN_EVENT.getMessage()),
 	STAT        (Material.BOOKSHELF,			"konquest.admin.stat",         new StatAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_STAT.getMessage()),
 	SAVE        (Material.TOTEM_OF_UNDYING,		"konquest.admin.save",         new SaveAdminCommand(),         MessagePath.DESCRIPTION_ADMIN_SAVE.getMessage()),
 	RELOAD      (Material.GLOWSTONE,			"konquest.admin.reload",       new ReloadAdminCommand(),       MessagePath.DESCRIPTION_ADMIN_RELOAD.getMessage());

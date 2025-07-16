@@ -48,13 +48,13 @@ public enum KonGlobalEventEffect {
     }
 
     // True if the other effect is in the same group as this one
-    public boolean isConflict(KonGlobalEventEffect otherEffect) {
+    public boolean isGroupConflict(KonGlobalEventEffect otherEffect) {
         return this.group == otherEffect.group;
     }
 
-    // True if the other effect is a higher priority than this one
-    public boolean isPriority(KonGlobalEventEffect otherEffect) {
-        return this.priority < otherEffect.priority;
+    // True if the other effect is in the same group and a higher priority than this one
+    public boolean isHigherPriority(KonGlobalEventEffect otherEffect) {
+        return this.group == otherEffect.group && this.priority < otherEffect.priority;
     }
 
     /**

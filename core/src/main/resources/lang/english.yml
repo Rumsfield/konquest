@@ -1161,6 +1161,7 @@ description:
   score: Display a Player's current score.
   fly: Fly within friendly land.
   border: Toggle particle borders of territories and plots.
+  event: Display details about global events.
   admin: For Admins only.
   admin-help: Display the admin help message.
   admin-bypass: Toggle Admin bypass mode.
@@ -1179,6 +1180,7 @@ description:
   admin-reload: Reloads configuration files.
   admin-flag: Set property flags for kingdoms and territories.
   admin-stat: Manage player stats.
+  admin-event: Manage global events and their effects.
 # //// PROPERTIES \\\\
 # Names and descriptions for all property flags in kingdoms and territories.
 properties:

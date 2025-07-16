@@ -70,6 +70,7 @@ permissions:
       konquest.command.settle: true
       konquest.command.travel: true
       konquest.command.favor: true
+      konquest.command.event: true
       konquest.command.quest: true
       konquest.command.score: true
       konquest.command.spy: true
@@ -122,6 +123,10 @@ permissions:
 
   konquest.command.favor:
     description: Display your favor and costs
+    default: true
+
+  konquest.command.event:
+    description: Display details about global events
     default: true
     
   konquest.command.quest:
@@ -188,6 +193,7 @@ permissions:
       konquest.admin.camp: true
       konquest.admin.capture: true
       konquest.admin.claim: true
+      konquest.admin.event: true
       konquest.admin.flag: true
       konquest.admin.help: true
       konquest.admin.kingdom: true
@@ -217,7 +223,11 @@ permissions:
   konquest.admin.claim:
     description: Claim land chunks for the nearest territory
     default: op
-  
+
+  konquest.admin.event:
+    description: Manage global events and their effects
+    default: op
+
   konquest.admin.flag:
     description: Set property flags for Kingdoms and territories
     default: op

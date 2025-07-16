@@ -1016,6 +1016,7 @@ public enum MessagePath {
 	DESCRIPTION_SCORE                           (0, "description.score"),
 	DESCRIPTION_FLY                             (0, "description.fly"),
 	DESCRIPTION_BORDER                          (0, "description.border"),
+	DESCRIPTION_EVENT                           (0, "description.event"),
 	DESCRIPTION_ADMIN                           (0, "description.admin"),
 	DESCRIPTION_ADMIN_HELP                      (0, "description.admin-help"),
 	DESCRIPTION_ADMIN_BYPASS                    (0, "description.admin-bypass"),
@@ -1034,6 +1035,7 @@ public enum MessagePath {
 	DESCRIPTION_ADMIN_RELOAD                    (0, "description.admin-reload"),
 	DESCRIPTION_ADMIN_FLAG                      (0, "description.admin-flag"),
 	DESCRIPTION_ADMIN_STAT                      (0, "description.admin-stat"),
+	DESCRIPTION_ADMIN_EVENT                     (0, "description.admin-event"),
 
 	PROPERTIES_TRAVEL							(0, "properties.travel"),
 	PROPERTIES_PVP								(0, "properties.pvp"),
