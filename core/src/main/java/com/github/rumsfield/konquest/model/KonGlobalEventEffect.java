@@ -1,32 +1,34 @@
 package com.github.rumsfield.konquest.model;
 
+import com.github.rumsfield.konquest.utility.MessagePath;
+
 public enum KonGlobalEventEffect {
 
     // Effects in the same group cannot be active at the same time.
     // Priority (higher) indicates which effect is used when multiple from the same group are active.
 
-    ALL_PVP                     (10, 0, "title",       "description"),
-    DIPLOMACY_WAR               (20, 0, "title",       "description"),
-    DIPLOMACY_PEACE             (20, 1, "title",       "description"),
-    DISABLE_SHIELDS             (30, 0, "title",       "description"),
-    DISABLE_ARMOR               (31, 0, "title",       "description"),
-    DISABLE_PROTECTION          (32, 0, "title",       "description"),
-    DISABLE_IMMUNITY            (33, 0, "title",       "description"),
-    EXP_BOOST_50                (40, 0, "title",       "description"),
-    EXP_BOOST_100               (40, 1, "title",       "description"),
-    EXP_BOOST_200               (40, 2, "title",       "description"),
-    FAVOR_DISCOUNT_25           (50, 0, "title",       "description"),
-    FAVOR_DISCOUNT_50           (50, 1, "title",       "description"),
-    FAVOR_DISCOUNT_75           (50, 2, "title",       "description"),
-    FAVOR_DISCOUNT_100          (50, 3, "title",       "description"),
-    FREE_TRAVEl                 (60, 0, "title",       "description"),
-    FREE_SHIELDS                (61, 0, "title",       "description"),
-    MONUMENT_LOOT_X2            (70, 0, "title",       "description"),
-    MONUMENT_LOOT_X5            (70, 1, "title",       "description"),
-    MONUMENT_LOOT_X10           (70, 2, "title",       "description"),
-    RUIN_LOOT_X2                (80, 0, "title",       "description"),
-    RUIN_LOOT_X5                (80, 1, "title",       "description"),
-    RUIN_LOOT_X10               (80, 2, "title",       "description");
+    ALL_PVP                     (10, 0, MessagePath.EFFECTS_PVP_NAME.getMessage(),           MessagePath.EFFECTS_PVP.getMessage()),
+    ALL_WAR                     (20, 0, MessagePath.EFFECTS_WAR_NAME.getMessage(),           MessagePath.EFFECTS_WAR.getMessage()),
+    ALL_PEACE                   (20, 1, MessagePath.EFFECTS_PEACE_NAME.getMessage(),         MessagePath.EFFECTS_PEACE.getMessage()),
+    FREE_TRAVEL                 (30, 0, MessagePath.EFFECTS_TRAVEL_NAME.getMessage(),        MessagePath.EFFECTS_TRAVEL.getMessage()),
+    FREE_SHIELDS                (40, 0, MessagePath.EFFECTS_SHIELDS_NAME.getMessage(),       MessagePath.EFFECTS_SHIELDS.getMessage()),
+    NO_SHIELDS                  (40, 1, MessagePath.EFFECTS_NO_SHIELDS_NAME.getMessage(),    MessagePath.EFFECTS_NO_SHIELDS.getMessage()),
+    NO_ARMOR                    (41, 0, MessagePath.EFFECTS_NO_ARMOR_NAME.getMessage(),      MessagePath.EFFECTS_NO_ARMOR.getMessage()),
+    NO_PROTECTION               (42, 0, MessagePath.EFFECTS_NO_PROTECTION_NAME.getMessage(), MessagePath.EFFECTS_NO_PROTECTION.getMessage()),
+    NO_IMMUNITY                 (43, 0, MessagePath.EFFECTS_NO_IMMUNITY_NAME.getMessage(),   MessagePath.EFFECTS_NO_IMMUNITY.getMessage()),
+    FAVOR_1                     (50, 0, MessagePath.EFFECTS_FAVOR_1_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_1.getMessage()),
+    FAVOR_2                     (50, 1, MessagePath.EFFECTS_FAVOR_2_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_2.getMessage()),
+    FAVOR_3                     (50, 2, MessagePath.EFFECTS_FAVOR_3_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_3.getMessage()),
+    FAVOR_4                     (50, 3, MessagePath.EFFECTS_FAVOR_4_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_4.getMessage()),
+    MONUMENT_LOOT_1             (60, 0, MessagePath.EFFECTS_MONUMENT_1_NAME.getMessage(),    MessagePath.EFFECTS_MONUMENT_1.getMessage()),
+    MONUMENT_LOOT_2             (60, 1, MessagePath.EFFECTS_MONUMENT_2_NAME.getMessage(),    MessagePath.EFFECTS_MONUMENT_2.getMessage()),
+    MONUMENT_LOOT_3             (60, 2, MessagePath.EFFECTS_MONUMENT_3_NAME.getMessage(),    MessagePath.EFFECTS_MONUMENT_3.getMessage()),
+    RUIN_LOOT_1                 (70, 0, MessagePath.EFFECTS_RUIN_1_NAME.getMessage(),        MessagePath.EFFECTS_RUIN_1.getMessage()),
+    RUIN_LOOT_2                 (70, 1, MessagePath.EFFECTS_RUIN_2_NAME.getMessage(),        MessagePath.EFFECTS_RUIN_2.getMessage()),
+    RUIN_LOOT_3                 (70, 2, MessagePath.EFFECTS_RUIN_3_NAME.getMessage(),        MessagePath.EFFECTS_RUIN_3.getMessage()),
+    EXP_BOOST_1                 (80, 0, MessagePath.EFFECTS_EXP_1_NAME.getMessage(),         MessagePath.EFFECTS_EXP_1.getMessage()),
+    EXP_BOOST_2                 (80, 1, MessagePath.EFFECTS_EXP_2_NAME.getMessage(),         MessagePath.EFFECTS_EXP_2.getMessage()),
+    EXP_BOOST_3                 (80, 2, MessagePath.EFFECTS_EXP_3_NAME.getMessage(),         MessagePath.EFFECTS_EXP_3.getMessage());
 
     private final int group;
     private final int priority;

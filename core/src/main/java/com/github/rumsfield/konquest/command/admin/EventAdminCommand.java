@@ -31,15 +31,16 @@ public class EventAdminCommand extends CommandBase {
                 newArg("remove",true,false)
                         .sub( newArg("name",false,false) )
         );
-        // start <name> [now]|[<year> <month> <day> <hour>]
+        // start <name> [now]|[<year> <month> <day> [<hour>] [minute]]
         addArgument(
                 newArg("start",true,false)
                         .sub( newArg("name",false,true)
                                 .sub( newArg("now",true,false) )
                                 .sub( newArg("year",false,false)
                                         .sub( newArg("month",false,false)
-                                                .sub( newArg("day",false,false)
-                                                        .sub( newArg("hour",false,false) ) ) ) ) )
+                                                .sub( newArg("day",false,true)
+                                                        .sub( newArg("hour",false,true)
+                                                            .sub( newArg("minute",false,false) ) ) ) ) ) )
         );
         // duration <name> days|hours|minutes <time>
         List<String> timeNames = Arrays.asList("days", "hours", "minutes");
@@ -107,8 +108,8 @@ public class EventAdminCommand extends CommandBase {
                         return;
                     }
                     // Create a new event
-                    boolean createEnabled = false; // start disabled
-                    long createStart = (new Date()).getTime(); // start now
+                    boolean createEnabled = true; // start enabled
+                    long createStart = 0; // no start
                     long createDuration = 60 * 60 * 1000; // 1 hour in ms
                     long createRepetition = 0; // no repetition
                     boolean status = konquest.getGlobalEventManager().createEvent(eventName,createEnabled,createStart,createDuration,createRepetition,Collections.emptyList());
@@ -138,14 +139,24 @@ public class EventAdminCommand extends CommandBase {
                         // Start event now
                         konquest.getGlobalEventManager().startEvent(eventName);
                         ChatUtil.sendNotice(sender, "Successfully started event "+eventName+" now.");
-                    } else if (args.size() == 6) {
+                    } else if (args.size() == 5 || args.size() == 6 || args.size() == 7) {
                         // Start at given date
-                        int startYear, startMonth, startDay, startHour = 0;
+                        int startYear = 0;
+                        int startMonth = 1;
+                        int startDay = 1;
+                        int startHour = 0;
+                        int startMinute = 0;
                         try {
                             startYear = Integer.parseInt(args.get(2)); // 2000 - ?
                             startMonth = Integer.parseInt(args.get(3)); // 1 - 12
                             startDay = Integer.parseInt(args.get(4)); // 1 - 31
-                            startHour = Integer.parseInt(args.get(5)); // 0 - 23
+                            if (args.size() >= 6) {
+                                startHour = Integer.parseInt(args.get(5)); // 0 - 23
+                            }
+                            if (args.size() == 7) {
+                                startMinute = Integer.parseInt(args.get(6)); // 0 - 59
+                            }
+
                         } catch(NumberFormatException e) {
                             ChatUtil.sendError(sender, "Incorrect number format: "+e.getMessage());
                             return;
@@ -166,12 +177,17 @@ public class EventAdminCommand extends CommandBase {
                             ChatUtil.sendError(sender, "Hour must be between 0 and 23.");
                             return;
                         }
+                        if (startMinute < 0 || startMinute > 59) {
+                            ChatUtil.sendError(sender, "Minute must be between 0 and 59.");
+                            return;
+                        }
                         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
                         try {
                             df.getCalendar().set(Calendar.YEAR, startYear);
-                            df.getCalendar().set(Calendar.MONTH, startMonth);
+                            df.getCalendar().set(Calendar.MONTH, startMonth-1);
                             df.getCalendar().set(Calendar.DAY_OF_MONTH, startDay);
                             df.getCalendar().set(Calendar.HOUR_OF_DAY, startHour);
+                            df.getCalendar().set(Calendar.MINUTE, startMinute);
                         } catch (ArrayIndexOutOfBoundsException exc) {
                             ChatUtil.sendError(sender, "Incorrect date format: "+exc.getMessage());
                             return;
@@ -241,6 +257,7 @@ public class EventAdminCommand extends CommandBase {
                         effectChangeStatus = event.addEffect(eventEffect);
                         if (effectChangeStatus) {
                             // Successfully added
+                            konquest.getGlobalEventManager().refreshDelayedEvents();
                             ChatUtil.sendNotice(sender, "Successfully added effect "+eventEffect.getTitle()+" to event "+eventName);
                         } else {
                             // Failed to add, other effects conflict
@@ -252,6 +269,7 @@ public class EventAdminCommand extends CommandBase {
                         effectChangeStatus = event.removeEffect(eventEffect);
                         if (effectChangeStatus) {
                             // Successfully removed
+                            konquest.getGlobalEventManager().refreshDelayedEvents();
                             ChatUtil.sendNotice(sender, "Successfully removed effect "+eventEffect.getTitle()+" from event "+eventName);
                         } else {
                             // Failed to remove, event does not contain this effect
@@ -271,9 +289,11 @@ public class EventAdminCommand extends CommandBase {
                     }
                     String enableValue = args.get(2);
                     if (enableValue.equalsIgnoreCase("true")) {
-                        konquest.getGlobalEventManager().modifyEventEnable(eventName,true);
+                        konquest.getGlobalEventManager().enableEvent(eventName,true);
+                        ChatUtil.sendNotice(sender, "Enabled global event "+eventName);
                     } else if (enableValue.equalsIgnoreCase("false")) {
-                        konquest.getGlobalEventManager().modifyEventEnable(eventName,false);
+                        konquest.getGlobalEventManager().enableEvent(eventName,false);
+                        ChatUtil.sendNotice(sender, "Disable global event "+eventName);
                     } else {
                         sendInvalidArgMessage(sender);
                         return;
@@ -365,6 +385,8 @@ public class EventAdminCommand extends CommandBase {
                 tabList.add("DAY");
             } else if (args.size() == 6) {
                 tabList.add("HOUR");
+            } else if (args.size() == 7) {
+                tabList.add("MINUTE");
             }
         }
         return matchLastArgToList(tabList,args);

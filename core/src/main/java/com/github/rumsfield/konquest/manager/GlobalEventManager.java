@@ -6,6 +6,7 @@ import com.github.rumsfield.konquest.model.KonGlobalEventEffect;
 import com.github.rumsfield.konquest.utility.ChatUtil;
 import com.github.rumsfield.konquest.utility.Timeable;
 import com.github.rumsfield.konquest.utility.Timer;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,13 +14,20 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import javax.annotation.Nullable;
 import java.util.*;
 
+/*
+ TODO
+ - Re-format info messages
+ - make event menu
+ - implement effects
+ */
+
 public class GlobalEventManager implements Timeable {
 
     private final Konquest konquest;
     private final ArrayList<KonGlobalEvent> events;
     private final HashSet<KonGlobalEventEffect> validEffects;
     private final Timer eventTimer;
-    private final int eventTimerInterval = 1200; // one minute in ticks, probably should be core.yml setting
+    private final int eventTimerInterval = 60; // one minute, probably should be core.yml setting
     private boolean isEventDataNull;
     private final Comparator<KonGlobalEvent> eventComparator;
 
@@ -49,7 +57,7 @@ public class GlobalEventManager implements Timeable {
         refreshAllEvents();
         // Start the event timer
         eventTimer.stopTimer();
-        eventTimer.setTime(eventTimerInterval);
+        eventTimer.setTime(eventTimerInterval); // seconds
         eventTimer.startLoopTimer();
         ChatUtil.printDebug("Global Event Manager is ready");
     }
@@ -59,6 +67,7 @@ public class GlobalEventManager implements Timeable {
         if(taskID == 0) {
             ChatUtil.printDebug("Event Timer ended with null taskID!");
         } else if(taskID == eventTimer.getTaskID()) {
+            ChatUtil.printDebug("Event Timer refreshed");
             refreshAllEvents();
             // Apply effects to other managers
             // TODO implement effects
@@ -75,16 +84,12 @@ public class GlobalEventManager implements Timeable {
             if (!wasActive && nowActive) {
                 // Event started
                 if (event.isEnabled()) {
-                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has started! Use /k events for details.");
+                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has started! Use /k event for details.");
                 }
             } else if (wasActive && !nowActive) {
                 // Event ended
                 if (event.isEnabled()) {
-                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has ended! Use /k events for details.");
-                }
-                // Remove events without repetition
-                if (!event.isRepeating()) {
-                    removeEvent(event);
+                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has ended! Use /k event for details.");
                 }
             }
             if (event.isActive() && event.isEnabled()) {
@@ -106,6 +111,10 @@ public class GlobalEventManager implements Timeable {
                 validEffects.add(effect);
             }
         }
+    }
+
+    public void refreshDelayedEvents() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Konquest.getInstance().getPlugin(), this::refreshAllEvents, 20);
     }
 
     public boolean isEffectValid(KonGlobalEventEffect effect) {
@@ -138,7 +147,7 @@ public class GlobalEventManager implements Timeable {
         KonGlobalEvent nextEvent = null;
         Date nextStart = null;
         for (KonGlobalEvent event : events) {
-            Date eventNextStart = event.getNextStart();
+            Date eventNextStart = event.getNextStartDate();
             if (eventNextStart != null && (nextStart == null || eventNextStart.before(nextStart))) {
                 nextStart = eventNextStart;
                 nextEvent = event;
@@ -202,24 +211,28 @@ public class GlobalEventManager implements Timeable {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
         globalEvent.setEnabled(isEnabled);
+        refreshDelayedEvents();
     }
 
     public void modifyEventStart(String name, Date startDate) {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
         globalEvent.setStart(startDate);
+        refreshDelayedEvents();
     }
 
     public void modifyEventDuration(String name, long duration) {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
         globalEvent.setDuration(duration);
+        refreshDelayedEvents();
     }
 
     public void modifyEventRepetition(String name, long repetition) {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
         globalEvent.setRepetition(repetition);
+        refreshDelayedEvents();
     }
 
     public void modifyEventEffects(String name, List<KonGlobalEventEffect> effects) {
@@ -229,22 +242,48 @@ public class GlobalEventManager implements Timeable {
         for (KonGlobalEventEffect effect : effects) {
             globalEvent.addEffect(effect);
         }
+        refreshDelayedEvents();
+    }
+
+    public void enableEvent(String name, boolean isEnabled) {
+        // Enable or disable an existing event
+        KonGlobalEvent globalEvent = getEvent(name);
+        if (globalEvent == null) return;
+        boolean wasEnabled = globalEvent.isEnabled();
+        globalEvent.setEnabled(isEnabled);
+        if (globalEvent.isActive()) {
+            // Broadcast changes to enable
+            if (!wasEnabled && isEnabled) {
+                // Event enabled
+                ChatUtil.sendBroadcast("Global Event " + globalEvent.getName() + " is now enabled.");
+            } else if (wasEnabled && !isEnabled) {
+                // Event disabled
+                ChatUtil.sendBroadcast("Global Event " + globalEvent.getName() + " is now disabled.");
+            }
+        }
+        refreshDelayedEvents();
     }
 
     public void cancelEvent(String name) {
         // Stop an existing event
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
+        if (globalEvent.isActive()) {
+            ChatUtil.sendBroadcast("Global Event " + globalEvent.getName() + " has been removed.");
+        }
         removeEvent(globalEvent);
+        refreshDelayedEvents();
     }
 
     public void startEvent(String name) {
-        // Start an existing event
+        // Start an existing event (enable it too)
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
+        globalEvent.setEnabled(true);
         Date now = new Date();
         globalEvent.setStart(now.getTime());
-        refreshAllEvents();
+        // Broadcast messages included in refresh
+        refreshDelayedEvents();
     }
 
     private void removeEvent(KonGlobalEvent event) {
@@ -331,13 +370,13 @@ public class GlobalEventManager implements Timeable {
                 eventSection.set("duration", event.getDurationTime());
                 eventSection.set("repetition", event.getRepetitionTime());
                 // Effects
-                ArrayList<KonGlobalEventEffect> eventEffects = new ArrayList<>();
+                ArrayList<String> eventEffectNames = new ArrayList<>();
                 for (KonGlobalEventEffect effect : KonGlobalEventEffect.values()) {
                     if (event.hasEffect(effect)) {
-                        eventEffects.add(effect);
+                        eventEffectNames.add(effect.toString());
                     }
                 }
-                eventSection.set("effects", eventEffects);
+                eventSection.set("effects", eventEffectNames);
             }
             // Save to file
             FileConfiguration eventsConfig = konquest.getConfigManager().getConfig("global-events");

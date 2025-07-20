@@ -1234,3 +1234,50 @@ properties:
   shop: Allow players to create shops
   arena-name: Arena
   arena: Allow any players to fight each other
+# //// EFFECTS \\\\
+# Titles and descriptions for all global event effects.
+effects:
+  pvp-name: All PvP
+  pvp: All players can fight
+  war-name: All War
+  war: All kingdoms are at war
+  peace-name: All Peace
+  peace: All kingdoms are at peace
+  travel-name: Free Travel
+  travel: Travel is instant and free
+  shields-name: Free Shields
+  shields: Towns and capitals get unlimited shields
+  no-shields-name: No Shields
+  no-shields: All town shields are broken
+  no-armor-name: No Armor
+  no-armor: All town armor is removed
+  no-protection-name: No Protection
+  no-protection: All towns can be attacked offline
+  no-immunity-name: No Immunity
+  no-immunity: All capitals lose immunity
+  favor-1-name: Favor Discount 1
+  favor-1: Favor costs are reduced 25%
+  favor-2-name: Favor Discount 2
+  favor-2: Favor costs are reduced 50%
+  favor-3-name: Favor Discount 3
+  favor-3: Favor costs are reduced 75%
+  favor-4-name: Favor Discount 4
+  favor-4: Favor costs are reduced 100%
+  monument-1-name: Monument Loot 1
+  monument-1: Town loot increased x2
+  monument-2-name: Monument Loot 2
+  monument-2: Town loot increased x5
+  monument-3-name: Monument Loot 3
+  monument-3: Town loot increased x10
+  ruin-1-name: Ruin Loot 1
+  ruin-1: Ruin loot increased x2
+  ruin-2-name: Ruin Loot 2
+  ruin-2: Ruin loot increased x5
+  ruin-3-name: Ruin Loot 3
+  ruin-3: Ruin loot increased x10
+  exp-1-name: EXP Boost 1
+  exp-1: Experience orbs increased x2
+  exp-2-name: EXP Boost 2
+  exp-2: Experience orbs increased x5
+  exp-3-name: EXP Boost 3
+  exp-3: Experience orbs increased x10

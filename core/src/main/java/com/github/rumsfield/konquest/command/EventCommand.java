@@ -1,6 +1,7 @@
 package com.github.rumsfield.konquest.command;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.manager.DisplayManager;
 import com.github.rumsfield.konquest.model.KonGlobalEvent;
 import com.github.rumsfield.konquest.model.KonGlobalEventEffect;
 import com.github.rumsfield.konquest.model.KonPlayer;
@@ -44,7 +45,8 @@ public class EventCommand extends CommandBase {
     @Override
     public void execute(Konquest konquest, CommandSender sender, List<String> args) {
         final int MAX_LINES_PER_PAGE = 6;
-        final String lineTemplate = ChatColor.GOLD+"> "+ChatColor.RESET+"%-20s -> "+ChatColor.AQUA+"%s";
+        final String messagePrefix = ChatColor.GOLD+"> ";
+        final String lineTemplate = messagePrefix+ChatColor.YELLOW+"%s"+ChatColor.WHITE+" = "+ChatColor.AQUA+"%s";
         if(args.isEmpty()) {
             // Display menu (player only)
             KonPlayer player = konquest.getPlayerManager().getPlayer(sender);
@@ -71,18 +73,21 @@ public class EventCommand extends CommandBase {
                 case "effects":
                     // Display all effect details
                     List<String> effectLines = new ArrayList<>();
-                    int pos = 1;
                     for (KonGlobalEventEffect effect : KonGlobalEventEffect.values()) {
                         String effectTitle = effect.getTitle();
                         String effectDescription = effect.getDescription();
-                        String isValid = String.valueOf(konquest.getGlobalEventManager().isEffectValid(effect));
-                        String message = pos+") "+ChatColor.AQUA+isValid+" "+ChatColor.LIGHT_PURPLE+effectTitle+ChatColor.WHITE+" - "+effectDescription;
-                        effectLines.add(message);
-                        pos++;
+                        boolean isEffectValid = konquest.getGlobalEventManager().isEffectValid(effect);
+                        String validDisplayText;
+                        if (isEffectValid) {
+                            validDisplayText = DisplayManager.boolean2Symbol(true)+ChatColor.LIGHT_PURPLE;
+                        } else {
+                            validDisplayText = DisplayManager.boolean2Symbol(false)+ChatColor.AQUA;
+                        }
+                        effectLines.add(validDisplayText+" "+effectTitle+ChatColor.WHITE+" "+effectDescription);
                     }
-                    ChatUtil.sendNotice(sender, "Global Event Effects");
+                    ChatUtil.sendNotice(sender, "All Global Event Effects");
                     for (String line : effectLines) {
-                        ChatUtil.sendMessage(sender, "  "+line);
+                        ChatUtil.sendMessage(sender, messagePrefix+line);
                     }
                     break;
                 case "list":
@@ -100,7 +105,15 @@ public class EventCommand extends CommandBase {
                     List<String> lines = new ArrayList<>();
                     int linePos = 1;
                     for (KonGlobalEvent event : events) {
-                        String message = linePos+") "+ChatColor.LIGHT_PURPLE+event.getName()+ChatColor.WHITE+" - Active: "+event.isActive();
+                        ChatColor eventColor = ChatColor.AQUA;
+                        if (event.isActive()) {
+                            if (event.isEnabled()) {
+                                eventColor = ChatColor.LIGHT_PURPLE;
+                            } else {
+                                eventColor = ChatColor.GRAY;
+                            }
+                        }
+                        String message = linePos+") "+eventColor+event.getName();
                         lines.add(message);
                         linePos++;
                     }
@@ -124,6 +137,7 @@ public class EventCommand extends CommandBase {
                     // Display lines
                     String pageDisplay = page + "/" + maxPages;
                     ChatUtil.sendNotice(sender, "Global Events, page "+pageDisplay);
+                    // TODO change these message paths
                     if (page == 1 && maxPages > 1) {
                         ChatUtil.sendNotice(sender, MessagePath.COMMAND_HELP_NOTICE_PAGE.getMessage());
                     }
@@ -131,7 +145,7 @@ public class EventCommand extends CommandBase {
                     int startIdx = (page-1) * MAX_LINES_PER_PAGE;
                     int endIdx = startIdx + MAX_LINES_PER_PAGE;
                     for (int i = startIdx; i < endIdx && i < numLines; i++) {
-                        ChatUtil.sendMessage(sender, "  "+lines.get(i));
+                        ChatUtil.sendMessage(sender, messagePrefix+lines.get(i));
                     }
                     break;
                 case "info":
@@ -143,9 +157,9 @@ public class EventCommand extends CommandBase {
                         ChatUtil.sendNotice(sender, "Global Event Info");
                         // Active event
                         if (activeEvents.isEmpty()) {
-                            ChatUtil.sendMessage(sender,"No active global events");
+                            ChatUtil.sendMessage(sender,messagePrefix+"No active global events", ChatColor.RED);
                         } else {
-                            ChatUtil.sendMessage(sender, "Active Global Events", ChatColor.GOLD);
+                            ChatUtil.sendMessage(sender, messagePrefix+"Active Global Effects", ChatColor.GOLD);
                             // Make list of enabled effects
                             ArrayList<String> enabledEffectNames = new ArrayList<>();
                             for (KonGlobalEventEffect effect : konquest.getGlobalEventManager().getValidEffects()) {
@@ -156,27 +170,23 @@ public class EventCommand extends CommandBase {
                                 effectListFormat = HelperUtil.formatCommaSeparatedList(enabledEffectNames);
                             }
                             // Show effect and event list info
-                            ChatUtil.sendMessage(sender,String.format(lineTemplate,"Effects",effectListFormat));
+                            //ChatUtil.sendMessage(sender,String.format(lineTemplate,"Effects",effectListFormat));
+                            ChatUtil.sendMessage(sender,"  "+effectListFormat, ChatColor.LIGHT_PURPLE);
+                            ChatUtil.sendMessage(sender, messagePrefix+"Current Global Events", ChatColor.GOLD);
                             int eventPos = 1;
                             for (KonGlobalEvent globalEvent : activeEvents) {
-                                ChatUtil.sendMessage(sender,eventPos+") "+globalEvent.getName());
-                                ChatUtil.sendMessage(sender,String.format(lineTemplate,"Enabled",globalEvent.isEnabled()));
-                                ChatUtil.sendMessage(sender,String.format(lineTemplate,"End Date",globalEvent.getNextEndDateFormat()));
-                                eventPos++;
+                                if (globalEvent.isEnabled()) {
+                                    ChatUtil.sendMessage(sender,"  "+eventPos+") "+ChatColor.LIGHT_PURPLE+globalEvent.getName()+" Ends on "+globalEvent.getNextEndDateFormat());
+                                    eventPos++;
+                                }
                             }
                         }
                         // Next event
                         if (nextEvent == null) {
-                            ChatUtil.sendMessage(sender, "No upcoming global events");
+                            ChatUtil.sendMessage(sender, messagePrefix+"No upcoming global events", ChatColor.RED);
                         } else {
-                            ChatUtil.sendMessage(sender, "Next Global Event", ChatColor.GOLD);
-                            String [] nextEventInfo = {
-                                    String.format(lineTemplate,"Name",nextEvent.getName()),
-                                    String.format(lineTemplate,"Start Date",nextEvent.getNextStartDateFormat())
-                            };
-                            for (String line : nextEventInfo) {
-                                ChatUtil.sendMessage(sender,line);
-                            }
+                            ChatUtil.sendMessage(sender, messagePrefix+"Next Global Event", ChatColor.GOLD);
+                            ChatUtil.sendMessage(sender,"  "+ChatColor.AQUA+nextEvent.getName()+" Starts on "+nextEvent.getNextStartDateFormat());
                         }
                     } else if (args.size() == 2) {
                         // Show detailed info about an event
@@ -205,8 +215,9 @@ public class EventCommand extends CommandBase {
                                 String.format(lineTemplate,"Active",globalEvent.isActive()),
                                 String.format(lineTemplate,"Duration Hours",globalEvent.getDurationHours()),
                                 String.format(lineTemplate,"Repetition Days",globalEvent.getRepetitionDays()),
-                                String.format(lineTemplate,"Start Date",globalEvent.getNextStartDateFormat()),
-                                String.format(lineTemplate,"End Date",globalEvent.getNextEndDateFormat()),
+                                String.format(lineTemplate,"Start Date",globalEvent.getStartDateFormat()),
+                                String.format(lineTemplate,"Next Start Date",globalEvent.getNextStartDateFormat()),
+                                String.format(lineTemplate,"Next End Date",globalEvent.getNextEndDateFormat()),
                                 String.format(lineTemplate,"Effects",effectListFormat)
                         };
                         for (String line : eventInfo) {
