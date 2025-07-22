@@ -3,7 +3,9 @@ package com.github.rumsfield.konquest.manager;
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonGlobalEvent;
 import com.github.rumsfield.konquest.model.KonGlobalEventEffect;
+import com.github.rumsfield.konquest.model.KonPlayer;
 import com.github.rumsfield.konquest.utility.ChatUtil;
+import com.github.rumsfield.konquest.utility.CorePath;
 import com.github.rumsfield.konquest.utility.Timeable;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.Bukkit;
@@ -27,9 +29,11 @@ public class GlobalEventManager implements Timeable {
     private final ArrayList<KonGlobalEvent> events;
     private final HashSet<KonGlobalEventEffect> validEffects;
     private final Timer eventTimer;
-    private final int eventTimerInterval = 60; // one minute, probably should be core.yml setting
     private boolean isEventDataNull;
     private final Comparator<KonGlobalEvent> eventComparator;
+
+    private int eventIntervalSeconds;
+    private boolean isEnabled;
 
     public GlobalEventManager(Konquest konquest) {
         this.konquest = konquest;
@@ -37,6 +41,8 @@ public class GlobalEventManager implements Timeable {
         this.validEffects = new HashSet<>();
         this.eventTimer = new Timer(this);
         this.isEventDataNull = false;
+        this.eventIntervalSeconds = 30;
+        this.isEnabled = true;
 
         this.eventComparator = (eventOne, eventTwo) -> {
             // sort by start date
@@ -53,13 +59,27 @@ public class GlobalEventManager implements Timeable {
     }
 
     public void initialize() {
+        // Load events from data file
         loadEvents();
-        refreshAllEvents();
-        // Start the event timer
-        eventTimer.stopTimer();
-        eventTimer.setTime(eventTimerInterval); // seconds
-        eventTimer.startLoopTimer();
-        ChatUtil.printDebug("Global Event Manager is ready");
+        // Get core settings
+        eventIntervalSeconds = Math.abs(konquest.getCore().getInt(CorePath.EVENT_INTERVAL.getPath()));
+        if (eventIntervalSeconds == 0) {
+            isEnabled = false;
+            eventTimer.stopTimer();
+        } else {
+            isEnabled = true;
+            // Update all events
+            refreshAllEvents();
+            // Start the event timer
+            eventTimer.stopTimer();
+            eventTimer.setTime(eventIntervalSeconds); // seconds
+            eventTimer.startLoopTimer();
+        }
+        ChatUtil.printDebug("Global Event Manager is ready, enabled = "+isEnabled);
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
     }
 
     @Override
@@ -67,7 +87,6 @@ public class GlobalEventManager implements Timeable {
         if(taskID == 0) {
             ChatUtil.printDebug("Event Timer ended with null taskID!");
         } else if(taskID == eventTimer.getTaskID()) {
-            ChatUtil.printDebug("Event Timer refreshed");
             refreshAllEvents();
             // Apply effects to other managers
             // TODO implement effects
@@ -84,12 +103,12 @@ public class GlobalEventManager implements Timeable {
             if (!wasActive && nowActive) {
                 // Event started
                 if (event.isEnabled()) {
-                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has started! Use /k event for details.");
+                    notifyAllPlayers("Global Event " + event.getName() + " has started! Use /k event for details.",true);
                 }
             } else if (wasActive && !nowActive) {
                 // Event ended
                 if (event.isEnabled()) {
-                    ChatUtil.sendBroadcast("Global Event " + event.getName() + " has ended! Use /k event for details.");
+                    notifyAllPlayers("Global Event " + event.getName() + " has ended! Use /k event for details.", false);
                 }
             }
             if (event.isActive() && event.isEnabled()) {
@@ -308,6 +327,17 @@ public class GlobalEventManager implements Timeable {
         events.add(event);
         ChatUtil.printConsole("Added Global Event "+eventName);
         return true;
+    }
+
+    private void notifyAllPlayers(String message, boolean type) {
+        for (KonPlayer onlinePlayer : konquest.getPlayerManager().getPlayersOnline()) {
+            if (type) {
+                Konquest.playNotificationGoodSound(onlinePlayer.getBukkitPlayer());
+            } else {
+                Konquest.playNotificationBadSound(onlinePlayer.getBukkitPlayer());
+            }
+        }
+        ChatUtil.sendBroadcast(message);
     }
 
     private void loadEvents() {

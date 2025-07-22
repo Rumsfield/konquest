@@ -538,7 +538,8 @@ public class Konquest implements KonquestAPI, Timeable {
 				String.format(lineTemplate,"Town Specializations",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath()))),
 				String.format(lineTemplate,"Town Plots",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath()))),
 				String.format(lineTemplate,"Barbarian Camps",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath()))),
-				String.format(lineTemplate,"Barbarian Clans",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath())))
+				String.format(lineTemplate,"Barbarian Clans",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath()))),
+				String.format(lineTemplate,"Global Events",ChatUtil.boolean2enable(getCore().getInt(CorePath.EVENT_INTERVAL.getPath())!=0))
 		};
 		ChatUtil.printConsoleAlert("Feature Summary...");
 		for (String row : status) {
@@ -1425,6 +1426,16 @@ public class Konquest implements KonquestAPI, Timeable {
     	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
 				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_EGG_THROW, (float)1.0, (float)0.1),1);
     }
+
+	public static void playNotificationGoodSound(Player bukkitPlayer) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0),1);
+	}
+
+	public static void playNotificationBadSound(Player bukkitPlayer) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)0.1),1);
+	}
 
 	/*
 	 * Events and Commands

@@ -10,6 +10,7 @@ import com.github.rumsfield.konquest.utility.HelperUtil;
 import com.github.rumsfield.konquest.utility.MessagePath;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +45,12 @@ public class EventCommand extends CommandBase {
 
     @Override
     public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+        if (!konquest.getGlobalEventManager().isEnabled()) {
+            ChatUtil.sendError(sender,MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+            return;
+        }
         final int MAX_LINES_PER_PAGE = 6;
-        final String messagePrefix = ChatColor.GOLD+"> ";
+        final String messagePrefix = "> ";
         final String lineTemplate = messagePrefix+ChatColor.YELLOW+"%s"+ChatColor.WHITE+" = "+ChatColor.AQUA+"%s";
         if(args.isEmpty()) {
             // Display menu (player only)
@@ -76,18 +81,25 @@ public class EventCommand extends CommandBase {
                     for (KonGlobalEventEffect effect : KonGlobalEventEffect.values()) {
                         String effectTitle = effect.getTitle();
                         String effectDescription = effect.getDescription();
-                        boolean isEffectValid = konquest.getGlobalEventManager().isEffectValid(effect);
                         String validDisplayText;
-                        if (isEffectValid) {
-                            validDisplayText = DisplayManager.boolean2Symbol(true)+ChatColor.LIGHT_PURPLE;
+                        if (konquest.getGlobalEventManager().isEffectValid(effect)) {
+                            if (sender instanceof ConsoleCommandSender) {
+                                validDisplayText = ChatColor.DARK_GREEN+"+"+ChatColor.LIGHT_PURPLE;
+                            } else {
+                                validDisplayText = DisplayManager.boolean2Symbol(true)+ChatColor.LIGHT_PURPLE;
+                            }
                         } else {
-                            validDisplayText = DisplayManager.boolean2Symbol(false)+ChatColor.AQUA;
+                            if (sender instanceof ConsoleCommandSender) {
+                                validDisplayText = ChatColor.DARK_RED+"-"+ChatColor.AQUA;
+                            } else {
+                                validDisplayText = DisplayManager.boolean2Symbol(false)+ChatColor.AQUA;
+                            }
                         }
                         effectLines.add(validDisplayText+" "+effectTitle+ChatColor.WHITE+" "+effectDescription);
                     }
                     ChatUtil.sendNotice(sender, "All Global Event Effects");
                     for (String line : effectLines) {
-                        ChatUtil.sendMessage(sender, messagePrefix+line);
+                        ChatUtil.sendMessage(sender, messagePrefix+line, ChatColor.GOLD);
                     }
                     break;
                 case "list":
@@ -145,7 +157,7 @@ public class EventCommand extends CommandBase {
                     int startIdx = (page-1) * MAX_LINES_PER_PAGE;
                     int endIdx = startIdx + MAX_LINES_PER_PAGE;
                     for (int i = startIdx; i < endIdx && i < numLines; i++) {
-                        ChatUtil.sendMessage(sender, messagePrefix+lines.get(i));
+                        ChatUtil.sendMessage(sender, messagePrefix+lines.get(i), ChatColor.GOLD);
                     }
                     break;
                 case "info":

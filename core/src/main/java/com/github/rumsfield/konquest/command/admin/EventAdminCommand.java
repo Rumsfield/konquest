@@ -76,6 +76,10 @@ public class EventAdminCommand extends CommandBase {
 
     @Override
     public void execute(Konquest konquest, CommandSender sender, List<String> args) {
+        if (!konquest.getGlobalEventManager().isEnabled()) {
+            ChatUtil.sendError(sender,MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+            return;
+        }
         // Parse arguments
         if (args.isEmpty() || (args.size() == 1 && args.get(0).equalsIgnoreCase("menu"))) {
             // Menu
