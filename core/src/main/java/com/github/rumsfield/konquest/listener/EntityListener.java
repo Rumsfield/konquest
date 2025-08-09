@@ -840,6 +840,9 @@ public class EntityListener implements Listener {
 			// Check for WorldGuard flags
 			boolean isFlagArenaAllowed = konquest.getIntegrationManager().getWorldGuard().isLocationArenaAllowed(victimBukkitPlayer.getLocation(),attackerBukkitPlayer);
 
+			// Check for global event
+			boolean isEventPvpValid = konquest.getGlobalEventManager().isEffectValid(KonGlobalEventEffect.ALL_PVP);
+
 			// Check for kingdom relationships
 			boolean isBarbarianPvpEnabled = konquest.getCore().getBoolean(CorePath.BARBARIANS_ALLOW_PVP.getPath(), true);
 			boolean isAllDamageEnabled = konquest.getCore().getBoolean(CorePath.KINGDOMS_ALLOW_ALL_PVP.getPath(), false);
@@ -856,7 +859,8 @@ public class EntityListener implements Listener {
 //					", role="+attackerRole+", enemy="+isPlayerEnemy+", arenaProperty="+isPropertyArenaEnabled+", arenaFlag="+isFlagArenaAllowed);
 
 			// Protection checks when the damage is not inside a territory with ARENA property = true
-			if(!isPropertyArenaEnabled && !isFlagArenaAllowed) {
+			// And when there is not a global event with all PVP active
+			if(!isPropertyArenaEnabled && !isFlagArenaAllowed && !isEventPvpValid) {
 				// Protect victim if they're peaceful
 				if (victimPlayer.getKingdom().isPeaceful()) {
 					ChatUtil.sendNotice(attackerBukkitPlayer, MessagePath.PROTECTION_NOTICE_PEACEFUL_VICTIM.getMessage());

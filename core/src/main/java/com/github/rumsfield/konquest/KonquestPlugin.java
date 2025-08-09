@@ -3,6 +3,7 @@ package com.github.rumsfield.konquest;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.hook.WorldGuardExec;
 import com.github.rumsfield.konquest.listener.*;
+import com.github.rumsfield.konquest.manager.GlobalEventManager;
 import com.github.rumsfield.konquest.utility.*;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -276,20 +277,24 @@ public class KonquestPlugin extends JavaPlugin {
 				}
 			}
 		}
+		double permissionDiscount = 1 - (double)discount / 100;
+		// Get discount from events
+		double eventDiscount = GlobalEventManager.favorDiscountMultiplier;
 		// Apply discount
+		double totalDiscount = permissionDiscount * eventDiscount; // 1 is no discount (multiplier)
+		int totalDiscountPercent = (int)(100 * (1 - totalDiscount));
 		double amountMod = amount;
-		if(discount > 0 && discount <= 100) {
-			//ChatUtil.printDebug("Applying discount of "+discount+"%");
-			double amountOff = amount * ((double)discount / 100);
-			amountMod = amount - amountOff;
+		if(totalDiscount >= 0 && totalDiscount < 1) {
+			double amountOff = amount * (1 - totalDiscount);
+			amountMod = amount * totalDiscount;
 			if(amountOff > 0) {
 				String amountF = econ.format(amountOff);
 				if(offlineBukkitPlayer.isOnline()) {
-					ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(discount,amountF), ChatColor.DARK_AQUA);
+					ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(totalDiscountPercent,amountF), ChatColor.DARK_AQUA);
 				}
 			}
-		} else if(discount != 0) {
-			ChatUtil.printDebug("Failed to apply invalid discount of "+discount+"%");
+		} else if(totalDiscount != 1) {
+			ChatUtil.printDebug("Failed to apply invalid discount of "+totalDiscountPercent+"%");
 		}
 		// Perform transaction
 		EconomyResponse resp = null;

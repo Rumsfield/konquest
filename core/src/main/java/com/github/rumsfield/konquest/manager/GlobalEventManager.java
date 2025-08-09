@@ -35,6 +35,8 @@ public class GlobalEventManager implements Timeable {
     private int eventIntervalSeconds;
     private boolean isEnabled;
 
+    public static double favorDiscountMultiplier = 1.0;
+
     public GlobalEventManager(Konquest konquest) {
         this.konquest = konquest;
         this.events = new ArrayList<>();
@@ -78,6 +80,15 @@ public class GlobalEventManager implements Timeable {
         ChatUtil.printDebug("Global Event Manager is ready, enabled = "+isEnabled);
     }
 
+    public void shutdown() {
+        // Disable events
+        konquest.getKingdomManager().enableGlobalEventWar(false);
+        konquest.getKingdomManager().enableGlobalEventPeace(false);
+        konquest.getShieldManager().enableGlobalEventShield(false,true);
+        konquest.getShieldManager().enableGlobalEventShield(false,false);
+        konquest.getShieldManager().enableGlobalEventArmor(false);
+    }
+
     public boolean isEnabled() {
         return isEnabled;
     }
@@ -88,8 +99,6 @@ public class GlobalEventManager implements Timeable {
             ChatUtil.printDebug("Event Timer ended with null taskID!");
         } else if(taskID == eventTimer.getTaskID()) {
             refreshAllEvents();
-            // Apply effects to other managers
-            // TODO implement effects
         }
     }
 
@@ -130,6 +139,13 @@ public class GlobalEventManager implements Timeable {
                 validEffects.add(effect);
             }
         }
+        // Apply effects
+        konquest.getKingdomManager().enableGlobalEventWar(isEffectValid(KonGlobalEventEffect.ALL_WAR));
+        konquest.getKingdomManager().enableGlobalEventPeace(isEffectValid(KonGlobalEventEffect.ALL_PEACE));
+        konquest.getShieldManager().enableGlobalEventShield(isEffectValid(KonGlobalEventEffect.FREE_SHIELDS),true);
+        konquest.getShieldManager().enableGlobalEventShield(isEffectValid(KonGlobalEventEffect.NO_SHIELDS),false);
+        konquest.getShieldManager().enableGlobalEventArmor(isEffectValid(KonGlobalEventEffect.NO_ARMOR));
+        updateFavorDiscountMultiplier();
     }
 
     public void refreshDelayedEvents() {
@@ -144,6 +160,56 @@ public class GlobalEventManager implements Timeable {
     public ArrayList<KonGlobalEventEffect> getValidEffects() {
         // Return all effects in active, enabled events with group priority filtered
         return new ArrayList<>(validEffects);
+    }
+
+    private void updateFavorDiscountMultiplier() {
+        if (validEffects.contains(KonGlobalEventEffect.FAVOR_4)) {
+            favorDiscountMultiplier = 0.00;
+        } else if (validEffects.contains(KonGlobalEventEffect.FAVOR_3)) {
+            favorDiscountMultiplier = 0.25;
+        } else if (validEffects.contains(KonGlobalEventEffect.FAVOR_2)) {
+            favorDiscountMultiplier = 0.50;
+        } else if (validEffects.contains(KonGlobalEventEffect.FAVOR_1)) {
+            favorDiscountMultiplier = 0.75;
+        } else {
+            favorDiscountMultiplier = 1.00;
+        }
+    }
+
+    public int getMonumentLootMultiplier() {
+        if (validEffects.contains(KonGlobalEventEffect.MONUMENT_LOOT_3)) {
+            return 10;
+        } else if (validEffects.contains(KonGlobalEventEffect.MONUMENT_LOOT_2)) {
+            return 5;
+        } else if (validEffects.contains(KonGlobalEventEffect.MONUMENT_LOOT_1)) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    public int getRuinLootMultiplier() {
+        if (validEffects.contains(KonGlobalEventEffect.RUIN_LOOT_3)) {
+            return 10;
+        } else if (validEffects.contains(KonGlobalEventEffect.RUIN_LOOT_2)) {
+            return 5;
+        } else if (validEffects.contains(KonGlobalEventEffect.RUIN_LOOT_1)) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    public int getExpMultiplier() {
+        if (validEffects.contains(KonGlobalEventEffect.EXP_BOOST_3)) {
+            return 10;
+        } else if (validEffects.contains(KonGlobalEventEffect.EXP_BOOST_2)) {
+            return 5;
+        } else if (validEffects.contains(KonGlobalEventEffect.EXP_BOOST_1)) {
+            return 2;
+        } else {
+            return 1;
+        }
     }
 
     public ArrayList<KonGlobalEvent> getEvents(boolean isActive) {

@@ -56,6 +56,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private final ArrayList<DiplomacyTicket> diplomacyTickets;
 	private boolean isKingdomDataNull;
 
+	// Global Event features
+	private boolean isGlobalEventWar;
+	private boolean isGlobalEventPeace;
+
 	// Config Settings
 	private boolean isAdminOnly;
 	private long payIntervalSeconds;
@@ -100,6 +104,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		this.exilePlayerCooldowns = new HashMap<>();
 		this.diplomacyTickets = new ArrayList<>();
 		this.isKingdomDataNull = false;
+		this.isGlobalEventWar = false;
+		this.isGlobalEventPeace = false;
 
 		this.isAdminOnly = false;
 		this.payIntervalSeconds = 0;
@@ -1985,6 +1991,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return false;
 		}
 
+		// Check for global events
+		if (isGlobalEventWar || isGlobalEventPeace) {
+			// Cannot change relation during global events
+			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+
 		// Check cost
 		double costRelation = getRelationCost(relation);
 		if(costRelation > 0 && !isAdmin && payPlayer != null) {
@@ -2268,6 +2281,32 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		kingdom2.removeRelationRequest(kingdom1);
 	}
 
+	public void enableGlobalEventWar(boolean isEnabled) {
+		boolean wasEnabled = isGlobalEventWar;
+		isGlobalEventWar = isEnabled;
+		if (wasEnabled != isEnabled) {
+			for (KonKingdom kingdom : getKingdoms()) {
+				konquest.updateNamePackets(kingdom);
+				konquest.getTerritoryManager().updatePlayerBorderParticles(kingdom);
+				konquest.getTerritoryManager().updateTownDisplayBars(kingdom);
+				refreshTownNerfs(kingdom);
+			}
+		}
+	}
+
+	public void enableGlobalEventPeace(boolean isEnabled) {
+		boolean wasEnabled = isGlobalEventPeace;
+		isGlobalEventPeace = isEnabled;
+		if (wasEnabled != isEnabled) {
+			for (KonKingdom kingdom : getKingdoms()) {
+				konquest.updateNamePackets(kingdom);
+				konquest.getTerritoryManager().updatePlayerBorderParticles(kingdom);
+				konquest.getTerritoryManager().updateTownDisplayBars(kingdom);
+				refreshTownNerfs(kingdom);
+			}
+		}
+	}
+
 	/**
 	 * Get the shared diplomatic type of two kingdoms.
 	 * Performs error checking to ensure both kingdoms have the same active relation.
@@ -2277,6 +2316,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @return The diplomatic type
 	 */
 	public KonquestDiplomacyType getDiplomacy(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+		// Check for global events
+		if (isGlobalEventWar) {
+			// When global event war is enabled, all kingdoms are at war
+			return KonquestDiplomacyType.WAR;
+		} else if (isGlobalEventPeace) {
+			// When global event peace is enabled, all kingdoms are at peace
+			return KonquestDiplomacyType.PEACE;
+		}
 		// Default kingdoms are always at war (barbarian & neutral)
 		if(!kingdom1.isCreated() || !kingdom2.isCreated()) {
 			return KonquestDiplomacyType.WAR;
@@ -2320,17 +2367,37 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	}
 		KonquestRelationshipType result;
     	if(contextKingdom.equals(getBarbarians())) {
+			// Theirs is barbarian
     		result = KonquestRelationshipType.BARBARIAN;
 		} else if(contextKingdom.equals(getNeutrals())) {
+			// Theirs is neutral
     		result = KonquestRelationshipType.NEUTRAL;
 		} else {
+			// Theirs is a kingdom
 			if(displayKingdom.equals(contextKingdom)) {
+				// Ours and theirs is the same kingdom
 				result = KonquestRelationshipType.FRIENDLY;
     		} else if (displayKingdom.equals(getBarbarians())) {
-    			result = KonquestRelationshipType.ENEMY;
+				// Ours is barbarian, theirs is a kingdom
+				if (isGlobalEventPeace) {
+					result = KonquestRelationshipType.PEACEFUL;
+				} else {
+					result = KonquestRelationshipType.ENEMY;
+				}
     		} else {
+				// Ours is a kingdom, theirs is a different kingdom
+				if (isGlobalEventWar) {
+					// Global event, all kingdoms at war
+					return KonquestRelationshipType.ENEMY;
+				}
+				// Evaluate diplomacy relationship
     			if(isKingdomWar(displayKingdom, contextKingdom)) {
-    				result = KonquestRelationshipType.ENEMY;
+					if (isGlobalEventPeace) {
+						// Global event, make peace for kingdoms at war
+						result = KonquestRelationshipType.PEACEFUL;
+					} else {
+						result = KonquestRelationshipType.ENEMY;
+					}
 				} else if(isKingdomAlliance(displayKingdom, contextKingdom)) {
 					result = KonquestRelationshipType.ALLY;
 				} else if(isKingdomTrade(displayKingdom, contextKingdom)) {
@@ -5090,9 +5157,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					townInstanceSection.set("friendly_redstone", town.isFriendlyRedstoneAllowed());
 					townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
 					townInstanceSection.set("golem_offensive", town.isGolemOffensive());
-					townInstanceSection.set("shield", town.isShielded());
+					townInstanceSection.set("shield", town.isShielded(true));
 					townInstanceSection.set("shield_time", town.getShieldEndTime());
-					townInstanceSection.set("armor", town.isArmored());
+					townInstanceSection.set("armor", town.isArmored(true));
 					townInstanceSection.set("armor_blocks", town.getArmorBlocks());
 					townInstanceSection.set("lord", "");
 					ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");

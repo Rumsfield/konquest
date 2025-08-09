@@ -54,12 +54,17 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final HashMap<KonTownOption,Boolean> townOptions;
 	private boolean isAttacked;
 	private boolean isShielded;
+	private boolean isShieldFreeEvent;
+	private boolean isShieldDisableEvent;
 	private boolean isArmored;
+	private boolean isArmorDisableEvent;
 	private boolean isTownWatchProtected;
 	private int shieldEndTimeSeconds;
 	private int shieldNowTimeSeconds;
+	private int shieldStoreTimeSeconds;
 	private int armorTotalBlocks;
 	private int armorCurrentBlocks;
+	private int armorStoreBlocks;
 	private double armorProgress;
 	private final ArrayList<UUID> defenders;
 	private final HashMap<KonquestUpgrade,Integer> upgrades;
@@ -106,12 +111,17 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.joinRequestKeeper = new RequestKeeper();
 		this.isAttacked = false;
 		this.isShielded = false;
+		this.isShieldFreeEvent = false;
+		this.isShieldDisableEvent = false;
 		this.isArmored = false;
+		this.isArmorDisableEvent = false;
 		this.isTownWatchProtected = false;
 		this.shieldEndTimeSeconds = 0;
 		this.shieldNowTimeSeconds = 0;
+		this.shieldStoreTimeSeconds = 0;
 		this.armorTotalBlocks = 0;
 		this.armorCurrentBlocks = 0;
+		this.armorStoreBlocks = 0;
 		this.armorProgress = 0.0;
 		this.defenders = new ArrayList<>();
 		this.upgrades = new HashMap<>();
@@ -1086,21 +1096,21 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		String critical = MessagePath.LABEL_CRITICAL_HITS.getMessage();
 
 		// Set title conditions
-		if(isShielded && isArmored) {
-			remainingSeconds = getRemainingShieldTimeSeconds();
+		if(isShielded() && isArmored()) {
+			remainingSeconds = isShieldFreeEvent ? -1 : getRemainingShieldTimeSeconds();
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
 			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
 			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
 			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
-		} else if(isShielded) {
-			remainingSeconds = getRemainingShieldTimeSeconds();
+		} else if(isShielded()) {
+			remainingSeconds = isShieldFreeEvent ? -1 : getRemainingShieldTimeSeconds();
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
 			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
 			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
 			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
-		} else if(isArmored) {
+		} else if(isArmored()) {
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor);
@@ -1121,7 +1131,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		
 		// Set progress conditions
-		if(isShielded || isArmored) {
+		if(isShielded() || isArmored()) {
 			setAllBarStyle(BarStyle.SEGMENTED_10);
 			setBarProgress(armorProgress);
 		} else if(isAttacked) {
@@ -1681,15 +1691,32 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 
 	public boolean isTownWatchProtected() {
-		return isTownWatchProtected;
+		boolean isGlobalEventNoProtection = getKonquest().getGlobalEventManager().isEffectValid(KonGlobalEventEffect.NO_PROTECTION);
+		return isTownWatchProtected && !isGlobalEventNoProtection;
 	}
 	
 	public boolean isShielded() {
-		return isShielded;
+		return isShielded(false);
+	}
+
+	public boolean isShielded(boolean ignoreEvents) {
+		if (ignoreEvents) {
+			return isShielded;
+		} else {
+			return isShieldFreeEvent || (isShielded && !isShieldDisableEvent);
+		}
 	}
 	
 	public boolean isArmored() {
-		return isArmored;
+		return isArmored(false);
+	}
+
+	public boolean isArmored(boolean ignoreEvents) {
+		if (ignoreEvents) {
+			return isArmored;
+		} else {
+			return isArmored && !isArmorDisableEvent;
+		}
 	}
 	
 	public void activateShield(int val) {
@@ -1715,6 +1742,44 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		isShielded = false;
 		shieldTimer.stopTimer();
+		updateBarTitle();
+	}
+
+	private void restoreShieldTime() {
+		if (shieldStoreTimeSeconds > 0) {
+			Date now = new Date();
+			shieldNowTimeSeconds = (int)(now.getTime()/1000);
+			shieldEndTimeSeconds = shieldNowTimeSeconds + shieldStoreTimeSeconds;
+		}
+	}
+
+	public void enableShieldEvent(boolean isEventEnable, boolean isFreeNotDisable) {
+		// Shield event is either free shields, or disabled shields
+		boolean wasEventEnabled = isShieldFreeEvent || isShieldDisableEvent;
+		if (!wasEventEnabled && isEventEnable) {
+			// Begin a new event
+			if(isShielded) {
+				// Town is already shielded
+				// Save remaining time to be applied after event is over
+				shieldStoreTimeSeconds = getRemainingShieldTimeSeconds();
+			}
+			if (isShieldFreeEvent) {
+				playActivateSound();
+			} else if (isShieldDisableEvent) {
+				playDeactivateSound();
+			}
+		} else if (wasEventEnabled && !isEventEnable) {
+			// End an ongoing event
+			restoreShieldTime();
+		}
+		isShieldFreeEvent = isEventEnable && isFreeNotDisable;
+		isShieldDisableEvent = isEventEnable && !isFreeNotDisable;
+		updateBarTitle();
+	}
+
+	public void enableArmorEvent(boolean isEventEnable) {
+		// Armor event is disabled armor
+		isArmorDisableEvent = isEventEnable;
 		updateBarTitle();
 	}
 	
@@ -1778,6 +1843,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	private void playDeactivateSound() {
 		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
+	}
+
+	private void playActivateSound() {
+		getWorld().playSound(getCenterLoc(), Sound.BLOCK_BEACON_ACTIVATE, (float)3.0, (float)0.3);
 	}
 	
 	public void putPlot(KonPlot plot) {

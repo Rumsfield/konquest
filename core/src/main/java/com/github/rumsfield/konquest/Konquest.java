@@ -240,6 +240,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void disable() {
 		integrationManager.disable();
+		globalEventManager.shutdown();
 		globalEventManager.saveEvents();
 		sanctuaryManager.saveSanctuaries();
 		kingdomManager.saveKingdoms();
