@@ -163,14 +163,12 @@ public class GlobalEventManager implements Timeable {
     }
 
     private void updateFavorDiscountMultiplier() {
-        if (validEffects.contains(KonGlobalEventEffect.FAVOR_4)) {
-            favorDiscountMultiplier = 0.00;
-        } else if (validEffects.contains(KonGlobalEventEffect.FAVOR_3)) {
-            favorDiscountMultiplier = 0.25;
+        if (validEffects.contains(KonGlobalEventEffect.FAVOR_3)) {
+            favorDiscountMultiplier = 0.20;
         } else if (validEffects.contains(KonGlobalEventEffect.FAVOR_2)) {
             favorDiscountMultiplier = 0.50;
         } else if (validEffects.contains(KonGlobalEventEffect.FAVOR_1)) {
-            favorDiscountMultiplier = 0.75;
+            favorDiscountMultiplier = 0.80;
         } else {
             favorDiscountMultiplier = 1.00;
         }
@@ -306,18 +304,26 @@ public class GlobalEventManager implements Timeable {
         refreshDelayedEvents();
     }
 
-    public void modifyEventDuration(String name, long duration) {
+    public boolean modifyEventDuration(String name, long duration) {
         KonGlobalEvent globalEvent = getEvent(name);
-        if (globalEvent == null) return;
+        if (globalEvent == null) return false;
+        if (globalEvent.getRepetitionTime() < duration) {
+            return false;
+        }
         globalEvent.setDuration(duration);
         refreshDelayedEvents();
+        return true;
     }
 
-    public void modifyEventRepetition(String name, long repetition) {
+    public boolean modifyEventRepetition(String name, long repetition) {
         KonGlobalEvent globalEvent = getEvent(name);
-        if (globalEvent == null) return;
+        if (globalEvent == null) return false;
+        if (globalEvent.getDurationTime() > repetition) {
+            return false;
+        }
         globalEvent.setRepetition(repetition);
         refreshDelayedEvents();
+        return true;
     }
 
     public void modifyEventEffects(String name, List<KonGlobalEventEffect> effects) {

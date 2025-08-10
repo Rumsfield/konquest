@@ -1256,13 +1256,11 @@ effects:
   no-immunity-name: No Immunity
   no-immunity: All capitals lose immunity
   favor-1-name: Favor Discount 1
-  favor-1: Favor costs are reduced 25%
+  favor-1: Favor costs are reduced 20%
   favor-2-name: Favor Discount 2
   favor-2: Favor costs are reduced 50%
   favor-3-name: Favor Discount 3
-  favor-3: Favor costs are reduced 75%
-  favor-4-name: Favor Discount 4
-  favor-4: Favor costs are reduced 100%
+  favor-3: Favor costs are reduced 80%
   monument-1-name: Monument Loot 1
   monument-1: Town loot increased x2
   monument-2-name: Monument Loot 2

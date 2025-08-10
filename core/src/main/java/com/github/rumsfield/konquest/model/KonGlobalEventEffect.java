@@ -7,6 +7,8 @@ public enum KonGlobalEventEffect {
     // Effects in the same group cannot be active at the same time.
     // Priority (higher) indicates which effect is used when multiple from the same group are active.
 
+    //TODO - Fix FREE_SHIELDS, Test NO_SHIELDS, NO_ARMOR, NO_PROTECTION, NO_IMMUNITY (all others work)
+
     ALL_PVP                     (10, 0, MessagePath.EFFECTS_PVP_NAME.getMessage(),           MessagePath.EFFECTS_PVP.getMessage()),
     ALL_WAR                     (20, 0, MessagePath.EFFECTS_WAR_NAME.getMessage(),           MessagePath.EFFECTS_WAR.getMessage()),
     ALL_PEACE                   (20, 1, MessagePath.EFFECTS_PEACE_NAME.getMessage(),         MessagePath.EFFECTS_PEACE.getMessage()),
@@ -19,7 +21,6 @@ public enum KonGlobalEventEffect {
     FAVOR_1                     (50, 0, MessagePath.EFFECTS_FAVOR_1_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_1.getMessage()),
     FAVOR_2                     (50, 1, MessagePath.EFFECTS_FAVOR_2_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_2.getMessage()),
     FAVOR_3                     (50, 2, MessagePath.EFFECTS_FAVOR_3_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_3.getMessage()),
-    FAVOR_4                     (50, 3, MessagePath.EFFECTS_FAVOR_4_NAME.getMessage(),       MessagePath.EFFECTS_FAVOR_4.getMessage()),
     MONUMENT_LOOT_1             (60, 0, MessagePath.EFFECTS_MONUMENT_1_NAME.getMessage(),    MessagePath.EFFECTS_MONUMENT_1.getMessage()),
     MONUMENT_LOOT_2             (60, 1, MessagePath.EFFECTS_MONUMENT_2_NAME.getMessage(),    MessagePath.EFFECTS_MONUMENT_2.getMessage()),
     MONUMENT_LOOT_3             (60, 2, MessagePath.EFFECTS_MONUMENT_3_NAME.getMessage(),    MessagePath.EFFECTS_MONUMENT_3.getMessage()),

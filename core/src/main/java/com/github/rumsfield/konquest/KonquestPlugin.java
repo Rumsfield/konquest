@@ -261,7 +261,7 @@ public class KonquestPlugin extends JavaPlugin {
 					String[] permArr = perm.split("\\.",3);
 					if(permArr.length == 3) {
 						String valStr = permArr[2];
-						//ChatUtil.printDebug("Withdraw discount found: "+valStr);
+						ChatUtil.printDebug("Withdraw discount found: "+valStr);
 						int valNum = 0;
 						try {
 		        			valNum = Integer.parseInt(valStr);
@@ -277,15 +277,15 @@ public class KonquestPlugin extends JavaPlugin {
 				}
 			}
 		}
-		double permissionDiscount = 1 - (double)discount / 100;
+		double permissionDiscount = 1.0 - ((double)discount / 100.0);
 		// Get discount from events
 		double eventDiscount = GlobalEventManager.favorDiscountMultiplier;
 		// Apply discount
 		double totalDiscount = permissionDiscount * eventDiscount; // 1 is no discount (multiplier)
-		int totalDiscountPercent = (int)(100 * (1 - totalDiscount));
+		int totalDiscountPercent = (int)(100.0 * (1.0 - totalDiscount));
 		double amountMod = amount;
 		if(totalDiscount >= 0 && totalDiscount < 1) {
-			double amountOff = amount * (1 - totalDiscount);
+			double amountOff = amount * (1.0 - totalDiscount);
 			amountMod = amount * totalDiscount;
 			if(amountOff > 0) {
 				String amountF = econ.format(amountOff);

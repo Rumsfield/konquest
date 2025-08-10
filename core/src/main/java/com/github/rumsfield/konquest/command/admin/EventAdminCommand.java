@@ -232,11 +232,19 @@ public class EventAdminCommand extends CommandBase {
                         return;
                     }
                     if (cmdName.equalsIgnoreCase("duration")) {
-                        konquest.getGlobalEventManager().modifyEventDuration(eventName,timeDuration);
-                        ChatUtil.sendNotice(sender, "Successfully set event duration to "+timeValue+" "+resolution);
+                        if (konquest.getGlobalEventManager().modifyEventDuration(eventName,timeDuration)) {
+                            ChatUtil.sendNotice(sender, "Successfully set event duration to "+timeValue+" "+resolution);
+                        } else {
+                            ChatUtil.sendError(sender, "Failed to set duration greater than repetition time. Increase repetition first.");
+                        }
+
                     } else {
-                        konquest.getGlobalEventManager().modifyEventRepetition(eventName,timeDuration);
-                        ChatUtil.sendNotice(sender, "Successfully set event repetition to "+timeValue+" "+resolution);
+                        if (konquest.getGlobalEventManager().modifyEventRepetition(eventName,timeDuration)) {
+                            ChatUtil.sendNotice(sender, "Successfully set event repetition to "+timeValue+" "+resolution);
+                        } else {
+                            ChatUtil.sendError(sender, "Failed to set repetition less than duration time. Decrease duration first.");
+                        }
+
                     }
                     break;
 

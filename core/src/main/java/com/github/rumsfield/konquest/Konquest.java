@@ -284,6 +284,7 @@ public class Konquest implements KonquestAPI, Timeable {
 
 			} else {
 				isVersionSupported = false;
+				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 
 			}
     	} catch (Exception | NoClassDefFoundError e) {
