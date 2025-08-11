@@ -1994,7 +1994,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Check for global events
 		if (isGlobalEventWar || isGlobalEventPeace) {
 			// Cannot change relation during global events
-			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_NO_EVENT.getMessage());
 			return false;
 		}
 
@@ -5158,7 +5158,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
 					townInstanceSection.set("golem_offensive", town.isGolemOffensive());
 					townInstanceSection.set("shield", town.isShielded(true));
-					townInstanceSection.set("shield_time", town.getShieldEndTime());
+					townInstanceSection.set("shield_time", town.getShieldEndTime(true));
 					townInstanceSection.set("armor", town.isArmored(true));
 					townInstanceSection.set("armor_blocks", town.getArmorBlocks());
 					townInstanceSection.set("lord", "");

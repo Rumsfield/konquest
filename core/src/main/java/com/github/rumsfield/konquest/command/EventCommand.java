@@ -118,14 +118,18 @@ public class EventCommand extends CommandBase {
                     int linePos = 1;
                     for (KonGlobalEvent event : events) {
                         ChatColor eventColor = ChatColor.AQUA;
+                        String dateInfo;
                         if (event.isActive()) {
                             if (event.isEnabled()) {
                                 eventColor = ChatColor.LIGHT_PURPLE;
                             } else {
                                 eventColor = ChatColor.GRAY;
                             }
+                            dateInfo = "Ends on "+event.getNextEndDateFormat();
+                        } else {
+                            dateInfo = "Starts on "+event.getNextStartDateFormat();
                         }
-                        String message = ChatColor.YELLOW+""+linePos+") "+eventColor+event.getName();
+                        String message = ChatColor.YELLOW+""+linePos+") "+eventColor+event.getName()+" "+dateInfo;
                         lines.add(message);
                         linePos++;
                     }

@@ -277,23 +277,24 @@ public class KonquestPlugin extends JavaPlugin {
 				}
 			}
 		}
-		double permissionDiscount = 1.0 - ((double)discount / 100.0);
+		double permissionDiscount = (100.0 - discount) / 100.0;
 		// Get discount from events
 		double eventDiscount = GlobalEventManager.favorDiscountMultiplier;
 		// Apply discount
-		double totalDiscount = permissionDiscount * eventDiscount; // 1 is no discount (multiplier)
-		int totalDiscountPercent = (int)(100.0 * (1.0 - totalDiscount));
+		double totalDiscountMultiplier = permissionDiscount * eventDiscount; // 1 is no discount (multiplier)
+		double totalDiscountPercent = Math.round(100.0 - (totalDiscountMultiplier*100.0));
 		double amountMod = amount;
-		if(totalDiscount >= 0 && totalDiscount < 1) {
-			double amountOff = amount * (1.0 - totalDiscount);
-			amountMod = amount * totalDiscount;
+		if(totalDiscountPercent > 0 && totalDiscountPercent <= 100) {
+			double amountOff = (double) Math.round(amount * totalDiscountPercent) / 100;
+			amountMod = (double) Math.round((amount - amountOff) * 100) / 100;
 			if(amountOff > 0) {
+				String percentF = String.format("%.1f",totalDiscountPercent);
 				String amountF = econ.format(amountOff);
 				if(offlineBukkitPlayer.isOnline()) {
-					ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(totalDiscountPercent,amountF), ChatColor.DARK_AQUA);
+					ChatUtil.sendNotice((Player)offlineBukkitPlayer, MessagePath.GENERIC_NOTICE_DISCOUNT_FAVOR.getMessage(percentF,amountF), ChatColor.DARK_AQUA);
 				}
 			}
-		} else if(totalDiscount != 1) {
+		} else if(totalDiscountPercent != 0) {
 			ChatUtil.printDebug("Failed to apply invalid discount of "+totalDiscountPercent+"%");
 		}
 		// Perform transaction

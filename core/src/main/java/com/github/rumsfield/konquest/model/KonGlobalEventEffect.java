@@ -7,8 +7,6 @@ public enum KonGlobalEventEffect {
     // Effects in the same group cannot be active at the same time.
     // Priority (higher) indicates which effect is used when multiple from the same group are active.
 
-    //TODO - Fix FREE_SHIELDS, Test NO_SHIELDS, NO_ARMOR, NO_PROTECTION, NO_IMMUNITY (all others work)
-
     ALL_PVP                     (10, 0, MessagePath.EFFECTS_PVP_NAME.getMessage(),           MessagePath.EFFECTS_PVP.getMessage()),
     ALL_WAR                     (20, 0, MessagePath.EFFECTS_WAR_NAME.getMessage(),           MessagePath.EFFECTS_WAR.getMessage()),
     ALL_PEACE                   (20, 1, MessagePath.EFFECTS_PEACE_NAME.getMessage(),         MessagePath.EFFECTS_PEACE.getMessage()),

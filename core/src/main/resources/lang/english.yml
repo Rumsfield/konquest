@@ -500,6 +500,7 @@ generic:
     no-permission: You do not have permission to do that.
     no-allow: You are not allowed to do that.
     no-player: You must be a player to do this!
+    no-event: You cannot do that during the global event.
     unknown-name: Failed to find unknown name, check spelling %s
     bad-name: Could not find %s in your Kingdom.
     format-name: Name must only contain letters and/or numbers.

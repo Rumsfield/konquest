@@ -188,11 +188,11 @@ public class KonGlobalEvent {
                 // Initial start date is next
                 return endDate;
             } else if (isRepeating()) {
-                // Event repeats, find next start time
-                long diffTime = now.getTime() - startDate.getTime();
+                // Event repeats, find next end time
+                long diffTime = now.getTime() - (startDate.getTime() + duration);
                 int numReps = (int) (diffTime / repetition);
-                long startOffset = (numReps + 1) * repetition;
-                return new Date(startDate.getTime() + startOffset + duration);
+                long endOffset = (numReps + 1) * repetition;
+                return new Date(startDate.getTime() + duration + endOffset);
             }
         }
         // Could not find an end time

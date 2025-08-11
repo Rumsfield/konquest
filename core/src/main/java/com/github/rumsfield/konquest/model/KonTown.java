@@ -64,7 +64,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private int shieldStoreTimeSeconds;
 	private int armorTotalBlocks;
 	private int armorCurrentBlocks;
-	private int armorStoreBlocks;
 	private double armorProgress;
 	private final ArrayList<UUID> defenders;
 	private final HashMap<KonquestUpgrade,Integer> upgrades;
@@ -121,7 +120,6 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.shieldStoreTimeSeconds = 0;
 		this.armorTotalBlocks = 0;
 		this.armorCurrentBlocks = 0;
-		this.armorStoreBlocks = 0;
 		this.armorProgress = 0.0;
 		this.defenders = new ArrayList<>();
 		this.upgrades = new HashMap<>();
@@ -1750,12 +1748,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 			Date now = new Date();
 			shieldNowTimeSeconds = (int)(now.getTime()/1000);
 			shieldEndTimeSeconds = shieldNowTimeSeconds + shieldStoreTimeSeconds;
+			shieldStoreTimeSeconds = 0;
 		}
 	}
 
-	public void enableShieldEvent(boolean isEventEnable, boolean isFreeNotDisable) {
-		// Shield event is either free shields, or disabled shields
-		boolean wasEventEnabled = isShieldFreeEvent || isShieldDisableEvent;
+	public void enableShieldFreeEvent(boolean isEventEnable) {
+		if (isShieldDisableEvent) return; // Cannot have conflicting events
+		// Free shields
+		boolean wasEventEnabled = isShieldFreeEvent;
 		if (!wasEventEnabled && isEventEnable) {
 			// Begin a new event
 			if(isShielded) {
@@ -1763,21 +1763,36 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 				// Save remaining time to be applied after event is over
 				shieldStoreTimeSeconds = getRemainingShieldTimeSeconds();
 			}
-			if (isShieldFreeEvent) {
-				playActivateSound();
-			} else if (isShieldDisableEvent) {
-				playDeactivateSound();
-			}
+			playActivateSound();
 		} else if (wasEventEnabled && !isEventEnable) {
 			// End an ongoing event
 			restoreShieldTime();
 		}
-		isShieldFreeEvent = isEventEnable && isFreeNotDisable;
-		isShieldDisableEvent = isEventEnable && !isFreeNotDisable;
+		isShieldFreeEvent = isEventEnable;
 		updateBarTitle();
 	}
 
-	public void enableArmorEvent(boolean isEventEnable) {
+	public void enableShieldDisableEvent(boolean isEventEnable) {
+		if (isShieldFreeEvent) return; // Cannot have conflicting events
+		// Disable shields
+		boolean wasEventEnabled = isShieldDisableEvent;
+		if (!wasEventEnabled && isEventEnable) {
+			// Begin a new event
+			if(isShielded) {
+				// Town is already shielded
+				// Save remaining time to be applied after event is over
+				shieldStoreTimeSeconds = getRemainingShieldTimeSeconds();
+			}
+			playDeactivateSound();
+		} else if (wasEventEnabled && !isEventEnable) {
+			// End an ongoing event
+			restoreShieldTime();
+		}
+		isShieldDisableEvent = isEventEnable;
+		updateBarTitle();
+	}
+
+	public void enableArmorDisableEvent(boolean isEventEnable) {
 		// Armor event is disabled armor
 		isArmorDisableEvent = isEventEnable;
 		updateBarTitle();
@@ -1826,6 +1841,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public int getShieldEndTime() {
+		return getShieldEndTime(false);
+	}
+
+	public int getShieldEndTime(boolean ignoreEvents) {
+		if (ignoreEvents) {
+			restoreShieldTime();
+		}
 		return shieldEndTimeSeconds;
 	}
 	

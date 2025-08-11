@@ -461,6 +461,7 @@ public enum MessagePath {
 	GENERIC_ERROR_NO_PERMISSION                 (0, "generic.error.no-permission"),
 	GENERIC_ERROR_NO_ALLOW                      (0, "generic.error.no-allow"),
 	GENERIC_ERROR_NO_PLAYER                     (0, "generic.error.no-player"),
+	GENERIC_ERROR_NO_EVENT                      (0, "generic.error.no-event"),
 	GENERIC_ERROR_UNKNOWN_NAME                  (1, "generic.error.unknown-name"),
 	GENERIC_ERROR_BAD_NAME                      (1, "generic.error.bad-name"),
 	GENERIC_ERROR_FORMAT_NAME                   (0, "generic.error.format-name"),

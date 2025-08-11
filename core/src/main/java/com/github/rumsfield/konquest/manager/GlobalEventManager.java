@@ -84,9 +84,9 @@ public class GlobalEventManager implements Timeable {
         // Disable events
         konquest.getKingdomManager().enableGlobalEventWar(false);
         konquest.getKingdomManager().enableGlobalEventPeace(false);
-        konquest.getShieldManager().enableGlobalEventShield(false,true);
-        konquest.getShieldManager().enableGlobalEventShield(false,false);
-        konquest.getShieldManager().enableGlobalEventArmor(false);
+        konquest.getShieldManager().enableGlobalEventFreeShield(false);
+        konquest.getShieldManager().enableGlobalEventDisableShield(false);
+        konquest.getShieldManager().enableGlobalEventDisableArmor(false);
     }
 
     public boolean isEnabled() {
@@ -142,9 +142,9 @@ public class GlobalEventManager implements Timeable {
         // Apply effects
         konquest.getKingdomManager().enableGlobalEventWar(isEffectValid(KonGlobalEventEffect.ALL_WAR));
         konquest.getKingdomManager().enableGlobalEventPeace(isEffectValid(KonGlobalEventEffect.ALL_PEACE));
-        konquest.getShieldManager().enableGlobalEventShield(isEffectValid(KonGlobalEventEffect.FREE_SHIELDS),true);
-        konquest.getShieldManager().enableGlobalEventShield(isEffectValid(KonGlobalEventEffect.NO_SHIELDS),false);
-        konquest.getShieldManager().enableGlobalEventArmor(isEffectValid(KonGlobalEventEffect.NO_ARMOR));
+        konquest.getShieldManager().enableGlobalEventFreeShield(isEffectValid(KonGlobalEventEffect.FREE_SHIELDS));
+        konquest.getShieldManager().enableGlobalEventDisableShield(isEffectValid(KonGlobalEventEffect.NO_SHIELDS));
+        konquest.getShieldManager().enableGlobalEventDisableArmor(isEffectValid(KonGlobalEventEffect.NO_ARMOR));
         updateFavorDiscountMultiplier();
     }
 
