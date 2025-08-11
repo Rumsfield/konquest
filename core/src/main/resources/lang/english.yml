@@ -590,6 +590,28 @@ command:
       error:
         create-exist: Player already has a camp, remove it first before creating a new one.
         destroy-exist: Player does not have a camp.
+    event:
+      notice:
+        create: Successfully created event %s, use this command again to modify and start the event.
+        remove: Removed event %s.
+        start-now: Started event %s now.
+        start-date: Set event %s to start on %s.
+        duration: Set event %s duration to %s.
+        repetition: Set event %s repetition to %s.
+        effect-add: Added effect %s to event %s.
+        effect-remove: Removed effect %s from event %s.
+        enable: Enabled global event %s.
+        disable: Disabled global event %s.
+      error:
+        year: Year must be greater than 2000.
+        month: Month must be between 1 (January) and 12 (December).
+        day: Day must be between 1 and 31.
+        hour: Hour must be between 0 and 23.
+        minute: Minute must be between 0 and 59.
+        duration: Failed to set duration greater than repetition time. Increase repetition first.
+        repetition: Failed to set repetition less than duration time. Decrease duration first.
+        effect-conflict: Failed to add effect that conflicts with the existing event effect %s.
+        effect-missing: Failed to remove effect because it is missing from the event.
     flag:
       notice:
         all-properties: All Properties
@@ -695,6 +717,37 @@ command:
       fail-far: Failed to claim, too far from territory center.
       fail-claimed: Failed to claim, already claimed.
       resident: You must join %s as a resident to claim land.
+  event:
+    broadcast:
+      start: Global Event %s has started! Use command "/k event" for details.
+      end: Global Event %s has ended. Use command "/k event" for details.
+      enable: Global Event %s is now enabled, and its effects are active.
+      disable: Global Event %s is now disabled, and its effects are paused.
+    notice:
+      effects: All Global Event Effects
+      no-events: No Global Events
+      ends: Ends on %s
+      starts: Starts on %s
+      events: Global Events Page %s
+      page: To view more pages use /k event list <page>
+      info: Global Event Information
+      info-no-active: No Active Global Events
+      info-no-upcoming: No Upcoming Global Events
+      info-effects: Active Global Effects
+      info-events: Current Global Events
+      info-next: Next Global Event
+      details: Global Event Details
+    property:
+      none: None
+      name: Event Name
+      enabled: Enabled
+      active: Active
+      duration: Duration Hours
+      repetition: Repetition Days
+      start-initial: Initial Start Date
+      start-next: Next Start Date
+      end-next: Next End Date
+      effects: Effects
   favor:
     notice:
       message: You have %s Favor, costs are...

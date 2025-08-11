@@ -4,9 +4,7 @@ import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.model.KonGlobalEvent;
 import com.github.rumsfield.konquest.model.KonGlobalEventEffect;
 import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.Timeable;
+import com.github.rumsfield.konquest.utility.*;
 import com.github.rumsfield.konquest.utility.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -18,9 +16,7 @@ import java.util.*;
 
 /*
  TODO
- - Re-format info messages
  - make event menu
- - implement effects
  */
 
 public class GlobalEventManager implements Timeable {
@@ -112,12 +108,12 @@ public class GlobalEventManager implements Timeable {
             if (!wasActive && nowActive) {
                 // Event started
                 if (event.isEnabled()) {
-                    notifyAllPlayers("Global Event " + event.getName() + " has started! Use /k event for details.",true);
+                    notifyAllPlayers(MessagePath.COMMAND_EVENT_BROADCAST_START.getMessage(event.getName()),true);
                 }
             } else if (wasActive && !nowActive) {
                 // Event ended
                 if (event.isEnabled()) {
-                    notifyAllPlayers("Global Event " + event.getName() + " has ended! Use /k event for details.", false);
+                    notifyAllPlayers(MessagePath.COMMAND_EVENT_BROADCAST_END.getMessage(event.getName()),false);
                 }
             }
             if (event.isActive() && event.isEnabled()) {
@@ -346,10 +342,10 @@ public class GlobalEventManager implements Timeable {
             // Broadcast changes to enable
             if (!wasEnabled && isEnabled) {
                 // Event enabled
-                ChatUtil.sendBroadcast("Global Event " + globalEvent.getName() + " is now enabled.");
+                ChatUtil.sendBroadcast(MessagePath.COMMAND_EVENT_BROADCAST_ENABLE.getMessage(globalEvent.getName()));
             } else if (wasEnabled && !isEnabled) {
                 // Event disabled
-                ChatUtil.sendBroadcast("Global Event " + globalEvent.getName() + " is now disabled.");
+                ChatUtil.sendBroadcast(MessagePath.COMMAND_EVENT_BROADCAST_DISABLE.getMessage(globalEvent.getName()));
             }
         }
         refreshDelayedEvents();
@@ -360,7 +356,7 @@ public class GlobalEventManager implements Timeable {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
         if (globalEvent.isActive()) {
-            ChatUtil.sendBroadcast("Global Event " + globalEvent.getName() + " has been removed.");
+            ChatUtil.sendBroadcast(MessagePath.COMMAND_EVENT_BROADCAST_END.getMessage(globalEvent.getName()));
         }
         removeEvent(globalEvent);
         refreshDelayedEvents();

@@ -119,7 +119,7 @@ public class EventAdminCommand extends CommandBase {
                     boolean status = konquest.getGlobalEventManager().createEvent(eventName,createEnabled,createStart,createDuration,createRepetition,Collections.emptyList());
                     if (status) {
                         // Successfully created event, prompt to edit options
-                        ChatUtil.sendNotice(sender, "Successfully created event "+eventName+", use this command again to modify and enable the event.");
+                        ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_CREATE.getMessage(eventName));
                     } else {
                         // Failed, likely due to bad name
                         ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_TAKEN_NAME.getMessage());
@@ -134,7 +134,7 @@ public class EventAdminCommand extends CommandBase {
                         return;
                     }
                     konquest.getGlobalEventManager().cancelEvent(eventName);
-                    ChatUtil.sendNotice(sender, "Successfully removed event "+eventName+".");
+                    ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_REMOVE.getMessage(eventName));
                     break;
 
                 case "start":
@@ -142,7 +142,7 @@ public class EventAdminCommand extends CommandBase {
                     if (args.size() == 3 && args.get(2).equalsIgnoreCase("now")) {
                         // Start event now
                         konquest.getGlobalEventManager().startEvent(eventName);
-                        ChatUtil.sendNotice(sender, "Successfully started event "+eventName+" now.");
+                        ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_START_NOW.getMessage(eventName));
                     } else if (args.size() == 5 || args.size() == 6 || args.size() == 7) {
                         // Start at given date
                         int startYear = 0;
@@ -162,27 +162,27 @@ public class EventAdminCommand extends CommandBase {
                             }
 
                         } catch(NumberFormatException e) {
-                            ChatUtil.sendError(sender, "Incorrect number format: "+e.getMessage());
+                            ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage(e.getMessage()));
                             return;
                         }
                         if (startYear < 2000) {
-                            ChatUtil.sendError(sender, "Year must be greater than 2000.");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_YEAR.getMessage());
                             return;
                         }
                         if (startMonth < 1 || startMonth > 12) {
-                            ChatUtil.sendError(sender, "Month must be between 1 (January) and 12 (December).");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_MONTH.getMessage());
                             return;
                         }
                         if (startDay < 1 || startDay > 31) {
-                            ChatUtil.sendError(sender, "Day must be between 1 and 31.");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_DAY.getMessage());
                             return;
                         }
                         if (startHour < 0 || startHour > 23) {
-                            ChatUtil.sendError(sender, "Hour must be between 0 and 23.");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_HOUR.getMessage());
                             return;
                         }
                         if (startMinute < 0 || startMinute > 59) {
-                            ChatUtil.sendError(sender, "Minute must be between 0 and 59.");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_MINUTE.getMessage());
                             return;
                         }
                         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
@@ -193,12 +193,12 @@ public class EventAdminCommand extends CommandBase {
                             df.getCalendar().set(Calendar.HOUR_OF_DAY, startHour);
                             df.getCalendar().set(Calendar.MINUTE, startMinute);
                         } catch (ArrayIndexOutOfBoundsException exc) {
-                            ChatUtil.sendError(sender, "Incorrect date format: "+exc.getMessage());
+                            ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage(exc.getMessage()));
                             return;
                         }
                         Date startDate = df.getCalendar().getTime();
                         konquest.getGlobalEventManager().modifyEventStart(eventName,startDate);
-                        ChatUtil.sendNotice(sender, "Successfully set event start on "+df.format(startDate));
+                        ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_START_DATE.getMessage(df.format(startDate)));
                     } else {
                         sendInvalidArgMessage(sender);
                         return;
@@ -217,7 +217,7 @@ public class EventAdminCommand extends CommandBase {
                     try {
                         timeValue = Double.parseDouble(args.get(3));
                     } catch(NumberFormatException e) {
-                        ChatUtil.sendError(sender, "Incorrect number format: "+e.getMessage());
+                        ChatUtil.sendError(sender, MessagePath.GENERIC_ERROR_INTERNAL.getMessage(e.getMessage()));
                         return;
                     }
                     long timeDuration;
@@ -231,20 +231,19 @@ public class EventAdminCommand extends CommandBase {
                         sendInvalidArgMessage(sender);
                         return;
                     }
+                    String timeFormat = timeValue+" "+resolution;
                     if (cmdName.equalsIgnoreCase("duration")) {
                         if (konquest.getGlobalEventManager().modifyEventDuration(eventName,timeDuration)) {
-                            ChatUtil.sendNotice(sender, "Successfully set event duration to "+timeValue+" "+resolution);
+                            ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_DURATION.getMessage(eventName,timeFormat));
                         } else {
-                            ChatUtil.sendError(sender, "Failed to set duration greater than repetition time. Increase repetition first.");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_DURATION.getMessage());
                         }
-
                     } else {
                         if (konquest.getGlobalEventManager().modifyEventRepetition(eventName,timeDuration)) {
-                            ChatUtil.sendNotice(sender, "Successfully set event repetition to "+timeValue+" "+resolution);
+                            ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_REPETITION.getMessage(eventName,timeFormat));
                         } else {
-                            ChatUtil.sendError(sender, "Failed to set repetition less than duration time. Decrease duration first.");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_REPETITION.getMessage());
                         }
-
                     }
                     break;
 
@@ -270,22 +269,22 @@ public class EventAdminCommand extends CommandBase {
                         if (effectChangeStatus) {
                             // Successfully added
                             konquest.getGlobalEventManager().refreshDelayedEvents();
-                            ChatUtil.sendNotice(sender, "Successfully added effect "+eventEffect.getTitle()+" to event "+eventName);
+                            ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_EFFECT_ADD.getMessage(eventEffect.getTitle(), eventName));
                         } else {
                             // Failed to add, other effects conflict
                             KonGlobalEventEffect conflictEffect = event.getConflictEffect(eventEffect);
                             String conflictEffectTitle = conflictEffect == null ? "unknown" : conflictEffect.getTitle();
-                            ChatUtil.sendError(sender, "Failed, the event has a conflicting effect - "+conflictEffectTitle);
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_EFFECT_CONFLICT.getMessage(conflictEffectTitle));
                         }
                     } else if (effectMode.equalsIgnoreCase("remove")) {
                         effectChangeStatus = event.removeEffect(eventEffect);
                         if (effectChangeStatus) {
                             // Successfully removed
                             konquest.getGlobalEventManager().refreshDelayedEvents();
-                            ChatUtil.sendNotice(sender, "Successfully removed effect "+eventEffect.getTitle()+" from event "+eventName);
+                            ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_EFFECT_REMOVE.getMessage(eventEffect.getTitle(), eventName));
                         } else {
                             // Failed to remove, event does not contain this effect
-                            ChatUtil.sendError(sender, "Failed, the event does not contain this effect.");
+                            ChatUtil.sendError(sender, MessagePath.COMMAND_ADMIN_EVENT_ERROR_EFFECT_MISSING.getMessage());
                         }
                     } else {
                         sendInvalidArgMessage(sender);
@@ -302,10 +301,10 @@ public class EventAdminCommand extends CommandBase {
                     String enableValue = args.get(2);
                     if (enableValue.equalsIgnoreCase("true")) {
                         konquest.getGlobalEventManager().enableEvent(eventName,true);
-                        ChatUtil.sendNotice(sender, "Enabled global event "+eventName);
+                        ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_ENABLE.getMessage(eventName));
                     } else if (enableValue.equalsIgnoreCase("false")) {
                         konquest.getGlobalEventManager().enableEvent(eventName,false);
-                        ChatUtil.sendNotice(sender, "Disable global event "+eventName);
+                        ChatUtil.sendNotice(sender, MessagePath.COMMAND_ADMIN_EVENT_NOTICE_DISABLE.getMessage(eventName));
                     } else {
                         sendInvalidArgMessage(sender);
                         return;
