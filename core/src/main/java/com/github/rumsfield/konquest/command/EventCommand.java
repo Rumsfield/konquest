@@ -59,8 +59,7 @@ public class EventCommand extends CommandBase {
                 sendInvalidSenderMessage(sender);
                 return;
             }
-            ChatUtil.sendMessage(sender,"TODO");
-            //konquest.getDisplayManager().displayScoreMenu(player);
+            konquest.getDisplayManager().displayEventMenu(player);
         } else {
             // Has arguments
             switch (args.get(0).toLowerCase()) {
@@ -71,9 +70,7 @@ public class EventCommand extends CommandBase {
                         sendInvalidSenderMessage(sender);
                         return;
                     }
-                    // TODO implement menu
-                    ChatUtil.sendMessage(sender,"TODO");
-                    //konquest.getDisplayManager().displayScoreMenu(player);
+                    konquest.getDisplayManager().displayEventMenu(player);
                     break;
                 case "effects":
                     // Display all effect details
@@ -222,8 +219,8 @@ public class EventCommand extends CommandBase {
                         ChatUtil.sendNotice(sender, MessagePath.COMMAND_EVENT_NOTICE_DETAILS.getMessage());
                         String [] eventInfo = {
                                 String.format(lineTemplate,MessagePath.COMMAND_EVENT_PROPERTY_NAME.getMessage(),globalEvent.getName()),
-                                String.format(lineTemplate,MessagePath.COMMAND_EVENT_PROPERTY_ENABLED.getMessage(),globalEvent.isEnabled()),
-                                String.format(lineTemplate,MessagePath.COMMAND_EVENT_PROPERTY_ACTIVE.getMessage(),globalEvent.isActive()),
+                                String.format(lineTemplate,MessagePath.LABEL_ENABLED.getMessage(),globalEvent.isEnabled()),
+                                String.format(lineTemplate,MessagePath.LABEL_ACTIVE.getMessage(),globalEvent.isActive()),
                                 String.format(lineTemplate,MessagePath.COMMAND_EVENT_PROPERTY_DURATION.getMessage(),String.format("%.2f",globalEvent.getDurationHours())),
                                 String.format(lineTemplate,MessagePath.COMMAND_EVENT_PROPERTY_REPETITION.getMessage(),String.format("%.2f",globalEvent.getRepetitionDays())),
                                 String.format(lineTemplate,MessagePath.COMMAND_EVENT_PROPERTY_START_INITIAL.getMessage(),globalEvent.getStartDateFormat()),

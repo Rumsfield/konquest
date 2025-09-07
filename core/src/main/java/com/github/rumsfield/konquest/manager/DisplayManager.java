@@ -301,6 +301,17 @@ public class DisplayManager {
 		TravelMenu newMenu = new TravelMenu(konquest, displayPlayer, isAdmin);
 		displayMenuToPlayer(displayPlayer, newMenu);
 	}
+
+	/*
+	 * ===============================================
+	 * Event Menu
+	 * ===============================================
+	 */
+	public void displayEventMenu(KonPlayer displayPlayer) {
+		if (displayPlayer == null) return;
+		EventMenu newMenu = new EventMenu(konquest, displayPlayer);
+		displayMenuToPlayer(displayPlayer, newMenu);
+	}
    	
    	/*
 	 * Helper methods

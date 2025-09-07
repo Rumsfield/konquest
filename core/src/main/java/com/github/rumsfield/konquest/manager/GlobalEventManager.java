@@ -221,6 +221,16 @@ public class GlobalEventManager implements Timeable {
         return result;
     }
 
+    public ArrayList<KonGlobalEvent> getEventsOnDay(Date day) {
+        ArrayList<KonGlobalEvent> result = new ArrayList<>();
+        for (KonGlobalEvent event : events) {
+            if (event.isActiveOnDay(day)) {
+                result.add(event);
+            }
+        }
+        return result;
+    }
+
     public @Nullable KonGlobalEvent getNextEvent() {
         // Get the event with the next closest start time to now
         KonGlobalEvent nextEvent = null;

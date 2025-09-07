@@ -75,6 +75,14 @@ public abstract class MenuIcon {
 		descriptions.addAll(HelperUtil.stringPaginate(description, color));
 	}
 
+	public void addDescription(String description, String color) {
+		descriptions.addAll(HelperUtil.stringPaginate(description, color));
+	}
+
+	public void addDescriptionSingle(String description) {
+		descriptions.add(description);
+	}
+
 	public void addError(String description) {
 		descriptions.addAll(HelperUtil.stringPaginate(description, DisplayManager.errorFormat));
 	}

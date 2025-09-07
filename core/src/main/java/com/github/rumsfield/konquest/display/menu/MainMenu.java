@@ -41,6 +41,7 @@ public class MainMenu extends StateMenu {
         PREFIX,
         SCORE,
         TRAVEL,
+        EVENT,
         DASHBOARD,
         DASH_MAP_AUTO,
         DASH_CHAT,
@@ -88,6 +89,7 @@ public class MainMenu extends StateMenu {
         int ROOT_SLOT_KINGDOM 	= 7;
         // Row 1:  9 10 11 12 13 14 15 16 17
         int ROOT_SLOT_INFO 		= 10;
+        int ROOT_SLOT_EVENT 	= 13;
         int ROOT_SLOT_TOWN		= 16;
         // Row 2: 18 19 20 21 22 23 24 25 26
         int ROOT_SLOT_QUEST 	= 19;
@@ -106,7 +108,7 @@ public class MainMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Dashboard */
-        icon = new InfoIcon(MessagePath.MENU_MAIN_DASHBOARD.getMessage(), Material.CLOCK, ROOT_SLOT_DASH, true);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_DASHBOARD.getMessage(), Material.REDSTONE_BLOCK, ROOT_SLOT_DASH, true);
         icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_DASHBOARD.getMessage());
         icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
         icon.setState(MenuState.DASHBOARD);
@@ -226,6 +228,19 @@ public class MainMenu extends StateMenu {
             icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
         }
         icon.setState(MenuState.TRAVEL);
+        result.addIcon(icon);
+
+        /* Event Menu */
+        iconCommand = CommandType.EVENT;
+        isClickable = getKonquest().getGlobalEventManager().isEnabled() && hasPermission(iconCommand);
+        icon = new InfoIcon(MessagePath.MENU_MAIN_EVENT.getMessage(), iconCommand.iconMaterial(), ROOT_SLOT_EVENT, isClickable);
+        icon.addDescription(MessagePath.MENU_MAIN_DESCRIPTION_EVENT.getMessage());
+        if (isClickable) {
+            icon.addHint(MessagePath.MENU_HINT_OPEN.getMessage());
+        } else {
+            icon.addAlert(MessagePath.LABEL_NO_PERMISSION.getMessage());
+        }
+        icon.setState(MenuState.EVENT);
         result.addIcon(icon);
 
         /* Navigation */
@@ -531,6 +546,10 @@ public class MainMenu extends StateMenu {
                         case TRAVEL:
                             // Open Travel Menu (close this menu)
                             getKonquest().getDisplayManager().displayTravelMenu(player);
+                            break;
+                        case EVENT:
+                            // Open Event Menu (close this menu)
+                            getKonquest().getDisplayManager().displayEventMenu(player);
                             break;
                     }
                     break;

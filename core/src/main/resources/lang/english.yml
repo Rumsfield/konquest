@@ -12,6 +12,7 @@ version: 0.0.0
 # //// LABEL \\\\
 # Simple words or phrases used throughout the plugin.
 label:
+  active: Active
   admin: Admin
   admin-kingdom: Admin Kingdom
   allied-building: Allied Building
@@ -31,9 +32,11 @@ label:
   cost: Cost
   critical-hits: Critical Hits
   current: Current
+  date: Date
   diplomacy: Diplomacy
   disabled: Disabled
   friendly-redstone: Friendly Redstone
+  enabled: Enabled
   enemy-redstone: Enemy Redstone
   false: False
   favor: Favor
@@ -181,6 +184,7 @@ menu:
     kingdom: Kingdom Menu
     town: Town Menu
     travel: Travel Menu
+    event: Global Events Menu
     map-auto: Map Auto Mode
     kingdom-chat: Kingdom Chat
     admin-bypass: Admin Bypass
@@ -200,6 +204,21 @@ menu:
     description-kingdom: Manage your kingdom, join other kingdoms, or become a barbarian.
     description-town: Manage your towns and join other towns.
     description-travel: Teleport to various destinations.
+    description-event: Display details about server global events.
+  event:
+    title: Konquest Global Events
+    global-event: Global Event
+    global-effect: Global Effect
+    today: Today
+    date: Date
+    calendar: Calendar
+    events: Events
+    effects: Effects
+    description-calendar: Display a calendar of events by month.
+    description-events: Show all global events and view details.
+    description-effects: Show all event effects and their status.
+
+
   stats:
     title: Accomplishment Stats
     intro-1: Use "/k stats" or "/k s" to open this book again.
@@ -740,8 +759,6 @@ command:
     property:
       none: None
       name: Event Name
-      enabled: Enabled
-      active: Active
       duration: Duration Hours
       repetition: Repetition Days
       start-initial: Initial Start Date

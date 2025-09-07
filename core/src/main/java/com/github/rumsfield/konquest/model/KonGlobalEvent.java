@@ -1,7 +1,10 @@
 package com.github.rumsfield.konquest.model;
 
+import com.github.rumsfield.konquest.utility.ChatUtil;
+
 import javax.annotation.Nullable;
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -141,8 +144,8 @@ public class KonGlobalEvent {
         return isActive;
     }
 
-    public boolean isActiveOnDate(Date date) {
-        // Is the event active on the given date?
+    private boolean isActiveOnDate(Date date) {
+        // Is the event active on the specific date?
         if (hasStartDate() && date.after(startDate)) {
             // Date is after event start
             // Find how many repetition intervals
@@ -157,6 +160,94 @@ public class KonGlobalEvent {
             Date activeEnd = new Date(activeStart.getTime() + duration);
             return date.after(activeStart) && date.before(activeEnd);
         }
+        return false;
+    }
+
+    public boolean isActiveOnDay(Date day) {
+        /*  Single Day Event
+            |||[  ]||||||||||||||||||[  ]||||||||||||||||||[  ]|||||||||||||||
+            +          -          +          -          +          -
+
+            Multiple Day Event
+            |||[         ]||||||||||||||||||||||[         ]|||||||||||||||||||
+            +          +          -          +          +          -
+
+            Multiple Events per day
+            ||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]||[ ]|
+            +          +          +          +          +          +
+
+            Repetition barely longer than 1 day
+            ||[       ]||||||||||||[       ]||||||||||||[       ]||||||||||||[       ]|||
+            +          -          +          -          +          +          +
+
+         */
+        if (!hasStartDate()) return false;
+
+        Calendar checkCal = Calendar.getInstance();
+        checkCal.setTime(day);
+
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(startDate);
+
+        // Check for initial start day
+        if (checkCal.get(Calendar.YEAR) < startCal.get(Calendar.YEAR)) {
+            return false;
+        } else if (checkCal.get(Calendar.YEAR) == startCal.get(Calendar.YEAR) &&
+                checkCal.get(Calendar.DAY_OF_YEAR) < startCal.get(Calendar.DAY_OF_YEAR)) {
+            return false;
+        }
+
+        long startTime_ms = getStartTime();
+        long endTime_ms = startTime_ms + duration;
+        long startPreOffset = 0;
+        long startPostOffset = 0;
+        if (repetition > 0) {
+            long numReps = (day.getTime() - startTime_ms) / repetition;
+            startPreOffset = numReps * repetition;
+            startPostOffset = startPreOffset + repetition;
+        }
+
+        long startPreTime_ms = startTime_ms + startPreOffset;
+        long endPreTime_ms = endTime_ms + startPreOffset;
+
+        long startPostTime_ms = startTime_ms + startPostOffset;
+        long endPostTime_ms = endTime_ms + startPostOffset;
+
+        Calendar startPreTimeCal = Calendar.getInstance();
+        startPreTimeCal.setTimeInMillis(startPreTime_ms);
+        Calendar endPreTimeCal = Calendar.getInstance();
+        endPreTimeCal.setTimeInMillis(endPreTime_ms);
+
+        Calendar startPostTimeCal = Calendar.getInstance();
+        startPostTimeCal.setTimeInMillis(startPostTime_ms);
+        Calendar endPostTimeCal = Calendar.getInstance();
+        endPostTimeCal.setTimeInMillis(endPostTime_ms);
+
+        return isCalDayInRange(checkCal,startPreTimeCal,endPreTimeCal) || isCalDayInRange(checkCal,startPostTimeCal,endPostTimeCal);
+    }
+
+    private boolean isCalDayInRange(Calendar checkCal, Calendar startCal, Calendar endCal) {
+        if (startCal.get(Calendar.YEAR) == endCal.get(Calendar.YEAR)) {
+            // Start and End are in the same year
+            if (checkCal.get(Calendar.YEAR) == startCal.get(Calendar.YEAR)) {
+                // Check is in the same year
+                return checkCal.get(Calendar.DAY_OF_YEAR) >= startCal.get(Calendar.DAY_OF_YEAR) &&
+                        checkCal.get(Calendar.DAY_OF_YEAR) <= endCal.get(Calendar.DAY_OF_YEAR);
+            }
+        } else if (startCal.get(Calendar.YEAR) < endCal.get(Calendar.YEAR)) {
+            // Start is in a previous year than End
+            if (checkCal.get(Calendar.YEAR) == startCal.get(Calendar.YEAR)) {
+                // Check is in the start year
+                return checkCal.get(Calendar.DAY_OF_YEAR) >= startCal.get(Calendar.DAY_OF_YEAR);
+            } else if (checkCal.get(Calendar.YEAR) < endCal.get(Calendar.YEAR)) {
+                // Check is between start and end years
+                return true;
+            } else if (checkCal.get(Calendar.YEAR) == endCal.get(Calendar.YEAR)) {
+                // Check is in the end year
+                return checkCal.get(Calendar.DAY_OF_YEAR) <= endCal.get(Calendar.DAY_OF_YEAR);
+            }
+        }
+        // Invalid range conditions
         return false;
     }
 

@@ -17,10 +17,6 @@ public class EventAdminCommand extends CommandBase {
         // Define name and sender support
         super("event",false, true);
         // Define arguments
-        // menu
-        addArgument(
-                newArg("menu",true,false)
-        );
         // create <name>
         addArgument(
                 newArg("create",true,false)
@@ -81,12 +77,7 @@ public class EventAdminCommand extends CommandBase {
             return;
         }
         // Parse arguments
-        if (args.isEmpty() || (args.size() == 1 && args.get(0).equalsIgnoreCase("menu"))) {
-            // Menu
-            // TODO implement admin event menu
-            ChatUtil.sendMessage(sender,"TODO");
-
-        } else if (args.size() >= 2) {
+        if (args.size() >= 2) {
             // Other commands
             String cmdName = args.get(0);
             String eventName = args.get(1);
@@ -324,7 +315,6 @@ public class EventAdminCommand extends CommandBase {
         List<String> tabList = new ArrayList<>();
         if (args.size() == 1) {
             // Suggest sub-commands
-            tabList.add("menu");
             tabList.add("create");
             tabList.add("remove");
             tabList.add("start");

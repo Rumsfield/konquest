@@ -204,18 +204,19 @@ public class HelperUtil {
         ArrayList<String> result = new ArrayList<>();
         String[] words = sentence.split(" ");
         StringBuilder line = new StringBuilder();
-        // create lines no more than 30 characters (including spaces) long
+        int MAX_LINE_LENGTH = 50;
+        // create lines no more than 50 characters (including spaces) long
         for(int i=0;i<words.length;i++) {
             String test = line + words[i];
             if(i == words.length-1) {
-                if(test.length() > 30) {
+                if(test.length() > MAX_LINE_LENGTH) {
                     result.add(line.toString().trim());
                     result.add(words[i].trim());
                 } else {
                     result.add(test.trim());
                 }
             } else {
-                if(test.length() > 30) {
+                if(test.length() > MAX_LINE_LENGTH) {
                     result.add(line.toString().trim());
                     line = new StringBuilder(words[i] + " ");
                 } else {
