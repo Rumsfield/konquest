@@ -1,6 +1,8 @@
 package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
+import com.github.rumsfield.konquest.api.event.server.KonquestGlobalEventEndEvent;
+import com.github.rumsfield.konquest.api.event.server.KonquestGlobalEventStartEvent;
 import com.github.rumsfield.konquest.model.KonGlobalEvent;
 import com.github.rumsfield.konquest.model.KonGlobalEventEffect;
 import com.github.rumsfield.konquest.model.KonPlayer;
@@ -102,18 +104,40 @@ public class GlobalEventManager implements Timeable {
         HashSet<KonGlobalEventEffect> eventEffects = new HashSet<>();
         // Refresh active events
         for (KonGlobalEvent event : events) {
+            // Send notifications, events
             boolean wasActive = event.isActive();
             boolean nowActive = event.refreshActive();
-            // TODO use message paths
             if (!wasActive && nowActive) {
                 // Event started
                 if (event.isEnabled()) {
                     notifyAllPlayers(MessagePath.COMMAND_EVENT_BROADCAST_START.getMessage(event.getName()),true);
+                    // Fire event
+                    ArrayList<String> eventEffectNames = new ArrayList<>();
+                    ArrayList<String> eventEffectDescriptions = new ArrayList<>();
+                    for (KonGlobalEventEffect effect : KonGlobalEventEffect.values()) {
+                        if (event.hasEffect(effect)) {
+                            eventEffectNames.add(effect.getTitle());
+                            eventEffectDescriptions.add(effect.getDescription());
+                        }
+                    }
+                    KonquestGlobalEventStartEvent invokeEvent = new KonquestGlobalEventStartEvent(konquest,event.getName(),event.getDurationHours(),eventEffectNames,eventEffectDescriptions);
+                    Konquest.callKonquestEvent(invokeEvent);
                 }
             } else if (wasActive && !nowActive) {
                 // Event ended
                 if (event.isEnabled()) {
                     notifyAllPlayers(MessagePath.COMMAND_EVENT_BROADCAST_END.getMessage(event.getName()),false);
+                    // Fire event
+                    ArrayList<String> eventEffectNames = new ArrayList<>();
+                    ArrayList<String> eventEffectDescriptions = new ArrayList<>();
+                    for (KonGlobalEventEffect effect : KonGlobalEventEffect.values()) {
+                        if (event.hasEffect(effect)) {
+                            eventEffectNames.add(effect.getTitle());
+                            eventEffectDescriptions.add(effect.getDescription());
+                        }
+                    }
+                    KonquestGlobalEventEndEvent invokeEvent = new KonquestGlobalEventEndEvent(konquest,event.getName(),event.getRepetitionDays(),eventEffectNames,eventEffectDescriptions);
+                    Konquest.callKonquestEvent(invokeEvent);
                 }
             }
             if (event.isActive() && event.isEnabled()) {
@@ -366,7 +390,18 @@ public class GlobalEventManager implements Timeable {
         KonGlobalEvent globalEvent = getEvent(name);
         if (globalEvent == null) return;
         if (globalEvent.isActive()) {
-            ChatUtil.sendBroadcast(MessagePath.COMMAND_EVENT_BROADCAST_END.getMessage(globalEvent.getName()));
+            notifyAllPlayers(MessagePath.COMMAND_EVENT_BROADCAST_END.getMessage(globalEvent.getName()),false);
+            // Fire event
+            ArrayList<String> eventEffectNames = new ArrayList<>();
+            ArrayList<String> eventEffectDescriptions = new ArrayList<>();
+            for (KonGlobalEventEffect effect : KonGlobalEventEffect.values()) {
+                if (globalEvent.hasEffect(effect)) {
+                    eventEffectNames.add(effect.getTitle());
+                    eventEffectDescriptions.add(effect.getDescription());
+                }
+            }
+            KonquestGlobalEventEndEvent invokeEvent = new KonquestGlobalEventEndEvent(konquest,globalEvent.getName(),0,eventEffectNames,eventEffectDescriptions);
+            Konquest.callKonquestEvent(invokeEvent);
         }
         removeEvent(globalEvent);
         refreshDelayedEvents();
