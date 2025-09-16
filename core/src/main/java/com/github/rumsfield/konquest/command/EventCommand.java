@@ -174,7 +174,7 @@ public class EventCommand extends CommandBase {
                             for (KonGlobalEventEffect effect : konquest.getGlobalEventManager().getValidEffects()) {
                                 enabledEffectNames.add(effect.getTitle());
                             }
-                            String effectListFormat = MessagePath.COMMAND_EVENT_PROPERTY_NONE.getMessage();
+                            String effectListFormat = MessagePath.LABEL_NONE.getMessage();
                             if (!enabledEffectNames.isEmpty()) {
                                 effectListFormat = HelperUtil.formatCommaSeparatedList(enabledEffectNames);
                             }
@@ -211,7 +211,7 @@ public class EventCommand extends CommandBase {
                                 eventEffectNames.add(effect.getTitle());
                             }
                         }
-                        String effectListFormat = MessagePath.COMMAND_EVENT_PROPERTY_NONE.getMessage();
+                        String effectListFormat = MessagePath.LABEL_NONE.getMessage();
                         if (!eventEffectNames.isEmpty()) {
                             effectListFormat = HelperUtil.formatCommaSeparatedList(eventEffectNames);
                         }

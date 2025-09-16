@@ -67,6 +67,7 @@ label:
   monument-templates: Monument Templates
   neutrals: Neutrals
   next: Next
+  none: None
   no-lord: No Lord
   no-permission: No Permission
   officers: Officers
@@ -210,15 +211,12 @@ menu:
     global-event: Global Event
     global-effect: Global Effect
     today: Today
-    date: Date
     calendar: Calendar
-    events: Events
-    effects: Effects
+    events: Global Events
+    effects: Global Effects
     description-calendar: Display a calendar of events by month.
     description-events: Show all global events and view details.
     description-effects: Show all event effects and their status.
-
-
   stats:
     title: Accomplishment Stats
     intro-1: Use "/k stats" or "/k s" to open this book again.
@@ -757,14 +755,13 @@ command:
       info-next: Next Global Event
       details: Global Event Details
     property:
-      none: None
       name: Event Name
       duration: Duration Hours
       repetition: Repetition Days
       start-initial: Initial Start Date
       start-next: Next Start Date
       end-next: Next End Date
-      effects: Effects
+      effects: Effects List
   favor:
     notice:
       message: You have %s Favor, costs are...

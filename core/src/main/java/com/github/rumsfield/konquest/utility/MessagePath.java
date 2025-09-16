@@ -59,6 +59,7 @@ public enum MessagePath {
 	LABEL_MONUMENT_TEMPLATES                    (0, "label.monument-templates"),
 	LABEL_NEUTRALS                              (0, "label.neutrals"),
 	LABEL_NEXT                                  (0, "label.next"),
+	LABEL_NONE                                  (0, "label.none"),
 	LABEL_NO_LORD                               (0, "label.no-lord"),
 	LABEL_NO_PERMISSION                         (0, "label.no-permission"),
 	LABEL_OFFICERS                              (0, "label.officers"),
@@ -184,7 +185,6 @@ public enum MessagePath {
 	MENU_MAIN_DESCRIPTION_TOWN                  (0, "menu.main.description-town"),
 	MENU_MAIN_DESCRIPTION_TRAVEL                (0, "menu.main.description-travel"),
 	MENU_MAIN_DESCRIPTION_EVENT                 (0, "menu.main.description-event"),
-
 	MENU_EVENT_TITLE                            (0, "menu.event.title"),
 	MENU_EVENT_GLOBAL_EVENT                     (0, "menu.event.global-event"),
 	MENU_EVENT_GLOBAL_EFFECT                    (0, "menu.event.global-effect"),
@@ -195,7 +195,6 @@ public enum MessagePath {
 	MENU_EVENT_DESCRIPTION_CALENDAR             (0, "menu.event.description-calendar"),
 	MENU_EVENT_DESCRIPTION_EVENTS               (0, "menu.event.description-events"),
 	MENU_EVENT_DESCRIPTION_EFFECTS              (0, "menu.event.description-effects"),
-
 	MENU_STATS_TITLE                            (0, "menu.stats.title"),
 	MENU_STATS_INTRO_1                          (0, "menu.stats.intro-1"),
 	MENU_STATS_INTRO_2                          (0, "menu.stats.intro-2"),
@@ -664,7 +663,6 @@ public enum MessagePath {
 	COMMAND_EVENT_NOTICE_INFO_EVENTS            (0, "command.event.notice.info-events"),
 	COMMAND_EVENT_NOTICE_INFO_NEXT              (0, "command.event.notice.info-next"),
 	COMMAND_EVENT_NOTICE_DETAILS                (0, "command.event.notice.details"),
-	COMMAND_EVENT_PROPERTY_NONE                 (0, "command.event.property.none"),
 	COMMAND_EVENT_PROPERTY_NAME                 (0, "command.event.property.name"),
 	COMMAND_EVENT_PROPERTY_DURATION             (0, "command.event.property.duration"),
 	COMMAND_EVENT_PROPERTY_REPETITION           (0, "command.event.property.repetition"),

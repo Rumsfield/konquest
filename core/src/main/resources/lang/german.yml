@@ -12,6 +12,7 @@ version: 0.0.0
 # //// LABEL \\\\
 # Einfache Wörter oder Ausdrücke, die im gesamten Plugin verwendet werden.
 label:
+  active: Aktiv
   admin: Admin
   admin-kingdom: Admin-Königreich
   allied-building: Alliiertes Gebäude
@@ -31,9 +32,11 @@ label:
   cost: Kosten
   critical-hits: Kritische Treffer
   current: Aktuell
+  date: Datum
   diplomacy: Diplomatie
   disabled: Deaktiviert
   friendly-redstone: Freundlicher Redstone
+  enabled: Aktiviert
   enemy-redstone: Feindlicher Redstone
   false: Falsch
   favor: Gunst
@@ -64,6 +67,7 @@ label:
   monument-templates: Monumentvorlagen
   neutrals: Neutrale
   next: Nächste
+  none: Keiner
   no-lord: Kein Lord
   no-permission: Keine Berechtigung
   officers: Offiziere
@@ -181,6 +185,7 @@ menu:
     kingdom: Königreichmenü
     town: Stadtmenü
     travel: Reisemenü
+    event: Menü „Globale Ereignisse“
     map-auto: Automatischer Kartenmodus
     kingdom-chat: Königreich-Chat
     admin-bypass: Admin-Bypass
@@ -200,6 +205,18 @@ menu:
     description-kingdom: Verwalten Sie Ihr Königreich, schließen Sie sich anderen Königreichen an oder werden Sie ein Barbar.
     description-town: Verwalten Sie Ihre Städte und schließen Sie sich anderen Städten an.
     description-travel: Teleportiere dich zu verschiedenen Zielen.
+    description-event: Zeigt Details zu globalen Serverereignissen an.
+  event:
+    title: Konquest Globale Ereignisse
+    global-event: Globales Ereignis
+    global-effect: Globale Wirkung
+    today: Heute
+    calendar: Kalender
+    events: Globale Ereignisse
+    effects: Globale Effekte
+    description-calendar: Zeigen Sie einen Veranstaltungskalender nach Monaten an.
+    description-events: Alle globalen Ereignisse anzeigen und Details anzeigen.
+    description-effects: Alle Ereigniseffekte und deren Status anzeigen.
   stats:
     title: Leistungsstatistiken
     intro-1: Verwende "/k stats" oder "/k s", um dieses Buch erneut zu öffnen.
@@ -500,6 +517,7 @@ generic:
     no-permission: Du hast keine Berechtigung, das zu tun.
     no-allow: Du darfst das nicht tun.
     no-player: Sie müssen ein Spieler sein, um dies zu tun!
+    no-event: Während des globalen Events ist dies nicht möglich.
     unknown-name: Unbekannter Name konnte nicht gefunden werden, überprüfen Sie die Rechtschreibung %s
     bad-name: '%s konnte in Ihrem Königreich nicht gefunden werden.'
     format-name: Name darf nur Buchstaben und/oder Zahlen enthalten.
@@ -589,6 +607,28 @@ command:
       error:
         create-exist: Der Spieler hat bereits ein Lager. Entfernen Sie es zuerst, bevor Sie ein neues erstellen.
         destroy-exist: Der Spieler hat kein Lager.
+    event:
+      notice:
+        create: Ereignis %s erfolgreich erstellt. Verwenden Sie diesen Befehl erneut, um das Ereignis zu ändern und zu starten.
+        remove: Ereignis %s entfernt.
+        start-now: Ereignis %s jetzt gestartet.
+        start-date: Legen Sie fest, dass das Ereignis %s am %s beginnt.
+        duration: Setzen Sie die Dauer des Ereignisses %s auf %s.
+        repetition: Setze die Wiederholung des Ereignisses %s auf %s.
+        effect-add: Effekt %s zum Ereignis %s hinzugefügt.
+        effect-remove: Effekt %s aus Ereignis %s entfernt.
+        enable: Globales Ereignis %s aktiviert.
+        disable: Globales Ereignis %s deaktiviert.
+      error:
+        year: Das Jahr muss größer als 2000 sein.
+        month: Der Monat muss zwischen 1 (Januar) und 12 (Dezember) liegen.
+        day: Der Tag muss zwischen 1 und 31 liegen.
+        hour: Die Stunde muss zwischen 0 und 23 liegen.
+        minute: Die Minute muss zwischen 0 und 59 liegen.
+        duration: Dauer konnte nicht größer als Wiederholungszeit eingestellt werden. Erhöhen Sie zuerst die Wiederholung.
+        repetition: Wiederholung konnte nicht auf weniger als die Dauer eingestellt werden. Verringern Sie zuerst die Dauer.
+        effect-conflict: Fehler beim Hinzufügen eines Effekts, der mit dem vorhandenen Ereigniseffekt %s in Konflikt steht.
+        effect-missing: Der Effekt konnte nicht entfernt werden, da er im Ereignis fehlt.
     flag:
       notice:
         all-properties: Alle Eigenschaften
@@ -694,6 +734,34 @@ command:
       fail-far: Anspruch fehlgeschlagen, zu weit vom Gebietszentrum entfernt.
       fail-claimed: Anspruch fehlgeschlagen, bereits beansprucht.
       resident: Sie müssen %s als Einwohner beitreten, um Land zu beanspruchen.
+  event:
+    broadcast:
+      start: Das globale Ereignis %s hat begonnen! Verwenden Sie den Befehl „/k event“, um weitere Informationen zu erhalten.
+      end: Das globale Ereignis %s ist beendet. Verwenden Sie den Befehl „/k event“, um weitere Informationen zu erhalten.
+      enable: Das globale Ereignis %s ist jetzt aktiviert und seine Auswirkungen sind aktiv.
+      disable: Das globale Ereignis %s ist jetzt deaktiviert und seine Auswirkungen sind angehalten.
+    notice:
+      effects: Alle globalen Ereigniseffekte
+      no-events: Keine globalen Ereignisse
+      ends: Endet am %s
+      starts: Beginnt am %s
+      events: Globale Ereignisse Seite %s
+      page: Um weitere Seiten anzuzeigen, verwenden Sie /k event list <page>
+      info: Globale Ereignisinformationen
+      info-no-active: Keine aktiven globalen Ereignisse
+      info-no-upcoming: Keine bevorstehenden globalen Ereignisse
+      info-effects: Aktive globale Effekte
+      info-events: Aktuelle globale Ereignisse
+      info-next: Nächstes globales Ereignis
+      details: Globale Ereignisdetails
+    property:
+      name: Ereignisname
+      duration: Dauer Stunden
+      repetition: Wiederholungstage
+      start-initial: Ursprüngliches Startdatum
+      start-next: Nächstes Startdatum
+      end-next: Nächstes Enddatum
+      effects: Effektliste
   favor:
     notice:
       message: Sie haben %s Gunst, die Kosten betragen...
@@ -1161,6 +1229,7 @@ description:
   score: Zeigt die aktuelle Punktzahl eines Spielers an.
   fly: Fliegen Sie innerhalb befreundeter Gebiete.
   border: Schaltet Partikelgrenzen von Territorien und Grundstücken um.
+  event: Details zu globalen Ereignissen anzeigen.
   admin: Nur für Administratoren.
   admin-help: Zeigt die Hilfemeldung des Administrators an.
   admin-bypass: Schaltet den Admin-Bypass-Modus um.
@@ -1179,6 +1248,7 @@ description:
   admin-reload: Lädt Konfigurationsdateien neu.
   admin-flag: Legt Eigenschaftsflags für Königreiche und Gebiete fest.
   admin-stat: Verwaltet Spielerstatistiken.
+  admin-event: Verwalten Sie globale Ereignisse und ihre Auswirkungen.
 # //// PROPERTIES \\\\
 # Namen und Beschreibungen für alle Eigenschaftsflags in Königreichen und Gebieten.
 properties:
@@ -1232,3 +1302,48 @@ properties:
   shop: Erlaubt Spielern, Shops zu erstellen
   arena-name: Arena
   arena: Erlaubt allen Spielern, gegeneinander zu kämpfen
+# //// EFFECTS \\\\
+# Titel und Beschreibungen für alle globalen Ereigniseffekte.
+effects:
+  pvp-name: Alle PvP-Spieler
+  pvp: Alle Spieler können kämpfen
+  war-name: Alle Kriege
+  war: Alle Königreiche befinden sich im Krieg
+  peace-name: Alle Frieden
+  peace: Alle Königreiche befinden sich im Frieden
+  travel-name: Freie Reise
+  travel: Reisen ist sofort und kostenlos
+  shields-name: Kostenlose Schilde
+  shields: Städte und Hauptstädte erhalten unbegrenzt Schilde
+  no-shields-name: Keine Schilde
+  no-shields: Alle Stadtschilde sind zerstört
+  no-armor-name: Keine Rüstung
+  no-armor: Alle Stadtpanzerungen werden entfernt
+  no-protection-name: Kein Schutz
+  no-protection: Alle Städte können offline angegriffen werden
+  no-immunity-name: Keine Immunität
+  no-immunity: Alle Hauptstädte verlieren ihre Immunität
+  favor-1-name: Gunstrabatt 1
+  favor-1: Gunstkosten werden um 20 % reduziert
+  favor-2-name: Gunstrabatt 2
+  favor-2: Gunstkosten werden um 50 % reduziert
+  favor-3-name: Gunstrabatt 3
+  favor-3: Gunstkosten werden um 80 % reduziert.
+  monument-1-name: Monumentbeute 1
+  monument-1: Stadtbeute 2x erhöht
+  monument-2-name: Monumentbeute 2
+  monument-2: Stadtbeute 5x erhöht
+  monument-3-name: Monumentbeute 3
+  monument-3: Stadtbeute 10x erhöht
+  ruin-1-name: Ruinenbeute 1
+  ruin-1: Ruinenbeute 2x erhöht
+  ruin-2-name: Ruinenbeute 2
+  ruin-2: Ruinenbeute 5x erhöht
+  ruin-3-name: Ruinenbeute 3
+  ruin-3: Ruinenbeute 10x erhöht
+  exp-1-name: EXP-Boost 1
+  exp-1: Erfahrungskugeln 2x erhöht
+  exp-2-name: EXP-Boost 2
+  exp-2: Erfahrungskugeln 5x erhöht
+  exp-3-name: EXP-Boost 3
+  exp-3: Erfahrungskugeln 10x erhöht

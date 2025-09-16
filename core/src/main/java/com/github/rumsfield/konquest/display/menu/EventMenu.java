@@ -81,7 +81,7 @@ public class EventMenu extends StateMenu {
             for (KonGlobalEventEffect effect : getKonquest().getGlobalEventManager().getValidEffects()) {
                 enabledEffectNames.add(effect.getTitle());
             }
-            String effectListFormat = MessagePath.COMMAND_EVENT_PROPERTY_NONE.getMessage();
+            String effectListFormat = MessagePath.LABEL_NONE.getMessage();
             if (!enabledEffectNames.isEmpty()) {
                 effectListFormat = HelperUtil.formatCommaSeparatedList(enabledEffectNames);
             }
