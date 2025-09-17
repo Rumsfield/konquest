@@ -590,8 +590,9 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isCapitalImmune() {
 		boolean result = true;
+		boolean isGlobalEventNoImmunity = konquest.getGlobalEventManager().isEffectValid(KonGlobalEventEffect.NO_IMMUNITY);
 		int immunityThreshold = konquest.getCore().getInt(CorePath.KINGDOMS_CAPITAL_IMMUNITY_TOWNS.getPath(),0);
-		if(immunityThreshold > 0) {
+		if(!isGlobalEventNoImmunity && immunityThreshold > 0) {
 			// Capital can only be capture when there are fewer towns than threshold
 			if(getNumTowns() < immunityThreshold) {
 				result = false;
@@ -717,7 +718,8 @@ public class KonKingdom implements Timeable, KonquestKingdom, KonPropertyFlagHol
 	
 	public boolean isOfflineProtected() {
 		boolean isBreakDisabledOffline = konquest.getCore().getBoolean(CorePath.KINGDOMS_NO_ENEMY_EDIT_OFFLINE.getPath());
-		return isOfflineProtected && isBreakDisabledOffline;
+		boolean isGlobalEventNoProtection = konquest.getGlobalEventManager().isEffectValid(KonGlobalEventEffect.NO_PROTECTION);
+		return isOfflineProtected && isBreakDisabledOffline && !isGlobalEventNoProtection;
 	}
 	
 	public void setOfflineProtected(boolean val) {

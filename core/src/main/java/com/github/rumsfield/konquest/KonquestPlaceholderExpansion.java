@@ -106,6 +106,14 @@ public class KonquestPlaceholderExpansion extends PlaceholderExpansion implement
         String result = null;
         String identifierLower = identifier.toLowerCase();
         switch(identifierLower) {
+			/* %konquest_events% - List of active global events */
+			case "events":
+				result = placeholderManager.getActiveEvents();
+				break;
+			/* %konquest_event_effects% - List of active global event effects */
+			case "event_effects":
+				result = placeholderManager.getActiveEventEffects();
+				break;
 			/* %konquest_timer_loot% - Time until monument loot refreshes */
 			case "timer_loot":
 				result = placeholderManager.getTimerLoot(player);

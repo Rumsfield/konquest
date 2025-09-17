@@ -37,6 +37,7 @@ public abstract class StateMenu {
     protected final Comparator<KonPrefixType> prefixComparator;
     protected final Comparator<KonOfflinePlayer> playerScoreComparator;
     protected final Comparator<KonKingdom> kingdomScoreComparator;
+    protected final Comparator<KonGlobalEvent> eventStartComparator;
     protected final int MAX_ICONS_PER_PAGE = 45;
     protected final int MAX_ROW_SIZE = 9;
     protected final int INDEX_HOME = 3;
@@ -189,6 +190,19 @@ public abstract class StateMenu {
             if(scoreOne < scoreTwo) {
                 result = 1;
             } else if(scoreOne > scoreTwo) {
+                result = -1;
+            }
+            return result;
+        };
+
+        this.eventStartComparator = (eventOne, eventTwo) -> {
+            // sort by initial start time
+            long startOne = eventOne.getStartTime();
+            long startTwo = eventTwo.getStartTime();
+            int result = 0;
+            if(startOne < startTwo) {
+                result = 1;
+            } else if(startOne > startTwo) {
                 result = -1;
             }
             return result;

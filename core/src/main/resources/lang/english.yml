@@ -12,6 +12,7 @@ version: 0.0.0
 # //// LABEL \\\\
 # Simple words or phrases used throughout the plugin.
 label:
+  active: Active
   admin: Admin
   admin-kingdom: Admin Kingdom
   allied-building: Allied Building
@@ -31,9 +32,11 @@ label:
   cost: Cost
   critical-hits: Critical Hits
   current: Current
+  date: Date
   diplomacy: Diplomacy
   disabled: Disabled
   friendly-redstone: Friendly Redstone
+  enabled: Enabled
   enemy-redstone: Enemy Redstone
   false: False
   favor: Favor
@@ -64,6 +67,7 @@ label:
   monument-templates: Monument Templates
   neutrals: Neutrals
   next: Next
+  none: None
   no-lord: No Lord
   no-permission: No Permission
   officers: Officers
@@ -181,6 +185,7 @@ menu:
     kingdom: Kingdom Menu
     town: Town Menu
     travel: Travel Menu
+    event: Global Events Menu
     map-auto: Map Auto Mode
     kingdom-chat: Kingdom Chat
     admin-bypass: Admin Bypass
@@ -200,6 +205,18 @@ menu:
     description-kingdom: Manage your kingdom, join other kingdoms, or become a barbarian.
     description-town: Manage your towns and join other towns.
     description-travel: Teleport to various destinations.
+    description-event: Display details about server global events.
+  event:
+    title: Konquest Global Events
+    global-event: Global Event
+    global-effect: Global Effect
+    today: Today
+    calendar: Calendar
+    events: Global Events
+    effects: Global Effects
+    description-calendar: Display a calendar of events by month.
+    description-events: Show all global events and view details.
+    description-effects: Show all event effects and their status.
   stats:
     title: Accomplishment Stats
     intro-1: Use "/k stats" or "/k s" to open this book again.
@@ -500,6 +517,7 @@ generic:
     no-permission: You do not have permission to do that.
     no-allow: You are not allowed to do that.
     no-player: You must be a player to do this!
+    no-event: You cannot do that during the global event.
     unknown-name: Failed to find unknown name, check spelling %s
     bad-name: Could not find %s in your Kingdom.
     format-name: Name must only contain letters and/or numbers.
@@ -589,6 +607,28 @@ command:
       error:
         create-exist: Player already has a camp, remove it first before creating a new one.
         destroy-exist: Player does not have a camp.
+    event:
+      notice:
+        create: Successfully created event %s, use this command again to modify and start the event.
+        remove: Removed event %s.
+        start-now: Started event %s now.
+        start-date: Set event %s to start on %s.
+        duration: Set event %s duration to %s.
+        repetition: Set event %s repetition to %s.
+        effect-add: Added effect %s to event %s.
+        effect-remove: Removed effect %s from event %s.
+        enable: Enabled global event %s.
+        disable: Disabled global event %s.
+      error:
+        year: Year must be greater than 2000.
+        month: Month must be between 1 (January) and 12 (December).
+        day: Day must be between 1 and 31.
+        hour: Hour must be between 0 and 23.
+        minute: Minute must be between 0 and 59.
+        duration: Failed to set duration greater than repetition time. Increase repetition first.
+        repetition: Failed to set repetition less than duration time. Decrease duration first.
+        effect-conflict: Failed to add effect that conflicts with the existing event effect %s.
+        effect-missing: Failed to remove effect because it is missing from the event.
     flag:
       notice:
         all-properties: All Properties
@@ -694,6 +734,34 @@ command:
       fail-far: Failed to claim, too far from territory center.
       fail-claimed: Failed to claim, already claimed.
       resident: You must join %s as a resident to claim land.
+  event:
+    broadcast:
+      start: Global Event %s has started! Use command "/k event" for details.
+      end: Global Event %s has ended. Use command "/k event" for details.
+      enable: Global Event %s is now enabled, and its effects are active.
+      disable: Global Event %s is now disabled, and its effects are paused.
+    notice:
+      effects: All Global Event Effects
+      no-events: No Global Events
+      ends: Ends on %s
+      starts: Starts on %s
+      events: Global Events Page %s
+      page: To view more pages use /k event list <page>
+      info: Global Event Information
+      info-no-active: No Active Global Events
+      info-no-upcoming: No Upcoming Global Events
+      info-effects: Active Global Effects
+      info-events: Current Global Events
+      info-next: Next Global Event
+      details: Global Event Details
+    property:
+      name: Event Name
+      duration: Duration Hours
+      repetition: Repetition Days
+      start-initial: Initial Start Date
+      start-next: Next Start Date
+      end-next: Next End Date
+      effects: Effects List
   favor:
     notice:
       message: You have %s Favor, costs are...
@@ -1161,6 +1229,7 @@ description:
   score: Display a Player's current score.
   fly: Fly within friendly land.
   border: Toggle particle borders of territories and plots.
+  event: Display details about global events.
   admin: For Admins only.
   admin-help: Display the admin help message.
   admin-bypass: Toggle Admin bypass mode.
@@ -1179,6 +1248,7 @@ description:
   admin-reload: Reloads configuration files.
   admin-flag: Set property flags for kingdoms and territories.
   admin-stat: Manage player stats.
+  admin-event: Manage global events and their effects.
 # //// PROPERTIES \\\\
 # Names and descriptions for all property flags in kingdoms and territories.
 properties:
@@ -1232,3 +1302,48 @@ properties:
   shop: Allow players to create shops
   arena-name: Arena
   arena: Allow any players to fight each other
+# //// EFFECTS \\\\
+# Titles and descriptions for all global event effects.
+effects:
+  pvp-name: All PvP
+  pvp: All players can fight
+  war-name: All War
+  war: All kingdoms are at war
+  peace-name: All Peace
+  peace: All kingdoms are at peace
+  travel-name: Free Travel
+  travel: Travel is instant and free
+  shields-name: Free Shields
+  shields: Towns and capitals get unlimited shields
+  no-shields-name: No Shields
+  no-shields: All town shields are broken
+  no-armor-name: No Armor
+  no-armor: All town armor is removed
+  no-protection-name: No Protection
+  no-protection: All towns can be attacked offline
+  no-immunity-name: No Immunity
+  no-immunity: All capitals lose immunity
+  favor-1-name: Favor Discount 1
+  favor-1: Favor costs are reduced 20%
+  favor-2-name: Favor Discount 2
+  favor-2: Favor costs are reduced 50%
+  favor-3-name: Favor Discount 3
+  favor-3: Favor costs are reduced 80%
+  monument-1-name: Monument Loot 1
+  monument-1: Town loot increased x2
+  monument-2-name: Monument Loot 2
+  monument-2: Town loot increased x5
+  monument-3-name: Monument Loot 3
+  monument-3: Town loot increased x10
+  ruin-1-name: Ruin Loot 1
+  ruin-1: Ruin loot increased x2
+  ruin-2-name: Ruin Loot 2
+  ruin-2: Ruin loot increased x5
+  ruin-3-name: Ruin Loot 3
+  ruin-3: Ruin loot increased x10
+  exp-1-name: EXP Boost 1
+  exp-1: Experience orbs increased x2
+  exp-2-name: EXP Boost 2
+  exp-2: Experience orbs increased x5
+  exp-3-name: EXP Boost 3
+  exp-3: Experience orbs increased x10

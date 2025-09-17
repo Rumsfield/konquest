@@ -25,6 +25,10 @@ public class ShieldManager implements KonquestShieldManager {
 	private boolean isArmorsEnabled;
 	private final ArrayList<KonShield> shields;
 	private final ArrayList<KonArmor> armors;
+
+	private boolean isGlobalShieldFreeEvent;
+	private boolean isGlobalShieldDisableEvent;
+	private boolean isGlobalArmorDisableEvent;
 	
 	public ShieldManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -32,8 +36,11 @@ public class ShieldManager implements KonquestShieldManager {
 		this.isArmorsEnabled = false;
 		this.shields = new ArrayList<>();
 		this.armors = new ArrayList<>();
+		this.isGlobalShieldFreeEvent = false;
+		this.isGlobalShieldDisableEvent = false;
+		this.isGlobalArmorDisableEvent = false;
 	}
-	
+
 	public void initialize() {
 		if(loadShields()) {
 			isShieldsEnabled = konquest.getCore().getBoolean(CorePath.TOWNS_ENABLE_SHIELDS.getPath(),false);
@@ -192,6 +199,11 @@ public class ShieldManager implements KonquestShieldManager {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}
+
+		if(isGlobalShieldFreeEvent || isGlobalShieldDisableEvent) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_EVENT.getMessage());
+			return false;
+		}
 		
 		Date now = new Date();
 		int shieldTime = shield.getDurationSeconds();
@@ -251,6 +263,11 @@ public class ShieldManager implements KonquestShieldManager {
 	public boolean activateTownArmor(KonArmor armor, KonTown town, Player bukkitPlayer, boolean ignoreCost) {
 		if(!isArmorsEnabled) {
 			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+
+		if(isGlobalArmorDisableEvent) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_EVENT.getMessage());
 			return false;
 		}
 		
@@ -436,5 +453,44 @@ public class ShieldManager implements KonquestShieldManager {
 		}
 		return result;
 	}
+
+	/*
+	 * Global Event methods
+	 */
+
+	// All towns get unlimited shields
+	public void enableGlobalEventFreeShield(boolean isEnable) {
+		isGlobalShieldFreeEvent = isEnable;
+		// Set enabled state in all towns & capitals
+		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+			for (KonTown town : kingdom.getCapitalTowns()) {
+				town.enableShieldFreeEvent(isEnable);
+			}
+		}
+	}
+
+	// All towns disable shields
+	public void enableGlobalEventDisableShield(boolean isEnable) {
+		isGlobalShieldDisableEvent = isEnable;
+		// Set enabled state in all towns & capitals
+		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+			for (KonTown town : kingdom.getCapitalTowns()) {
+				town.enableShieldDisableEvent(isEnable);
+			}
+		}
+	}
+
+	// All towns disable armor
+	public void enableGlobalEventDisableArmor(boolean isEnable) {
+		isGlobalArmorDisableEvent = isEnable;
+		// Set enabled state in all towns & capitals
+		for (KonKingdom kingdom : konquest.getKingdomManager().getKingdoms()) {
+			for (KonTown town : kingdom.getCapitalTowns()) {
+				town.enableArmorDisableEvent(isEnable);
+			}
+		}
+	}
+
+
 	
 }

@@ -35,7 +35,10 @@ core:
   
   # (*) Save interval in minutes, 0 to disable (integer >= 0)
   save_interval: 60
-  
+
+  # (*) Event refresh interval in seconds, 0 to disable all global events (integer >= 0)
+  event_interval: 30
+
   # URL which will appear in the "/k" community link icon (string)
   community_link: www.google.com
   
