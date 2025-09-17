@@ -388,6 +388,8 @@ public class PlayerListener implements Listener {
 		assert player != null;
         // Check that the player is setting a region
         if (!player.isSettingRegion()) return;
+		// Check for blanking timer
+		if (player.isRegionBlank()) return;
 		ChatUtil.printDebug(bukkitPlayer.getName() + " setting region with action "+event.getAction()+", equipment "+event.getHand()+", state is "+player.getRegionType());
 		// Check if the player clicked air (cancel region setup)
 		if (event.getClickedBlock() == null) {
@@ -515,6 +517,7 @@ public class PlayerListener implements Listener {
 			default:
 				break;
 		}
+		player.setRegionBlank();
 		event.setCancelled(true);
     }
 

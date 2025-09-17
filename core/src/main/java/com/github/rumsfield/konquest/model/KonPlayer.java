@@ -52,12 +52,14 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private boolean isFlying;
 	private boolean isBorderDisplay;
 	private boolean isAfk;
+	private boolean isRegionBlank;
 	private final Timer priorityTitleDisplayTimer;
 	private final Timer borderUpdateLoopTimer;
 	private final Timer monumentTemplateLoopTimer;
 	private final Timer monumentShowLoopTimer;
 	private final Timer combatTagTimer;
 	private final Timer flyDisableWarmupTimer;
+	private final Timer setRegionBlankTimer;
 	private long recordPlayCooldownTime;
 	private int monumentShowLoopCount;
 	private long flyDisableTime;
@@ -89,12 +91,14 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.isFlying = false;
 		this.isBorderDisplay = true;
 		this.isAfk = false;
+		this.isRegionBlank = false;
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
 		this.monumentTemplateLoopTimer = new Timer(this);
 		this.monumentShowLoopTimer = new Timer(this);
 		this.combatTagTimer = new Timer(this);
 		this.flyDisableWarmupTimer = new Timer(this);
+		this.setRegionBlankTimer = new Timer(this);
 		this.recordPlayCooldownTime = 0;
 		this.monumentShowLoopCount = 0;
 		this.flyDisableTime = 0;
@@ -213,6 +217,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	public boolean isAfk() {
 		return isAfk;
 	}
+
+	public boolean isRegionBlank() {
+		return isRegionBlank;
+	}
 	
 	public Timer getPriorityTitleDisplayTimer() {
 		return priorityTitleDisplayTimer;
@@ -239,6 +247,15 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	}
 	
 	// Setters
+
+	public void setRegionBlank() {
+		// Begin region blank for 2 seconds
+		isRegionBlank = true;
+		setRegionBlankTimer.stopTimer();
+		setRegionBlankTimer.setTime(2);
+		setRegionBlankTimer.startTimer();
+		ChatUtil.printDebug("Starting region blank Timer for "+bukkitPlayer.getName());
+	}
 	
 	public void settingRegion(RegionType type) {
 		settingRegion = type;
@@ -380,6 +397,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		monumentShowLoopTimer.stopTimer();
 		combatTagTimer.stopTimer();
 		flyDisableWarmupTimer.stopTimer();
+		setRegionBlankTimer.stopTimer();
 	}
 	
 	public void setIsMapAuto(boolean val) {
@@ -458,6 +476,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 				int timeLeft = (int)(flyDisableTime - now.getTime()) / 1000;
 				getBukkitPlayer().sendTitle(" ", ChatColor.GOLD+""+(timeLeft+1), 2, 10, 2);
 			}
+		} else if (taskID == setRegionBlankTimer.getTaskID()) {
+			// Disable region blank
+			isRegionBlank = false;
+			ChatUtil.printDebug("Ended region blank Timer for "+bukkitPlayer.getName());
 		}
 	}
 	
