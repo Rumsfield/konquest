@@ -251,9 +251,10 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	public void setRegionBlank() {
 		// Begin region blank for 2 seconds
 		isRegionBlank = true;
-		monumentTemplateLoopTimer.stopTimer();
-		monumentTemplateLoopTimer.setTime(2);
-		monumentTemplateLoopTimer.startTimer();
+		setRegionBlankTimer.stopTimer();
+		setRegionBlankTimer.setTime(2);
+		setRegionBlankTimer.startTimer();
+		ChatUtil.printDebug("Starting region blank Timer for "+bukkitPlayer.getName());
 	}
 	
 	public void settingRegion(RegionType type) {
