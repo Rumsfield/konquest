@@ -164,7 +164,7 @@ public class EventMenu extends StateMenu {
                 // List of events on the given day
                 if (listDate != null) {
                     events.addAll(getKonquest().getGlobalEventManager().getEventsOnDay(listDate));
-                    viewTitle = viewTitle+" "+dateFormat.format(listDate);
+                    viewTitle = dateFormat.format(listDate);
                 }
                 break;
             default:

@@ -16,11 +16,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import javax.annotation.Nullable;
 import java.util.*;
 
-/*
- TODO
- - make event menu
- */
-
 public class GlobalEventManager implements Timeable {
 
     private final Konquest konquest;

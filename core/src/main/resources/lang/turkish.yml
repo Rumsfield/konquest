@@ -609,16 +609,16 @@ command:
         destroy-exist: Oyuncunun kampı yok.
     event:
       notice:
-        create: %s olayı başarıyla oluşturuldu, olayı değiştirmek ve başlatmak için bu komutu tekrar kullanın.
-        remove: %s olayı kaldırıldı.
-        start-now: %s olayı şimdi başlatıldı.
-        start-date: %s olayının %s tarihinde başlamasını ayarla.
-        duration: %s olayının süresini %s olarak ayarla.
-        repetition: %s olayının tekrarını %s olarak ayarla.
-        effect-add: %s olayına %s efekti eklendi.
-        effect-remove: %s olayından %s efekti kaldırıldı.
-        enable: %s genel olayı etkinleştirildi.
-        disable: %s genel olayı devre dışı bırakıldı.
+        create: '%s olayı başarıyla oluşturuldu, olayı değiştirmek ve başlatmak için bu komutu tekrar kullanın.'
+        remove: '%s olayı kaldırıldı.'
+        start-now: '%s olayı şimdi başlatıldı.'
+        start-date: '%s olayının %s tarihinde başlamasını ayarla.'
+        duration: '%s olayının süresini %s olarak ayarla.'
+        repetition: '%s olayının tekrarını %s olarak ayarla.'
+        effect-add: '%s olayına %s efekti eklendi.'
+        effect-remove: '%s olayından %s efekti kaldırıldı.'
+        enable: '%s genel olayı etkinleştirildi.'
+        disable: '%s genel olayı devre dışı bırakıldı.'
       error:
         year: Yıl 2000'den büyük olmalıdır.
         month: Ay 1 (Ocak) ile 12 (Aralık) arasında olmalıdır.
@@ -743,8 +743,8 @@ command:
     notice:
       effects: Tüm Küresel Olay Etkileri
       no-events: Küresel Etkinlik Yok
-      ends: %s tarihinde sona eriyor
-      starts: %s'de başlıyor
+      ends: '%s tarihinde sona eriyor'
+      starts: "%s'de başlıyor"
       events: Küresel Etkinlikler Sayfası %s
       page: Daha fazla sayfa görüntülemek için "/k event list <page>" komutunu kullanın
       info: Küresel Etkinlik Bilgileri
