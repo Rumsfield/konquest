@@ -55,6 +55,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private final HashMap<UUID,Integer> exilePlayerCooldowns;
 	private final ArrayList<DiplomacyTicket> diplomacyTickets;
 	private boolean isKingdomDataNull;
+	private final Timer payTimer;
 
 	// Global Event features
 	private boolean isGlobalEventWar;
@@ -85,8 +86,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private boolean townDestroyLordEnable;
 	private boolean townDestroyMasterEnable;
 	private boolean townPurchaseEnable;
-
-	private final Timer payTimer;
 	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -191,6 +190,10 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		discountStack			= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
 		discountPercent 		= Math.max(discountPercent,0);
 		discountPercent 		= Math.min(discountPercent,100);
+
+		// Forced Town Options
+
+
 	}
 
 	public String getKingdomPayTime() {
@@ -3567,6 +3570,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if (!isTownOptionFeatureEnabled(option)) {
 			// Cannot set this option
 			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		// Check for overrides
+		if (town.isTownOptionOverridden(option)) {
+			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
 		// Set option

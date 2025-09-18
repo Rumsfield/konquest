@@ -13,6 +13,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.*;
@@ -52,6 +54,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final HashMap<UUID,Double> purchaseOffers;
 	private RequestKeeper joinRequestKeeper;
 	private final HashMap<KonTownOption,Boolean> townOptions;
+	private final HashMap<KonTownOption,Boolean> townOptionsOverride;
 	private boolean isAttacked;
 	private boolean isShielded;
 	private boolean isShieldFreeEvent;
@@ -126,6 +129,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.disabledUpgrades = new HashMap<>();
 		this.plots = new HashMap<>();
 		this.townOptions = new HashMap<>();
+		this.townOptionsOverride = new HashMap<>();
 		initOptions();
 		this.properties = new HashMap<>();
 		initProperties();
@@ -157,6 +161,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		for (KonTownOption option : townOptions.keySet()) {
 			copyTown.setTownOption(option, townOptions.get(option));
 		}
+		copyTown.refreshOptionOverrides();
 		// Set properties
 		for (KonPropertyFlag flag : properties.keySet()) {
 			copyTown.setPropertyValue(flag, properties.get(flag));
@@ -175,6 +180,40 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		townOptions.clear();
 		for (KonTownOption option : KonTownOption.values()) {
 			townOptions.put(option,option.getDefaultValue());
+		}
+		refreshOptionOverrides();
+	}
+
+	public void refreshOptionOverrides() {
+		townOptionsOverride.clear();
+		FileConfiguration townOptionsConfig = getKonquest().getConfigManager().getConfig("town-options");
+		if (townOptionsConfig.get("town-options") == null) return;
+		// Check for globals
+		ConfigurationSection globalSection = townOptionsConfig.getConfigurationSection("town-options.global");
+		if (globalSection != null) {
+			// Global section exists
+			for(String globalOptionName : globalSection.getKeys(false)) {
+				KonTownOption globalOptionOverride = KonTownOption.getOption(globalOptionName);
+				if (globalOptionOverride != null) {
+					// Add option override
+					boolean optionValue = globalSection.getBoolean(globalOptionName);
+					townOptionsOverride.put(globalOptionOverride, optionValue);
+				}
+			}
+		}
+		// Check for town name
+		String sectionName = (this instanceof KonCapital) ? this.getKingdom().getName() : this.getName();
+		ConfigurationSection townSection = townOptionsConfig.getConfigurationSection("town-options."+sectionName);
+		if (townSection != null) {
+			// Town section exists
+			for(String townOptionName : townSection.getKeys(false)) {
+				KonTownOption townOptionOverride = KonTownOption.getOption(townOptionName);
+				if (townOptionOverride != null) {
+					// Add option override
+					boolean optionValue = townSection.getBoolean(townOptionName);
+					townOptionsOverride.put(townOptionOverride, optionValue);
+				}
+			}
 		}
 	}
 
@@ -1323,11 +1362,21 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		Town Options
 	 */
 
+	public boolean isTownOptionOverridden(KonTownOption option) {
+		return townOptionsOverride.containsKey(option);
+	}
+
 	public boolean setTownOption(KonTownOption option, boolean value) {
 		if (townOptions.containsKey(option)) {
-			// Set valid option
-			townOptions.put(option,value);
-			return true;
+			// Option is valid
+			if (townOptionsOverride.containsKey(option)) {
+				// Option is overridden
+				return false;
+			} else {
+				// Set valid option
+				townOptions.put(option,value);
+				return true;
+			}
 		}
 		// No valid option
 		return false;
@@ -1335,8 +1384,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 	public boolean getTownOption(KonTownOption option) {
 		if (townOptions.containsKey(option)) {
-			// Get valid option
-			return townOptions.get(option);
+			// Option is valid
+			return townOptionsOverride.containsKey(option) ? townOptionsOverride.get(option) : townOptions.get(option);
 		}
 		// No valid option
 		return false;
@@ -1344,51 +1393,51 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 	/* Legacy Methods */
 	public void setIsOpen(boolean val) {
-		townOptions.put(KonTownOption.OPEN,val);
+		setTownOption(KonTownOption.OPEN,val);
 	}
 	
 	public boolean isOpen() {
-		return townOptions.get(KonTownOption.OPEN);
+		return getTownOption(KonTownOption.OPEN);
 	}
 
 	public void setIsAlliedBuildingAllowed(boolean val) {
-		townOptions.put(KonTownOption.ALLIED_BUILDING,val);
+		setTownOption(KonTownOption.ALLIED_BUILDING,val);
 	}
 
 	public boolean isAlliedBuildingAllowed() {
-		return townOptions.get(KonTownOption.ALLIED_BUILDING);
+		return getTownOption(KonTownOption.ALLIED_BUILDING);
 	}
 
 	public void setIsFriendlyRedstoneAllowed(boolean val) {
-		townOptions.put(KonTownOption.FRIENDLY_REDSTONE,val);
+		setTownOption(KonTownOption.FRIENDLY_REDSTONE,val);
 	}
 
 	public boolean isFriendlyRedstoneAllowed() {
-		return townOptions.get(KonTownOption.FRIENDLY_REDSTONE);
+		return getTownOption(KonTownOption.FRIENDLY_REDSTONE);
 	}
 
 	public void setIsEnemyRedstoneAllowed(boolean val) {
-		townOptions.put(KonTownOption.ENEMY_REDSTONE,val);
+		setTownOption(KonTownOption.ENEMY_REDSTONE,val);
 	}
 	
 	public boolean isEnemyRedstoneAllowed() {
-		return townOptions.get(KonTownOption.ENEMY_REDSTONE);
+		return getTownOption(KonTownOption.ENEMY_REDSTONE);
 	}
 	
 	public void setIsPlotOnly(boolean val) {
-		townOptions.put(KonTownOption.PLOTS_ONLY,val);
+		setTownOption(KonTownOption.PLOTS_ONLY,val);
 	}
 	
 	public boolean isPlotOnly() {
-		return townOptions.get(KonTownOption.PLOTS_ONLY);
+		return getTownOption(KonTownOption.PLOTS_ONLY);
 	}
 	
 	public void setIsGolemOffensive(boolean val) {
-		townOptions.put(KonTownOption.GOLEM_OFFENSE,val);
+		setTownOption(KonTownOption.GOLEM_OFFENSE,val);
 	}
 	
 	public boolean isGolemOffensive() {
-		return townOptions.get(KonTownOption.GOLEM_OFFENSE);
+		return getTownOption(KonTownOption.GOLEM_OFFENSE);
 	}
 
 	/*
