@@ -660,6 +660,9 @@ public class TownMenu extends StateMenu {
             if (townOption.equals(KonTownOption.ALLIED_BUILDING)) {
                 isOptionEnabled = getKonquest().getCore().getBoolean(CorePath.KINGDOMS_ALLY_BUILD.getPath(),false);
             }
+            if (town.isTownOptionOverridden(townOption)) {
+                isOptionEnabled = false;
+            }
             if (isOptionEnabled) {
                 allOptions.add(townOption);
             }

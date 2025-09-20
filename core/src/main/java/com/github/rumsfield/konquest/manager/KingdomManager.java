@@ -55,6 +55,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private final HashMap<UUID,Integer> exilePlayerCooldowns;
 	private final ArrayList<DiplomacyTicket> diplomacyTickets;
 	private boolean isKingdomDataNull;
+	private final Timer payTimer;
 
 	// Global Event features
 	private boolean isGlobalEventWar;
@@ -85,8 +86,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private boolean townDestroyLordEnable;
 	private boolean townDestroyMasterEnable;
 	private boolean townPurchaseEnable;
-
-	private final Timer payTimer;
 	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -191,6 +190,39 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		discountStack			= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
 		discountPercent 		= Math.max(discountPercent,0);
 		discountPercent 		= Math.min(discountPercent,100);
+
+		// Town Option Overrides
+		for (KonKingdom kingdom : getKingdoms()) {
+			for (KonTown townCapital : kingdom.getCapitalTowns()) {
+				townCapital.refreshOptionOverrides();
+			}
+		}
+		boolean showOptionList = false;
+		FileConfiguration townOptionsConfig = konquest.getConfigManager().getConfig("town-options");
+		ConfigurationSection rootSection = townOptionsConfig.getConfigurationSection("town-options");
+		if (rootSection != null) {
+			for(String townSectionName : rootSection.getKeys(false)) {
+				if (townSectionName.equals("global") || isTown(townSectionName) || isCapital(townSectionName)) {
+					// Check for valid keys
+					for(String optionName : rootSection.getConfigurationSection(townSectionName).getKeys(false)) {
+						if (KonTownOption.getOption(optionName) == null) {
+							ChatUtil.printConsoleError("Invalid option \""+optionName+"\" for entry \""+townSectionName+"\" in town-options.yml, must match a Town Option.");
+							showOptionList = true;
+						}
+					}
+				} else {
+					// Entry is not a valid town name
+					ChatUtil.printConsoleError("Invalid entry \""+townSectionName+"\" in town-options.yml, must match a town name, kingdom name, or global.");
+				}
+			}
+			if (showOptionList) {
+				ArrayList<String> optionNames = new ArrayList<>();
+				for (KonTownOption option : KonTownOption.values()) {
+					optionNames.add(option.toString());
+				}
+				ChatUtil.printConsoleError("Town Option names are: "+HelperUtil.formatCommaSeparatedList(optionNames));
+			}
+		}
 	}
 
 	public String getKingdomPayTime() {
@@ -3567,6 +3599,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		if (!isTownOptionFeatureEnabled(option)) {
 			// Cannot set this option
 			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
+			return false;
+		}
+		// Check for overrides
+		if (town.isTownOptionOverridden(option)) {
+			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
 			return false;
 		}
 		// Set option

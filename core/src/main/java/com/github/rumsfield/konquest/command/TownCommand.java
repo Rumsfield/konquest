@@ -723,6 +723,8 @@ public class TownCommand extends CommandBase {
 				}
 			}
 		} else if (numArgs == 4) {
+			String townName = args.get(1);
+			KonTown town;
 			switch (args.get(2).toLowerCase()) {
 				case "rename":
 					tabList.add("***");
@@ -756,17 +758,19 @@ public class TownCommand extends CommandBase {
 					}
 					break;
 				case "option":
+					town = kingdom.getTownCapital(townName);
+					if (town == null) return Collections.emptyList();
 					for (KonTownOption option : KonTownOption.values()) {
-						tabList.add(option.toString());
+						if (!town.isTownOptionOverridden(option)) {
+							tabList.add(option.toString());
+						}
 					}
 					break;
 				case "requests":
-					String townName = args.get(1);
-					KonTown town = kingdom.getTownCapital(townName);
-					if (town != null) {
-						for (OfflinePlayer requester : town.getJoinRequests()) {
-							tabList.add(requester.getName());
-						}
+					town = kingdom.getTownCapital(townName);
+					if (town == null) return Collections.emptyList();
+					for (OfflinePlayer requester : town.getJoinRequests()) {
+						tabList.add(requester.getName());
 					}
 					break;
 				case "resident":
