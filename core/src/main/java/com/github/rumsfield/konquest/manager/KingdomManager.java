@@ -3697,8 +3697,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_GOLEM_ENABLE.getMessage(town.getName());
 				}
 				break;
+			case KINGDOM_RESIDENTS:
+				if(!value) {
+					// Disable kingdom residents
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_DISABLE.getMessage(town.getName());
+				} else {
+					// Enable kingdom residents
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_ENABLE.getMessage(town.getName());
+				}
+				break;
 			default:
-				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL.getMessage();
+				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage("Missing town option case "+option+" in KingdomManager#setTownOption");
 				break;
 		}
 		boolean isSenderResident = false;

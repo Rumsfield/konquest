@@ -928,6 +928,8 @@ command:
     notice:
       open: Opened %s for access by all kingdom members.
       close: Closed %s, only residents may build and access containers.
+      kingdom-resident-enable: '%s now adds all new kingdom members as residents.'
+      kingdom-resident-disable: '%s no longer adds new kingdom members as residents.'
       plot-enable: '%s now allows residents to only build within plots.'
       plot-disable: '%s now allows residents to build in town land and within plots.'
       allied-building-enable: '%s now allows allies to build.'

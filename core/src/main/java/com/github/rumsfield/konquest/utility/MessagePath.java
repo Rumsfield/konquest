@@ -810,6 +810,8 @@ public enum MessagePath {
 	COMMAND_SPY_ERROR_TOWN                      (0, "command.spy.error.town"),
 	COMMAND_TOWN_NOTICE_OPEN                    (1, "command.town.notice.open"),
 	COMMAND_TOWN_NOTICE_CLOSE                   (1, "command.town.notice.close"),
+	COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_ENABLE (1, "command.town.notice.kingdom-resident-enable"),
+	COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_DISABLE (1, "command.town.notice.kingdom-resident-disable"),
 	COMMAND_TOWN_NOTICE_PLOT_ENABLE             (1, "command.town.notice.plot-enable"),
 	COMMAND_TOWN_NOTICE_PLOT_DISABLE            (1, "command.town.notice.plot-disable"),
 	COMMAND_TOWN_NOTICE_ALLIED_BUILDING_ENABLE  (1, "command.town.notice.allied-building-enable"),
