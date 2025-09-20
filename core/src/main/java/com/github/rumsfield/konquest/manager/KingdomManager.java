@@ -191,9 +191,38 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		discountPercent 		= Math.max(discountPercent,0);
 		discountPercent 		= Math.min(discountPercent,100);
 
-		// Forced Town Options
-
-
+		// Town Option Overrides
+		for (KonKingdom kingdom : getKingdoms()) {
+			for (KonTown townCapital : kingdom.getCapitalTowns()) {
+				townCapital.refreshOptionOverrides();
+			}
+		}
+		boolean showOptionList = false;
+		FileConfiguration townOptionsConfig = konquest.getConfigManager().getConfig("town-options");
+		ConfigurationSection rootSection = townOptionsConfig.getConfigurationSection("town-options");
+		if (rootSection != null) {
+			for(String townSectionName : rootSection.getKeys(false)) {
+				if (townSectionName.equals("global") || isTown(townSectionName) || isCapital(townSectionName)) {
+					// Check for valid keys
+					for(String optionName : rootSection.getConfigurationSection(townSectionName).getKeys(false)) {
+						if (KonTownOption.getOption(optionName) == null) {
+							ChatUtil.printConsoleError("Invalid option \""+optionName+"\" for entry \""+townSectionName+"\" in town-options.yml, must match a Town Option.");
+							showOptionList = true;
+						}
+					}
+				} else {
+					// Entry is not a valid town name
+					ChatUtil.printConsoleError("Invalid entry \""+townSectionName+"\" in town-options.yml, must match a town name, kingdom name, or global.");
+				}
+			}
+			if (showOptionList) {
+				ArrayList<String> optionNames = new ArrayList<>();
+				for (KonTownOption option : KonTownOption.values()) {
+					optionNames.add(option.toString());
+				}
+				ChatUtil.printConsoleError("Town Option names are: "+HelperUtil.formatCommaSeparatedList(optionNames));
+			}
+		}
 	}
 
 	public String getKingdomPayTime() {

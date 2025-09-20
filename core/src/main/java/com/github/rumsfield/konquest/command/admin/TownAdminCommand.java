@@ -650,6 +650,7 @@ public class TownAdminCommand extends CommandBase {
 	@Override
 	public List<String> tabComplete(Konquest konquest, CommandSender sender, List<String> args) {
 		List<String> tabList = new ArrayList<>();
+		KonTown town;
 		int numArgs = args.size();
 		if (numArgs == 1) {
 			// suggest sub-commands
@@ -713,8 +714,12 @@ public class TownAdminCommand extends CommandBase {
 					}
 					break;
 				case "option":
+					town = konquest.getKingdomManager().getTownCapital(args.get(1));
+					if (town == null) return Collections.emptyList();
 					for (KonTownOption option : KonTownOption.values()) {
-						tabList.add(option.toString());
+						if (!town.isTownOptionOverridden(option)) {
+							tabList.add(option.toString());
+						}
 					}
 					break;
 				case "shield":
@@ -755,8 +760,7 @@ public class TownAdminCommand extends CommandBase {
 					tabList.add("false");
 					break;
 				case "resident":
-					String townName = args.get(1);
-					KonTown town = konquest.getKingdomManager().getTownCapital(townName);
+					town = konquest.getKingdomManager().getTownCapital(args.get(1));
 					if (town == null) return Collections.emptyList();
 					switch (args.get(2).toLowerCase()) {
 						case "add":

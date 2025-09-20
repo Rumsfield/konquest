@@ -6,12 +6,12 @@
 # players from modifying the options in-game.
 #
 # The town options are
-#   open                All kingdom members can build and use chests
-#   allied_building     Allied players can build
-#   plots_only          Residents can only build and use chests in plots
-#   friendly_redstone   Kingdom members can use redstone switches and doors
-#   enemy_redstone      Enemies can use redstone switches and doors
-#   golem_offense       Iron Golems will attack all enemies who enter
+#   OPEN                All kingdom members can build and use chests
+#   ALLIED_BUILDING     Allied players can build
+#   PLOTS_ONLY          Residents can only build and use chests in plots
+#   FRIENDLY_REDSTONE   Kingdom members can use redstone switches and doors
+#   ENEMY_REDSTONE      Enemies can use redstone switches and doors
+#   GOLEM_OFFENSE       Iron Golems will attack all enemies who enter
 #
 # Set options in the "global" section, or make a section for a specific town or kingdom capital.
 # Use the kingdom's name for its capital, or a town's name to override options (case sensitive).
@@ -20,12 +20,12 @@
 # Example settings
 # town-options:
 #   global:
-#     enemy_redstone: true
+#     ENEMY_REDSTONE: true
 #   RomeKingdom:
-#     open: true
+#     OPEN: true
 #   BigTown:
-#     plots_only: true
-#     golem_offense: false
+#     PLOTS_ONLY: true
+#     GOLEM_OFFENSE: false
 #
 # Remember to use the "/k admin reload" command after modifying this file if the server is running.
 # 
@@ -33,9 +33,10 @@
 version: 0.0.0
 town-options:
 #  global:
-#    enemy_redstone: true
+#    ENEMY_REDSTONE: true
 #  example_town_name:
-#    allied_building: true
-#    golem_offense: false
+#    ALLIED_BUILDING: true
+#    GOLEM_OFFENSE: false
 #  example_kingdom_name:
-#    open: true
+#    OPEN: true
+#    ENEMY_REDSTONE: false
