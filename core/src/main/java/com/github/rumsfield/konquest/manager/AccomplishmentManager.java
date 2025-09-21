@@ -76,7 +76,7 @@ public class AccomplishmentManager {
 				playerPrefix.addPrefix(pre);
 				ChatUtil.sendKonPriorityTitle(player, ChatColor.DARK_PURPLE+pre.getName(), ChatColor.GOLD+MessagePath.GENERIC_NOTICE_ACCOMPLISHMENT.getMessage(), 60, 5, 10);
 				ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_UNLOCK.getMessage()+": "+ChatColor.DARK_PURPLE+pre.getName());
-				player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0);
+				Konquest.playNotificationGoodSound(player.getBukkitPlayer());
 			} else if(playerPrefix.hasPrefix(pre) && pre.level() > level) {
 				// Remove a prefix that is below the current level
 				ChatUtil.printDebug("Accomplishment reverted for player "+player.getBukkitPlayer().getName()+" with prefix "+pre.getName());
@@ -86,7 +86,7 @@ public class AccomplishmentManager {
 					playerPrefix.setEnable(false);
 				}
 				ChatUtil.sendNotice(player.getBukkitPlayer(), ChatColor.WHITE+MessagePath.GENERIC_NOTICE_PREFIX_LOST.getMessage()+": "+ChatColor.DARK_RED+pre.getName());
-				player.getBukkitPlayer().getWorld().playSound(player.getBukkitPlayer().getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)0.1);
+				Konquest.playNotificationBadSound(player.getBukkitPlayer());
 			}
 		}
 

@@ -43,7 +43,7 @@ repositories{
 
 dependencies{
     // Spigot
-    compileOnly("org.spigotmc:spigot-api:1.21.5-R0.1-SNAPSHOT") // Primary API
+    compileOnly("org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT") // Primary API
     compileOnly("org.spigotmc:spigot-1.17.1-R0.1-SNAPSHOT-remapped") // for nms packets, local lib
     compileOnly("org.spigotmc:spigot-1.16.5-R0.1-SNAPSHOT") // for nms packets, local lib
 
@@ -66,7 +66,7 @@ dependencies{
     compileOnly("net.essentialsx:EssentialsX:2.20.1")
     compileOnly("xyz.jpenilla:squaremap-api:1.3.4")
 
-    implementation("org.apache.commons:commons-lang3:3.14.0")
+    implementation("org.apache.commons:commons-lang3:3.17.0")
     implementation("org.xerial:sqlite-jdbc:3.41.2.2")
     implementation(project(":api"))
 }

@@ -2,10 +2,7 @@ package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.KonquestPlugin;
-import com.github.rumsfield.konquest.model.KonPlayer;
-import com.github.rumsfield.konquest.model.KonStatsType;
-import com.github.rumsfield.konquest.model.KonTerritory;
-import com.github.rumsfield.konquest.model.KonTown;
+import com.github.rumsfield.konquest.model.*;
 import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -82,6 +79,7 @@ public class TravelManager implements Timeable {
 		}
 
 		// Determine whether player can cover cost
+		boolean isGlobalEventTravel = konquest.getGlobalEventManager().isEffectValid(KonGlobalEventEffect.FREE_TRAVEL);
 		boolean isTravelAlwaysAllowed = konquest.getCore().getBoolean(CorePath.FAVOR_ALLOW_TRAVEL_ALWAYS.getPath(),true);
 		double cost = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL.getPath(),0.0);
 		double cost_per_chunk = konquest.getCore().getDouble(CorePath.FAVOR_COST_TRAVEL_PER_CHUNK.getPath(),0.0);
@@ -105,14 +103,14 @@ public class TravelManager implements Timeable {
 				total_cost = cost + cost_world;
 			}
 		}
-		if(!isTravelAlwaysAllowed && total_cost > 0) {
-			if(KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
-				ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
-				return false;
-			}
-		}
-		if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
+		if(!isGlobalEventTravel && !isTravelAlwaysAllowed && total_cost > 0 && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(total_cost));
+			return false;
+		} else if(isTravelAlwaysAllowed && KonquestPlugin.getBalance(bukkitPlayer) < total_cost) {
 			// Override cost to 0 to allow the player to travel, when they don't have enough money.
+			total_cost = 0;
+		} else if (isGlobalEventTravel) {
+			// Make all travel free
 			total_cost = 0;
 		}
 		// Condition destination location. Sanctuary destinations have preserved look angles.
@@ -129,6 +127,9 @@ public class TravelManager implements Timeable {
 		// If player uses another travel command during warmup, cancel current warmup and begin a new one for new destination
 		int warmupSeconds = konquest.getCore().getInt(CorePath.TRAVEL_WARMUP.getPath(),0);
 		warmupSeconds = Math.max(warmupSeconds, 0);
+		if (isGlobalEventTravel) {
+			warmupSeconds = 0;
+		}
 		if(warmupSeconds > 0) {
 			String warmupTimeStr = ""+warmupSeconds;
 			ChatUtil.sendNotice(bukkitPlayer, MessagePath.COMMAND_TRAVEL_NOTICE_WARMUP.getMessage(warmupTimeStr));

@@ -24,6 +24,7 @@
 #	UNCLAIM			Allow players to unclaim land
 #	UPGRADE			Allow players to upgrade this town
 #	PLOTS			Allow players to set town plots
+#   SPECIALIZE      Allow players to change trade specialization
 # 
 # Properties for kingdoms
 #	PEACEFUL		Make this kingdom only peaceful
@@ -77,6 +78,7 @@ properties:
     unclaim: true
     upgrade: true
     plots: true
+    specialize: true
     travel: true
     pvp: true
     pve: true

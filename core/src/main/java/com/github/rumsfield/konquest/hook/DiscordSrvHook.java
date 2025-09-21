@@ -81,7 +81,11 @@ public class DiscordSrvHook implements PluginHook {
 			return 3;
 		}
 		try {
+			// Subscribe listener
 			DiscordSRV.api.subscribe(discordSrvListener);
+			// Check for ready
+			isDiscordReady = DiscordSRV.isReady;
+			// Enable hook
 			isEnabled = true;
 			reloadSettings();
 			return 0;
@@ -526,7 +530,8 @@ public class DiscordSrvHook implements PluginHook {
 	 * Messaging Methods
 	 */
 
-	//TODO remove this? DiscordSRV alerts can replace this function
+	// NOTE: Rather than manually sending messages to Discord channels, use events with DiscordSRV's alerts.yml feature.
+	/*
 	public boolean sendGameToDiscordMessage(String channel, String message) {
 		if (!isEnabled) return false;
 		TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(channel);
@@ -539,7 +544,7 @@ public class DiscordSrvHook implements PluginHook {
 
 		textChannel.sendMessage(message).queue();
 		return true;
-	}
+	}*/
 
 	// For sending chat messages to the DiscordSRV processor
 	public void sendGameChatToDiscord(Player player, String message, String channel, boolean isCancelled) {

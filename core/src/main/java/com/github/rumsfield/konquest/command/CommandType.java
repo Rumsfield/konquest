@@ -29,6 +29,7 @@ public enum CommandType {
 	CHAT    (Material.ENDER_CHEST,      "konquest.command.chat",    "c",  new ChatCommand(),      MessagePath.DESCRIPTION_CHAT.getMessage()),
 	SPY     (Material.ENDER_EYE,        "konquest.command.spy",     "",   new SpyCommand(),       MessagePath.DESCRIPTION_SPY.getMessage()),
 	FAVOR   (Material.GOLD_INGOT,       "konquest.command.favor",   "f",  new FavorCommand(),     MessagePath.DESCRIPTION_FAVOR.getMessage()),
+	EVENT   (Material.CLOCK,            "konquest.command.event",   "e",  new EventCommand(),     MessagePath.DESCRIPTION_EVENT.getMessage()),
 	SCORE   (Material.GOLDEN_CARROT,    "konquest.command.score",   "",   new ScoreCommand(),     MessagePath.DESCRIPTION_SCORE.getMessage()),
 	QUEST   (Material.WRITABLE_BOOK,    "konquest.command.quest",   "q",  new QuestCommand(),     MessagePath.DESCRIPTION_QUEST.getMessage()),
 	STATS   (Material.BOOK,             "konquest.command.stats",   "s",  new StatsCommand(),     MessagePath.DESCRIPTION_STATS.getMessage()),

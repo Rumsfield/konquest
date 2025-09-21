@@ -6,10 +6,7 @@ import com.github.rumsfield.konquest.api.manager.KonquestPlaceholderManager;
 import com.github.rumsfield.konquest.api.model.KonquestRelationshipType;
 import com.github.rumsfield.konquest.api.model.KonquestTerritoryType;
 import com.github.rumsfield.konquest.model.*;
-import com.github.rumsfield.konquest.utility.ChatUtil;
-import com.github.rumsfield.konquest.utility.CorePath;
-import com.github.rumsfield.konquest.utility.Labeler;
-import com.github.rumsfield.konquest.utility.MessagePath;
+import com.github.rumsfield.konquest.utility.*;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -656,6 +653,34 @@ public class PlaceholderManager implements KonquestPlaceholderManager {
 		KonOfflinePlayer offlinePlayer = playerManager.getOfflinePlayer(player);
 		if(offlinePlayer != null) {
 			result = konquest.getKingdomManager().getKingdomPayTime();
+		}
+		return result;
+	}
+
+	/*
+	 * Placeholder Event Info
+	 */
+
+	public String getActiveEvents() {
+		String result = "";
+		ArrayList<String> eventNames = new ArrayList<>();
+		for (KonGlobalEvent activeEvent : konquest.getGlobalEventManager().getEvents(true)) {
+			eventNames.add(activeEvent.getName());
+		}
+		if (!eventNames.isEmpty()) {
+			result = HelperUtil.formatCommaSeparatedList(eventNames);
+		}
+		return result;
+	}
+
+	public String getActiveEventEffects() {
+		String result = "";
+		ArrayList<String> effectNames = new ArrayList<>();
+		for (KonGlobalEventEffect effect : konquest.getGlobalEventManager().getValidEffects()) {
+			effectNames.add(effect.getTitle());
+		}
+		if (!effectNames.isEmpty()) {
+			result = HelperUtil.formatCommaSeparatedList(effectNames);
 		}
 		return result;
 	}

@@ -55,6 +55,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private final HashMap<UUID,Integer> exilePlayerCooldowns;
 	private final ArrayList<DiplomacyTicket> diplomacyTickets;
 	private boolean isKingdomDataNull;
+	private final Timer payTimer;
+
+	// Global Event features
+	private boolean isGlobalEventWar;
+	private boolean isGlobalEventPeace;
 
 	// Config Settings
 	private boolean isAdminOnly;
@@ -81,8 +86,6 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	private boolean townDestroyLordEnable;
 	private boolean townDestroyMasterEnable;
 	private boolean townPurchaseEnable;
-
-	private final Timer payTimer;
 	
 	public KingdomManager(Konquest konquest) {
 		this.konquest = konquest;
@@ -100,6 +103,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		this.exilePlayerCooldowns = new HashMap<>();
 		this.diplomacyTickets = new ArrayList<>();
 		this.isKingdomDataNull = false;
+		this.isGlobalEventWar = false;
+		this.isGlobalEventPeace = false;
 
 		this.isAdminOnly = false;
 		this.payIntervalSeconds = 0;
@@ -185,6 +190,39 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		discountStack			= konquest.getCore().getBoolean(CorePath.TOWNS_DISCOUNT_STACK.getPath());
 		discountPercent 		= Math.max(discountPercent,0);
 		discountPercent 		= Math.min(discountPercent,100);
+
+		// Town Option Overrides
+		for (KonKingdom kingdom : getKingdoms()) {
+			for (KonTown townCapital : kingdom.getCapitalTowns()) {
+				townCapital.refreshOptionOverrides();
+			}
+		}
+		boolean showOptionList = false;
+		FileConfiguration townOptionsConfig = konquest.getConfigManager().getConfig("town-options");
+		ConfigurationSection rootSection = townOptionsConfig.getConfigurationSection("town-options");
+		if (rootSection != null) {
+			for(String townSectionName : rootSection.getKeys(false)) {
+				if (townSectionName.equals("global") || isTown(townSectionName) || isCapital(townSectionName)) {
+					// Check for valid keys
+					for(String optionName : rootSection.getConfigurationSection(townSectionName).getKeys(false)) {
+						if (KonTownOption.getOption(optionName) == null) {
+							ChatUtil.printConsoleError("Invalid option \""+optionName+"\" for entry \""+townSectionName+"\" in town-options.yml, must match a Town Option.");
+							showOptionList = true;
+						}
+					}
+				} else {
+					// Entry is not a valid town name
+					ChatUtil.printConsoleError("Invalid entry \""+townSectionName+"\" in town-options.yml, must match a town name, kingdom name, or global.");
+				}
+			}
+			if (showOptionList) {
+				ArrayList<String> optionNames = new ArrayList<>();
+				for (KonTownOption option : KonTownOption.values()) {
+					optionNames.add(option.toString());
+				}
+				ChatUtil.printConsoleError("Town Option names are: "+HelperUtil.formatCommaSeparatedList(optionNames));
+			}
+		}
 	}
 
 	public String getKingdomPayTime() {
@@ -910,7 +948,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		 * 		Updates offline protections
 		 * 		Updates border particles for player
 		 * 		Updates discord roles, if enabled
-		 * 		
+		 * 		Updates town/capital residencies, per-options
 		 */
     	
 		// Verify kingdom exists
@@ -1018,12 +1056,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		ChatUtil.printDebug("Failed to add member "+ id +" to kingdom "+joinKingdom.getName());
     		return -1;
     	}
-
+		// Update player's kingdom assignment
 		if(isOnline) {
     		onlinePlayer.setKingdom(joinKingdom);
     		onlinePlayer.setExileKingdom(joinKingdom);
     		onlinePlayer.setBarbarian(false);
-    		// Refresh any territory bars
+			// Update player's town residencies
+			addKingdomResidents(onlinePlayer,joinKingdom);
+			// Refresh any territory bars
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
     		if(territory instanceof KonBarDisplayer) {
     			((KonBarDisplayer)territory).removeBarPlayer(onlinePlayer);
@@ -1031,6 +1071,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		}
         	// Updates
         	updateKingdomOfflineProtection();
+			updatePlayerMembershipStats(onlinePlayer);
         	konquest.updateNamePackets(onlinePlayer);
         	konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
         	// Apply cool-down
@@ -1041,6 +1082,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		offlinePlayer.setKingdom(joinKingdom);
     		offlinePlayer.setExileKingdom(joinKingdom);
     		offlinePlayer.setBarbarian(false);
+			// Update offline player's town residencies
+			addKingdomResidents(offlinePlayer,joinKingdom);
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
 		// Update Discord roles
@@ -1565,6 +1608,33 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			return false;
 		}
 	}
+
+	// Used when assigning new kingdom members
+	// Adds players to towns/capital as residents, when options allow
+	private void addKingdomResidents(KonOfflinePlayer player, KonKingdom kingdom) {
+		OfflinePlayer offlinePlayer = player.getOfflineBukkitPlayer();
+		int numMaxResidents = konquest.getCore().getInt(CorePath.TOWNS_MAX_RESIDENT_LIMIT.getPath(),0);
+		for (KonTown townOrCapital : kingdom.getCapitalTowns()) {
+			if (townOrCapital.getTownOption(KonTownOption.KINGDOM_RESIDENTS)) {
+				// Check for joinable conditions
+				if(player.isBarbarian() || townOrCapital.isPlayerResident(offlinePlayer) || !townOrCapital.isJoinable()) {
+					continue;
+				}
+				if(numMaxResidents > 0 && townOrCapital.getNumResidents() >= numMaxResidents) {
+					continue;
+				}
+				// Add the player as a resident
+				townOrCapital.removeJoinRequest(offlinePlayer.getUniqueId());
+				if(townOrCapital.addPlayerResident(offlinePlayer,false)) {
+					for(OfflinePlayer resident : townOrCapital.getPlayerResidents()) {
+						if(resident.isOnline()) {
+							ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_NEW_RESIDENT.getMessage(offlinePlayer.getName(),townOrCapital.getName()));
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	// Wrapper for exile for offline players
 	// Used by officers to remove players from their kingdom
@@ -1917,8 +1987,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 */
 	public boolean menuChangeTownSpecialization(KonTown town, Villager.Profession profession, KonPlayer payPlayer, CommandSender messageSender, boolean isAdmin) {
 		if (town == null || profession == null) return false;
-		double costSpecial = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
+		// Check property flag
+		if (!isAdmin && town.hasPropertyValue(KonPropertyFlag.SPECIALIZE) && !town.getPropertyValue(KonPropertyFlag.SPECIALIZE)) {
+			// Non-admin tried to change specialization while SPECIALIZE flag is false
+			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		// Check cost
+		double costSpecial = konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SPECIALIZE.getPath());
 		if(costSpecial > 0 && !isAdmin && payPlayer != null) {
 			if(KonquestPlugin.getBalance(payPlayer.getBukkitPlayer()) < costSpecial) {
 				ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_FAVOR.getMessage(costSpecial));
@@ -1976,6 +2052,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		// Check for self relation
 		if(kingdom.equals(otherKingdom)) {
 			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
+
+		// Check for global events
+		if (isGlobalEventWar || isGlobalEventPeace) {
+			// Cannot change relation during global events
+			ChatUtil.sendError(messageSender,MessagePath.GENERIC_ERROR_NO_EVENT.getMessage());
 			return false;
 		}
 
@@ -2262,6 +2345,32 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		kingdom2.removeRelationRequest(kingdom1);
 	}
 
+	public void enableGlobalEventWar(boolean isEnabled) {
+		boolean wasEnabled = isGlobalEventWar;
+		isGlobalEventWar = isEnabled;
+		if (wasEnabled != isEnabled) {
+			for (KonKingdom kingdom : getKingdoms()) {
+				konquest.updateNamePackets(kingdom);
+				konquest.getTerritoryManager().updatePlayerBorderParticles(kingdom);
+				konquest.getTerritoryManager().updateTownDisplayBars(kingdom);
+				refreshTownNerfs(kingdom);
+			}
+		}
+	}
+
+	public void enableGlobalEventPeace(boolean isEnabled) {
+		boolean wasEnabled = isGlobalEventPeace;
+		isGlobalEventPeace = isEnabled;
+		if (wasEnabled != isEnabled) {
+			for (KonKingdom kingdom : getKingdoms()) {
+				konquest.updateNamePackets(kingdom);
+				konquest.getTerritoryManager().updatePlayerBorderParticles(kingdom);
+				konquest.getTerritoryManager().updateTownDisplayBars(kingdom);
+				refreshTownNerfs(kingdom);
+			}
+		}
+	}
+
 	/**
 	 * Get the shared diplomatic type of two kingdoms.
 	 * Performs error checking to ensure both kingdoms have the same active relation.
@@ -2271,6 +2380,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	 * @return The diplomatic type
 	 */
 	public KonquestDiplomacyType getDiplomacy(@NotNull KonquestKingdom kingdom1, @NotNull KonquestKingdom kingdom2) {
+		// Check for global events
+		if (isGlobalEventWar) {
+			// When global event war is enabled, all kingdoms are at war
+			return KonquestDiplomacyType.WAR;
+		} else if (isGlobalEventPeace) {
+			// When global event peace is enabled, all kingdoms are at peace
+			return KonquestDiplomacyType.PEACE;
+		}
 		// Default kingdoms are always at war (barbarian & neutral)
 		if(!kingdom1.isCreated() || !kingdom2.isCreated()) {
 			return KonquestDiplomacyType.WAR;
@@ -2314,17 +2431,37 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     	}
 		KonquestRelationshipType result;
     	if(contextKingdom.equals(getBarbarians())) {
+			// Theirs is barbarian
     		result = KonquestRelationshipType.BARBARIAN;
 		} else if(contextKingdom.equals(getNeutrals())) {
+			// Theirs is neutral
     		result = KonquestRelationshipType.NEUTRAL;
 		} else {
+			// Theirs is a kingdom
 			if(displayKingdom.equals(contextKingdom)) {
+				// Ours and theirs is the same kingdom
 				result = KonquestRelationshipType.FRIENDLY;
     		} else if (displayKingdom.equals(getBarbarians())) {
-    			result = KonquestRelationshipType.ENEMY;
+				// Ours is barbarian, theirs is a kingdom
+				if (isGlobalEventPeace) {
+					result = KonquestRelationshipType.PEACEFUL;
+				} else {
+					result = KonquestRelationshipType.ENEMY;
+				}
     		} else {
+				// Ours is a kingdom, theirs is a different kingdom
+				if (isGlobalEventWar) {
+					// Global event, all kingdoms at war
+					return KonquestRelationshipType.ENEMY;
+				}
+				// Evaluate diplomacy relationship
     			if(isKingdomWar(displayKingdom, contextKingdom)) {
-    				result = KonquestRelationshipType.ENEMY;
+					if (isGlobalEventPeace) {
+						// Global event, make peace for kingdoms at war
+						result = KonquestRelationshipType.PEACEFUL;
+					} else {
+						result = KonquestRelationshipType.ENEMY;
+					}
 				} else if(isKingdomAlliance(displayKingdom, contextKingdom)) {
 					result = KonquestRelationshipType.ALLY;
 				} else if(isKingdomTrade(displayKingdom, contextKingdom)) {
@@ -3496,6 +3633,11 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_DISABLED.getMessage());
 			return false;
 		}
+		// Check for overrides
+		if (town.isTownOptionOverridden(option)) {
+			ChatUtil.sendError(messageSender, MessagePath.GENERIC_ERROR_NO_ALLOW.getMessage());
+			return false;
+		}
 		// Set option
 		boolean result = town.setTownOption(option, value);
 		// Display messages
@@ -3555,8 +3697,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_GOLEM_ENABLE.getMessage(town.getName());
 				}
 				break;
+			case KINGDOM_RESIDENTS:
+				if(!value) {
+					// Disable kingdom residents
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_DISABLE.getMessage(town.getName());
+				} else {
+					// Enable kingdom residents
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_ENABLE.getMessage(town.getName());
+				}
+				break;
 			default:
-				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL.getMessage();
+				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage("Missing town option case "+option+" in KingdomManager#setTownOption");
 				break;
 		}
 		boolean isSenderResident = false;
@@ -3843,6 +3994,13 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	public KonLeaderboard getKingdomLeaderboard(KonKingdom kingdom) {
 		KonLeaderboard leaderboard = new KonLeaderboard();
 		if(kingdom.equals(barbarians)) return leaderboard;
+		// Gather weights
+		int weight_town_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_LORDS.getPath());
+		int weight_town_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_KNIGHTS.getPath());
+		int weight_town_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_RESIDENTS.getPath());
+		int weight_land_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_LORDS.getPath());
+		int weight_land_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_KNIGHTS.getPath());
+		int weight_land_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_RESIDENTS.getPath());
 		// Determine scores for all players within towns
 		HashMap<OfflinePlayer,KonPlayerScoreAttributes> memberScores = new HashMap<>();
 		int numTownLords;
@@ -3880,6 +4038,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					KonOfflinePlayer validPlayer = konquest.getPlayerManager().getOfflinePlayer(offlinePlayer);
 					if(validPlayer != null && validPlayer.getKingdom().equals(kingdom)) {
 						KonPlayerScoreAttributes newMemberAttributes = new KonPlayerScoreAttributes();
+						// Set weights
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, weight_town_lords);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, weight_town_knights);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, weight_town_residents);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_LORDS, weight_land_lords);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_KNIGHTS, weight_land_knights);
+						newMemberAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_RESIDENTS, weight_land_residents);
+						// Set attributes
 						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, numTownLords);
 						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, numTownKnights);
 						newMemberAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, numTownResidents);
@@ -3933,12 +4099,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 	    	for(KonOfflinePlayer kingdomPlayer : allPlayersInKingdom) {
 	    		numKingdomFavor += (int) KonquestPlugin.getBalance(kingdomPlayer.getOfflineBukkitPlayer());
 	    	}
-	    	// Gather favor costs
-	    	int cost_settle = (int)konquest.getCore().getDouble(CorePath.FAVOR_TOWNS_COST_SETTLE.getPath());
-	    	int cost_claim = (int)konquest.getCore().getDouble(CorePath.FAVOR_COST_CLAIM.getPath());
-	    	// Set attributes
-	    	scoreAttributes.setAttributeWeight(ScoreAttribute.TOWNS, cost_settle+2);
-	    	scoreAttributes.setAttributeWeight(ScoreAttribute.LAND, cost_claim+1);
+	    	// Gather weights
+			int weight_towns 		= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_TOWNS.getPath());
+			int weight_land 		= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_LAND.getPath());
+			int weight_favor 		= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_FAVOR.getPath());
+			int weight_population 	= (int)konquest.getCore().getDouble(CorePath.SCORE_KINGDOM_POPULATION.getPath());
+	    	// Set weights
+	    	scoreAttributes.setAttributeWeight(ScoreAttribute.TOWNS, weight_towns);
+	    	scoreAttributes.setAttributeWeight(ScoreAttribute.LAND, weight_land);
+			scoreAttributes.setAttributeWeight(ScoreAttribute.FAVOR, weight_favor);
+			scoreAttributes.setAttributeWeight(ScoreAttribute.POPULATION, weight_population);
+			// Set attributes
 	    	scoreAttributes.setAttribute(ScoreAttribute.TOWNS, numKingdomTowns);
 	    	scoreAttributes.setAttribute(ScoreAttribute.LAND, numKingdomLand);
 	    	scoreAttributes.setAttribute(ScoreAttribute.FAVOR, numKingdomFavor);
@@ -3974,6 +4145,21 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					numResidentLand += town.getChunkList().size();
 				}
 			}
+			// Gather weights
+			int weight_town_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_LORDS.getPath());
+			int weight_town_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_KNIGHTS.getPath());
+			int weight_town_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_TOWN_RESIDENTS.getPath());
+			int weight_land_lords 		= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_LORDS.getPath());
+			int weight_land_knights 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_KNIGHTS.getPath());
+			int weight_land_residents 	= (int)konquest.getCore().getDouble(CorePath.SCORE_PLAYER_LAND_RESIDENTS.getPath());
+			// Set weights
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, weight_town_lords);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, weight_town_knights);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, weight_town_residents);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_LORDS, weight_land_lords);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_KNIGHTS, weight_land_knights);
+			scoreAttributes.setAttributeWeight(KonPlayerScoreAttributes.ScoreAttribute.LAND_RESIDENTS, weight_land_residents);
+			// Set attributes
 			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_LORDS, numTownLords);
 			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_KNIGHTS, numTownKnights);
 			scoreAttributes.setAttribute(KonPlayerScoreAttributes.ScoreAttribute.TOWN_RESIDENTS, numTownResidents);
@@ -5049,9 +5235,9 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					townInstanceSection.set("friendly_redstone", town.isFriendlyRedstoneAllowed());
 					townInstanceSection.set("redstone", town.isEnemyRedstoneAllowed());
 					townInstanceSection.set("golem_offensive", town.isGolemOffensive());
-					townInstanceSection.set("shield", town.isShielded());
-					townInstanceSection.set("shield_time", town.getShieldEndTime());
-					townInstanceSection.set("armor", town.isArmored());
+					townInstanceSection.set("shield", town.isShielded(true));
+					townInstanceSection.set("shield_time", town.getShieldEndTime(true));
+					townInstanceSection.set("armor", town.isArmored(true));
 					townInstanceSection.set("armor_blocks", town.getArmorBlocks());
 					townInstanceSection.set("lord", "");
 					ConfigurationSection townInstanceResidentSection = townInstanceSection.createSection("residents");

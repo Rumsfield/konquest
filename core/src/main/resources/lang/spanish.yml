@@ -12,6 +12,7 @@ version: 0.0.0
 # //// LABEL \\\\
 # Palabras o frases simples utilizadas en todo el complemento.
 label:
+  active: Activo
   admin: Administrador
   admin-kingdom: Reino Administrativo
   allied-building: Construccion Aliada
@@ -31,9 +32,11 @@ label:
   cost: Costo
   critical-hits: Golpes Criticos
   current: Actual
+  date: Fecha
   diplomacy: Diplomacia
   disabled: Deshabilitado
   friendly-redstone: Redstone Amigable
+  enabled: Activado
   enemy-redstone: Redstone Enemigo
   'false': 'Falso'
   favor: Favor
@@ -48,6 +51,7 @@ label:
   invalid: Invalido
   kingdom: Reino
   kingdom-rank: Rango del Reino
+  kingdom-residents: Residentes del Reino
   kingdoms: Reinos
   knights: Caballeros
   land: Tierra
@@ -64,6 +68,7 @@ label:
   monument-templates: Plantillas de Monumentos
   neutrals: Neutrales
   next: Siguiente
+  none: Ninguno
   no-lord: Sin Senor
   no-permission: Sin Permiso
   officers: Oficiales
@@ -181,6 +186,7 @@ menu:
     kingdom: Menú del Reino
     town: Menú del Pueblo
     travel: Menú de Viajes
+    event: Menú de Eventos Globales
     map-auto: Modo Automático del Mapa
     kingdom-chat: Chat del Reino
     admin-bypass: Omisión de Administrador
@@ -200,6 +206,18 @@ menu:
     description-kingdom: Administra tu reino, únete a otros reinos o conviértete en un bárbaro.
     description-town: Administra tus ciudades y únete a otras ciudades.
     description-travel: Teletransportate a varios destinos.
+    description-event: Mostrar detalles sobre los eventos globales del servidor.
+  event:
+    title: Eventos Globales de Konquest
+    global-event: Evento Global
+    global-effect: Efecto Global
+    today: Hoy
+    calendar: Calendario
+    events: Eventos Globales
+    effects: Efectos Globales
+    description-calendar: Mostrar un calendario de eventos por mes.
+    description-events: Mostrar todos los eventos globales y ver detalles.
+    description-effects: Mostrar todos los efectos del evento y su estado.
   stats:
     title: Estadisticas de Logros
     intro-1: Usa "/k stats" o "/k s" para abrir este libro de nuevo.
@@ -286,6 +304,7 @@ menu:
   options:
     allied-building: Los jugadores aliados pueden construir
     open: Todos los miembros del reino pueden construir y usar cofres
+    kingdom-residents: Los nuevos miembros del reino se unen como residentes
     plot: Los residentes solo pueden construir y usar cofres en parcelas
     friendly-redstone: Los miembros del reino pueden usar interruptores y puertas de redstone
     redstone: Los enemigos pueden usar interruptores y puertas de redstone
@@ -500,6 +519,7 @@ generic:
     no-permission: No tienes permiso para hacer eso.
     no-allow: No tienes permiso para hacer eso.
     no-player: ¡Debes ser un jugador para hacer esto!
+    no-event: No puedes hacer eso durante el evento global.
     unknown-name: 'Error al encontrar nombre desconocido, verifica la ortografia: %s'
     bad-name: No se pudo encontrar %s en tu Reino.
     format-name: El nombre solo puede contener letras y/o numeros.
@@ -589,6 +609,28 @@ command:
       error:
         create-exist: El jugador ya tiene un campamento, eliminelo primero antes de crear uno nuevo.
         destroy-exist: El jugador no tiene un campamento.
+    event:
+      notice:
+        create: Evento %s creado correctamente. Use este comando de nuevo para modificar e iniciar el evento.
+        remove: Evento %s eliminado.
+        start-now: Evento %s iniciado ahora.
+        start-date: Evento %s programado para comenzar el %s.
+        duration: Duración del evento %s programada en %s.
+        repetition: Repetición del evento %s programada en %s.
+        effect-add: Efecto %s añadido al evento %s.
+        effect-remove: Efecto %s eliminado del evento %s.
+        enable: Evento global %s habilitado.
+        disable: Evento global %s deshabilitado.
+      error:
+        year: El año debe ser mayor que 2000.
+        month: El mes debe estar entre el 1 (enero) y el 12 (diciembre).
+        day: El día debe estar entre el 1 y el 31.
+        hour: La hora debe estar entre 0 y 23.
+        minute: El minuto debe estar entre 0 y 59.
+        duration: No se pudo establecer una duración mayor que el tiempo de repetición. Aumentar primero la repetición.
+        repetition: No se pudo establecer una repetición menor que el tiempo de duración. Disminuir primero la duración.
+        effect-conflict: No se pudo añadir un efecto que entra en conflicto con el efecto del evento existente %s.
+        effect-missing: No se pudo eliminar el efecto porque no está en el evento.
     flag:
       notice:
         all-properties: Todas las Propiedades
@@ -694,6 +736,34 @@ command:
       fail-far: Fallo al reclamar, demasiado lejos del centro del territorio.
       fail-claimed: Fallo al reclamar, ya reclamado.
       resident: Debes unirte a %s como residente para reclamar tierras.
+  event:
+    broadcast:
+      start: ¡El evento global %s ha comenzado! Usa el comando "/k event" para más detalles.
+      end: El evento global %s ha finalizado. Utilice el comando "/k event" para obtener más información.
+      enable: El evento global %s ahora está habilitado y sus efectos están activos.
+      disable: El evento global %s ahora está deshabilitado y sus efectos están pausados.
+    notice:
+      effects: Todos los efectos de eventos globales
+      no-events: No hay eventos globales
+      ends: Termina en %s
+      starts: Comienza en %s
+      events: Página de eventos globales %s
+      page: Para ver más páginas use /k event list <page>
+      info: Información del evento global
+      info-no-active: No hay eventos globales activos
+      info-no-upcoming: No hay próximos eventos globales
+      info-effects: Efectos globales activos
+      info-events: Acontecimientos mundiales actuales
+      info-next: Próximo evento global
+      details: Detalles del evento global
+    property:
+      name: Nombre del evento
+      duration: Duración Horas
+      repetition: Días de repetición
+      start-initial: Fecha de inicio inicial
+      start-next: Próxima fecha de inicio
+      end-next: Próxima fecha de finalización
+      effects: Lista de efectos
   favor:
     notice:
       message: Tienes %s Favor, los costos son...
@@ -858,6 +928,8 @@ command:
     notice:
       open: Abierto %s para acceso por todos los miembros del reino.
       close: Cerrado %s, solo los residentes pueden construir y acceder a contenedores.
+      kingdom-resident-enable: '%s ahora agrega a todos los nuevos miembros del reino como residentes.'
+      kingdom-resident-disable: '%s ya no agrega nuevos miembros del reino como residentes.'
       plot-enable: '%s ahora permite que los residentes solo construyan dentro de parcelas.'
       plot-disable: '%s ahora permite que los residentes construyan en tierra del pueblo y dentro de parcelas.'
       allied-building-enable: '%s ahora permite que los aliados construyan.'
@@ -1161,6 +1233,7 @@ description:
   score: Mostrar la puntuación actual de un Jugador.
   fly: Volar dentro de tierra amiga.
   border: Alternar los bordes de partículas de territorios y parcelas.
+  event: Mostrar detalles sobre eventos globales.
   admin: Solo para Admins.
   admin-help: Mostrar el mensaje de ayuda de admin.
   admin-bypass: Alternar modo de omisión de admin.
@@ -1179,6 +1252,7 @@ description:
   admin-reload: Recargar archivos de configuración.
   admin-flag: Establecer banderas de propiedad para reinos y territorios.
   admin-stat: Gestionar estadísticas de jugadores.
+  admin-event: Gestionar eventos globales y sus efectos.
 # //// PROPERTIES \\\\
 # Nombres y descripciones de todas las banderas de propiedad en reinos y territorios.
 properties:
@@ -1212,6 +1286,8 @@ properties:
   upgrade: Permitir que los jugadores mejoren este pueblo
   plots-name: Parcelas
   plots: Permitir que los jugadores establezcan parcelas del pueblo
+  specialize-name: Especializarse
+  specialize: Permitir cambiar la especialización comercial
   peaceful-name: Pacifico
   peaceful: Hacer un reino solo pacifico
   golems-name: Golems
@@ -1230,3 +1306,48 @@ properties:
   shop: Permitir que los jugadores creen tiendas
   arena-name: Arena
   arena: Permitir que cualquier jugador luche entre sí
+# //// EFFECTS \\\\
+# Títulos y descripciones de todos los efectos de eventos globales.
+effects:
+  pvp-name: Todo PvP
+  pvp: Todos los jugadores pueden luchar
+  war-name: Toda la guerra
+  war: Todos los reinos están en guerra
+  peace-name: Toda la paz
+  peace: Todos los reinos están en paz
+  travel-name: Viaje gratis
+  travel: El viaje es instantáneo y gratuito
+  shields-name: Escudos gratis
+  shields: Las ciudades y capitales obtienen escudos ilimitados
+  no-shields-name: Sin escudos
+  no-shields: Todos los escudos de las ciudades están rotos
+  no-armor-name: Sin armadura
+  no-armor: Se elimina toda la armadura de la ciudad
+  no-protection-name: Sin protección
+  no-protection: Todas las ciudades pueden ser atacadas sin conexión
+  no-immunity-name: Sin inmunidad
+  no-immunity: Todas las capitales pierden inmunidad
+  favor-1-name: Descuento de favor 1
+  favor-1: Los costes de favor se reducen un 20%
+  favor-2-name: Descuento de favor 2
+  favor-2: Los costes de favor se reducen un 50%
+  favor-3-name: Descuento de favor 3
+  favor-3: El coste de favor se reduce un 80%
+  monument-1-name: Botín de Monumento 1
+  monument-1: El botín de la ciudad se duplica x2
+  monument-2-name: Botín de Monumento 2
+  monument-2: El botín de la ciudad se duplica x5
+  monument-3-name: Botín de Monumento 3
+  monument-3: El botín de la ciudad se duplica x10
+  ruin-1-name: Botín de Ruina 1
+  ruin-1: El botín de Ruina se duplica x2
+  ruin-2-name: Botín de Ruina 2
+  ruin-2: El botín de Ruina se duplica x5
+  ruin-3-name: Botín de Ruina 3
+  ruin-3: El botín de Ruina se duplica x10
+  exp-1-name: Aumento de EXP 1
+  exp-1: Los orbes de experiencia se duplican x2
+  exp-2-name: Aumento de EXP 2
+  exp-2: Los orbes de experiencia se duplican x5
+  exp-3-name: Aumento de EXP 3
+  exp-3: Los orbes de experiencia se duplican x10

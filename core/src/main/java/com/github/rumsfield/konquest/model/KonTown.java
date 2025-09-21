@@ -13,6 +13,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.*;
@@ -52,12 +54,17 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	private final HashMap<UUID,Double> purchaseOffers;
 	private RequestKeeper joinRequestKeeper;
 	private final HashMap<KonTownOption,Boolean> townOptions;
+	private final HashMap<KonTownOption,Boolean> townOptionsOverride;
 	private boolean isAttacked;
 	private boolean isShielded;
+	private boolean isShieldFreeEvent;
+	private boolean isShieldDisableEvent;
 	private boolean isArmored;
+	private boolean isArmorDisableEvent;
 	private boolean isTownWatchProtected;
 	private int shieldEndTimeSeconds;
 	private int shieldNowTimeSeconds;
+	private int shieldStoreTimeSeconds;
 	private int armorTotalBlocks;
 	private int armorCurrentBlocks;
 	private double armorProgress;
@@ -106,10 +113,14 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.joinRequestKeeper = new RequestKeeper();
 		this.isAttacked = false;
 		this.isShielded = false;
+		this.isShieldFreeEvent = false;
+		this.isShieldDisableEvent = false;
 		this.isArmored = false;
+		this.isArmorDisableEvent = false;
 		this.isTownWatchProtected = false;
 		this.shieldEndTimeSeconds = 0;
 		this.shieldNowTimeSeconds = 0;
+		this.shieldStoreTimeSeconds = 0;
 		this.armorTotalBlocks = 0;
 		this.armorCurrentBlocks = 0;
 		this.armorProgress = 0.0;
@@ -118,6 +129,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		this.disabledUpgrades = new HashMap<>();
 		this.plots = new HashMap<>();
 		this.townOptions = new HashMap<>();
+		this.townOptionsOverride = new HashMap<>();
 		initOptions();
 		this.properties = new HashMap<>();
 		initProperties();
@@ -149,6 +161,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		for (KonTownOption option : townOptions.keySet()) {
 			copyTown.setTownOption(option, townOptions.get(option));
 		}
+		copyTown.refreshOptionOverrides();
 		// Set properties
 		for (KonPropertyFlag flag : properties.keySet()) {
 			copyTown.setPropertyValue(flag, properties.get(flag));
@@ -167,6 +180,44 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		townOptions.clear();
 		for (KonTownOption option : KonTownOption.values()) {
 			townOptions.put(option,option.getDefaultValue());
+			// Special conditions
+			if (option.equals(KonTownOption.KINGDOM_RESIDENTS) && this.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+				townOptions.put(option,true); // Force initial Kingdom Residents option to true for capitals
+			}
+		}
+		refreshOptionOverrides();
+	}
+
+	public void refreshOptionOverrides() {
+		townOptionsOverride.clear();
+		FileConfiguration townOptionsConfig = getKonquest().getConfigManager().getConfig("town-options");
+		if (townOptionsConfig.get("town-options") == null) return;
+		// Check for globals
+		ConfigurationSection globalSection = townOptionsConfig.getConfigurationSection("town-options.global");
+		if (globalSection != null) {
+			// Global section exists
+			for(String globalOptionName : globalSection.getKeys(false)) {
+				KonTownOption globalOptionOverride = KonTownOption.getOption(globalOptionName);
+				if (globalOptionOverride != null) {
+					// Add option override
+					boolean optionValue = globalSection.getBoolean(globalOptionName);
+					townOptionsOverride.put(globalOptionOverride, optionValue);
+				}
+			}
+		}
+		// Check for town name
+		String sectionName = (this instanceof KonCapital) ? this.getKingdom().getName() : this.getName();
+		ConfigurationSection townSection = townOptionsConfig.getConfigurationSection("town-options."+sectionName);
+		if (townSection != null) {
+			// Town section exists
+			for(String townOptionName : townSection.getKeys(false)) {
+				KonTownOption townOptionOverride = KonTownOption.getOption(townOptionName);
+				if (townOptionOverride != null) {
+					// Add option override
+					boolean optionValue = townSection.getBoolean(townOptionName);
+					townOptionsOverride.put(townOptionOverride, optionValue);
+				}
+			}
 		}
 	}
 
@@ -177,6 +228,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		result.add(KonPropertyFlag.UNCLAIM);
 		result.add(KonPropertyFlag.UPGRADE);
 		result.add(KonPropertyFlag.PLOTS);
+		result.add(KonPropertyFlag.SPECIALIZE);
 		result.add(KonPropertyFlag.TRAVEL);
 		result.add(KonPropertyFlag.PVP);
 		result.add(KonPropertyFlag.PVE);
@@ -1085,21 +1137,21 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		String critical = MessagePath.LABEL_CRITICAL_HITS.getMessage();
 
 		// Set title conditions
-		if(isShielded && isArmored) {
-			remainingSeconds = getRemainingShieldTimeSeconds();
+		if(isShielded() && isArmored()) {
+			remainingSeconds = isShieldFreeEvent ? -1 : getRemainingShieldTimeSeconds();
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
 			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
 			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
 			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+armorCurrentBlocks+" "+armor+" | "+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
-		} else if(isShielded) {
-			remainingSeconds = getRemainingShieldTimeSeconds();
+		} else if(isShielded()) {
+			remainingSeconds = isShieldFreeEvent ? -1 : getRemainingShieldTimeSeconds();
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.friendColor2));
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.enemyColor2));
 			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.alliedColor2));
 			monumentBarTrade.setTitle(Konquest.tradeColor2 +getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.tradeColor2));
 			monumentBarPeace.setTitle(Konquest.peacefulColor2+getName()+separator+shield+" "+HelperUtil.getTimeFormat(remainingSeconds,Konquest.peacefulColor2));
-		} else if(isArmored) {
+		} else if(isArmored()) {
 			monumentBarFriendlies.setTitle(Konquest.friendColor2+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarWar.setTitle(Konquest.enemyColor2+getName()+separator+armorCurrentBlocks+" "+armor);
 			monumentBarAlliance.setTitle(Konquest.alliedColor2+getName()+separator+armorCurrentBlocks+" "+armor);
@@ -1120,7 +1172,7 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		
 		// Set progress conditions
-		if(isShielded || isArmored) {
+		if(isShielded() || isArmored()) {
 			setAllBarStyle(BarStyle.SEGMENTED_10);
 			setBarProgress(armorProgress);
 		} else if(isAttacked) {
@@ -1190,7 +1242,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	public void sendRaidAlert(KonPlayer attacker) {
 		// Attempt to start a raid alert
-		if(!isRaidAlertDisabled()) {
+		boolean isPerm = attacker.getBukkitPlayer().hasPermission("konquest.raid.entry");
+		if(!isRaidAlertDisabled() && isPerm) {
 			// Alert all players of this town's kingdom
 			for(KonPlayer player : getKonquest().getPlayerManager().getPlayersInKingdom(getKingdom().getName())) {
 				if(!player.isAdminBypassActive() && !player.getBukkitPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
@@ -1313,11 +1366,21 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		Town Options
 	 */
 
+	public boolean isTownOptionOverridden(KonTownOption option) {
+		return townOptionsOverride.containsKey(option);
+	}
+
 	public boolean setTownOption(KonTownOption option, boolean value) {
 		if (townOptions.containsKey(option)) {
-			// Set valid option
-			townOptions.put(option,value);
-			return true;
+			// Option is valid
+			if (townOptionsOverride.containsKey(option)) {
+				// Option is overridden
+				return false;
+			} else {
+				// Set valid option
+				townOptions.put(option,value);
+				return true;
+			}
 		}
 		// No valid option
 		return false;
@@ -1325,8 +1388,8 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 	public boolean getTownOption(KonTownOption option) {
 		if (townOptions.containsKey(option)) {
-			// Get valid option
-			return townOptions.get(option);
+			// Option is valid
+			return townOptionsOverride.containsKey(option) ? townOptionsOverride.get(option) : townOptions.get(option);
 		}
 		// No valid option
 		return false;
@@ -1334,51 +1397,51 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 
 	/* Legacy Methods */
 	public void setIsOpen(boolean val) {
-		townOptions.put(KonTownOption.OPEN,val);
+		setTownOption(KonTownOption.OPEN,val);
 	}
 	
 	public boolean isOpen() {
-		return townOptions.get(KonTownOption.OPEN);
+		return getTownOption(KonTownOption.OPEN);
 	}
 
 	public void setIsAlliedBuildingAllowed(boolean val) {
-		townOptions.put(KonTownOption.ALLIED_BUILDING,val);
+		setTownOption(KonTownOption.ALLIED_BUILDING,val);
 	}
 
 	public boolean isAlliedBuildingAllowed() {
-		return townOptions.get(KonTownOption.ALLIED_BUILDING);
+		return getTownOption(KonTownOption.ALLIED_BUILDING);
 	}
 
 	public void setIsFriendlyRedstoneAllowed(boolean val) {
-		townOptions.put(KonTownOption.FRIENDLY_REDSTONE,val);
+		setTownOption(KonTownOption.FRIENDLY_REDSTONE,val);
 	}
 
 	public boolean isFriendlyRedstoneAllowed() {
-		return townOptions.get(KonTownOption.FRIENDLY_REDSTONE);
+		return getTownOption(KonTownOption.FRIENDLY_REDSTONE);
 	}
 
 	public void setIsEnemyRedstoneAllowed(boolean val) {
-		townOptions.put(KonTownOption.ENEMY_REDSTONE,val);
+		setTownOption(KonTownOption.ENEMY_REDSTONE,val);
 	}
 	
 	public boolean isEnemyRedstoneAllowed() {
-		return townOptions.get(KonTownOption.ENEMY_REDSTONE);
+		return getTownOption(KonTownOption.ENEMY_REDSTONE);
 	}
 	
 	public void setIsPlotOnly(boolean val) {
-		townOptions.put(KonTownOption.PLOTS_ONLY,val);
+		setTownOption(KonTownOption.PLOTS_ONLY,val);
 	}
 	
 	public boolean isPlotOnly() {
-		return townOptions.get(KonTownOption.PLOTS_ONLY);
+		return getTownOption(KonTownOption.PLOTS_ONLY);
 	}
 	
 	public void setIsGolemOffensive(boolean val) {
-		townOptions.put(KonTownOption.GOLEM_OFFENSE,val);
+		setTownOption(KonTownOption.GOLEM_OFFENSE,val);
 	}
 	
 	public boolean isGolemOffensive() {
-		return townOptions.get(KonTownOption.GOLEM_OFFENSE);
+		return getTownOption(KonTownOption.GOLEM_OFFENSE);
 	}
 
 	/*
@@ -1679,15 +1742,32 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 
 	public boolean isTownWatchProtected() {
-		return isTownWatchProtected;
+		boolean isGlobalEventNoProtection = getKonquest().getGlobalEventManager().isEffectValid(KonGlobalEventEffect.NO_PROTECTION);
+		return isTownWatchProtected && !isGlobalEventNoProtection;
 	}
 	
 	public boolean isShielded() {
-		return isShielded;
+		return isShielded(false);
+	}
+
+	public boolean isShielded(boolean ignoreEvents) {
+		if (ignoreEvents) {
+			return isShielded;
+		} else {
+			return isShieldFreeEvent || (isShielded && !isShieldDisableEvent);
+		}
 	}
 	
 	public boolean isArmored() {
-		return isArmored;
+		return isArmored(false);
+	}
+
+	public boolean isArmored(boolean ignoreEvents) {
+		if (ignoreEvents) {
+			return isArmored;
+		} else {
+			return isArmored && !isArmorDisableEvent;
+		}
 	}
 	
 	public void activateShield(int val) {
@@ -1713,6 +1793,61 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		}
 		isShielded = false;
 		shieldTimer.stopTimer();
+		updateBarTitle();
+	}
+
+	private void restoreShieldTime() {
+		if (shieldStoreTimeSeconds > 0) {
+			Date now = new Date();
+			shieldNowTimeSeconds = (int)(now.getTime()/1000);
+			shieldEndTimeSeconds = shieldNowTimeSeconds + shieldStoreTimeSeconds;
+			shieldStoreTimeSeconds = 0;
+		}
+	}
+
+	public void enableShieldFreeEvent(boolean isEventEnable) {
+		if (isShieldDisableEvent) return; // Cannot have conflicting events
+		// Free shields
+		boolean wasEventEnabled = isShieldFreeEvent;
+		if (!wasEventEnabled && isEventEnable) {
+			// Begin a new event
+			if(isShielded) {
+				// Town is already shielded
+				// Save remaining time to be applied after event is over
+				shieldStoreTimeSeconds = getRemainingShieldTimeSeconds();
+			}
+			playActivateSound();
+		} else if (wasEventEnabled && !isEventEnable) {
+			// End an ongoing event
+			restoreShieldTime();
+		}
+		isShieldFreeEvent = isEventEnable;
+		updateBarTitle();
+	}
+
+	public void enableShieldDisableEvent(boolean isEventEnable) {
+		if (isShieldFreeEvent) return; // Cannot have conflicting events
+		// Disable shields
+		boolean wasEventEnabled = isShieldDisableEvent;
+		if (!wasEventEnabled && isEventEnable) {
+			// Begin a new event
+			if(isShielded) {
+				// Town is already shielded
+				// Save remaining time to be applied after event is over
+				shieldStoreTimeSeconds = getRemainingShieldTimeSeconds();
+			}
+			playDeactivateSound();
+		} else if (wasEventEnabled && !isEventEnable) {
+			// End an ongoing event
+			restoreShieldTime();
+		}
+		isShieldDisableEvent = isEventEnable;
+		updateBarTitle();
+	}
+
+	public void enableArmorDisableEvent(boolean isEventEnable) {
+		// Armor event is disabled armor
+		isArmorDisableEvent = isEventEnable;
 		updateBarTitle();
 	}
 	
@@ -1759,6 +1894,13 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	}
 	
 	public int getShieldEndTime() {
+		return getShieldEndTime(false);
+	}
+
+	public int getShieldEndTime(boolean ignoreEvents) {
+		if (ignoreEvents) {
+			restoreShieldTime();
+		}
 		return shieldEndTimeSeconds;
 	}
 	
@@ -1776,6 +1918,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 	
 	private void playDeactivateSound() {
 		getWorld().playSound(getCenterLoc(), Sound.BLOCK_GLASS_BREAK, (float)3.0, (float)0.3);
+	}
+
+	private void playActivateSound() {
+		getWorld().playSound(getCenterLoc(), Sound.BLOCK_BEACON_ACTIVATE, (float)3.0, (float)0.3);
 	}
 	
 	public void putPlot(KonPlot plot) {

@@ -12,6 +12,7 @@ version: 0.0.0
 # //// LABEL \\\\
 # 整個插件中使用的簡單單字或短語。
 label:
+  active: 活性
   admin: 管理員
   admin-kingdom: 管理員王國
   allied-building: 聯合建築商
@@ -31,9 +32,11 @@ label:
   cost: 成本
   critical-hits: 致命打擊
   current: 現在
+  date: 日期
   diplomacy: 外交
   disabled: 禁用
   friendly-redstone: 友好紅石
+  enabled: 已啟用
   enemy-redstone: 敵對紅石
   'false': '假'
   favor: 寵幸
@@ -48,6 +51,7 @@ label:
   invalid: 無效
   kingdom: 王國
   kingdom-rank: 王國排名
+  kingdom-residents: 王國居民
   kingdoms: 王國
   knights: 騎士
   land: 土地
@@ -64,6 +68,7 @@ label:
   monument-templates: 紀念碑模板
   neutrals: 中立者
   next: 下一個
+  none: 沒有任何
   no-lord: 無領主
   no-permission: 沒有許可
   officers: 官員
@@ -181,6 +186,7 @@ menu:
     kingdom: 王國菜單
     town: 城鎮菜單
     travel: 旅遊選單
+    event: 全球活動菜單
     map-auto: 地圖自動模式
     kingdom-chat: 王國聊天
     admin-bypass: 管理員繞過
@@ -200,6 +206,18 @@ menu:
     description-kingdom: 管理你的王國，加入其他王國，或成為一個野蠻人。
     description-town: 管理您的城鎮並加入其他城鎮。
     description-travel: 傳送至各個目的地。
+    description-event: 顯示有​​關伺服器全域事件的詳細資訊。
+  event:
+    title: Konquest 全球活動
+    global-event: 全球事件
+    global-effect: 全球效應
+    today: 今天
+    calendar: 行事曆
+    events: 全球事件
+    effects: 全球影響
+    description-calendar: 按月顯示事件日曆。
+    description-events: 顯示所有全球事件並查看詳細資訊。
+    description-effects: 顯示所有事件效果及其狀態。
   stats:
     title: 成就統計
     intro-1: 使用"/k stats"或"/k s"再次打開這本書。
@@ -286,6 +304,7 @@ menu:
   options:
     allied-building: 同盟玩家可以建造
     open: 所有王國成員都可以建造和使用箱子
+    kingdom-residents: 新王國成員以居民身分加入
     plot: 居民只能在地塊中建造和使用箱子
     friendly-redstone: 王國成員可以使用紅石開關和門
     redstone: 敵人可以使用紅石開關和門
@@ -500,6 +519,7 @@ generic:
     no-permission: 您沒有執行此操作的權限。
     no-allow: 您不允許執行此操作。
     no-player: 您必須是一名玩家才能執行此操作！
+    no-event: 在全球活動期間你不能這樣做。
     unknown-name: '無法找到未知名稱，請檢查拼寫： %s'
     bad-name: 在您的王國中找不到 %s。
     format-name: 名稱只能包含字母和/或數字。
@@ -589,6 +609,28 @@ command:
       error:
         create-exist: 玩家已經有一個營地，請先移除它，然後再創建一個新的。
         destroy-exist: 玩家沒有營地。
+    event:
+      notice:
+        create: 成功建立事件 %s，請再次使用此命令修改並啟動該事件。
+        remove: 已刪除事件 %s。
+        start-now: 活動 %s 現已開始。
+        start-date: 將事件 %s 設定為於 %s 開始。
+        duration: 將事件 %s 持續時間設定為 %s。
+        repetition: 將事件 %s 重複設為 %s。
+        effect-add: 為事件 %s 增加了效果 %s。
+        effect-remove: 已從事件 %s 移除效果 %s。
+        enable: 已啟用全域事件 %s。
+        disable: 已禁用全域事件 %s。
+      error:
+        year: 年份必須大於 2000。
+        month: 月份必須介於 1（一月）和 12（十二月）之間。
+        day: 日期必須介於 1 至 31 之間。
+        hour: 小時必須介於 0 至 23 之間。
+        minute: 分鐘必須介於 0 到 59 之間。
+        duration: 無法設定大於重複次數的持續時間。請先增加重複次數。
+        repetition: 無法將重複次數設定為小於持續時間。請先減少持續時間。
+        effect-conflict: 無法加入與現有事件效果 %s 衝突的效果。
+        effect-missing: 無法刪除效果，因為事件中缺少該效果。
     flag:
       notice:
         all-properties: 所有屬性
@@ -694,6 +736,34 @@ command:
       fail-far: 宣佈失敗，距離領土中心太遠。
       fail-claimed: 宣佈失敗，已經被宣佈。
       resident: 您必須以居民身分加入 %s 才能領取土地。
+  event:
+    broadcast:
+      start: 全域事件 %s 已開始！使用命令“/k event”查看詳情。
+      end: 全域事件 %s 已結束。使用命令“/k event”查看詳情。
+      enable: 全域事件 %s 現已啟用，且其效果處於活動狀態。
+      disable: 全域事件 %s 現已停用，其效果已暫停。
+    notice:
+      effects: 所有全域事件效果
+      no-events: 沒有全球事件
+      ends: 結束於 %s
+      starts: 開始於 %s
+      events: 全球事件頁面 %s
+      page: 要查看更多頁面，請使用 /k event list <page>
+      info: 全球活動資訊
+      info-no-active: 沒有活躍的全球事件
+      info-no-upcoming: 沒有即將發生的全球事件
+      info-effects: 主動全域效應
+      info-events: 當前全球事件
+      info-next: 下一個全球事件
+      details: 全球事件詳情
+    property:
+      name: 事件名稱
+      duration: 持續時間
+      repetition: 重複日
+      start-initial: 初始開始日期
+      start-next: 下次開始日期
+      end-next: 下一個結束日期
+      effects: 效果列表
   favor:
     notice:
       message: 你擁有 %s 的青睞，花費如下...
@@ -858,6 +928,8 @@ command:
     notice:
       open: 開放了 %s，所有王國成員都可以訪問。
       close: 關閉了 %s，只有居民可以建造和訪問容器。
+      kingdom-resident-enable: '%s 現在將所有新王國成員加入為居民。'
+      kingdom-resident-disable: '%s 不再增加新的王國成員作為居民。'
       plot-enable: '%s 現在允許居民只能在地塊內建造。'
       plot-disable: '%s 現在允許居民在城鎮土地內和地塊內建造。'
       allied-building-enable: '%s 現在允許盟友建造。'
@@ -1161,6 +1233,7 @@ description:
   score: 顯示玩家當前的分數。
   fly: 在友好土地範圍內飛行。
   border: 切換領地和地塊的粒子邊界。
+  event: 顯示有​​關全球事件的詳細資訊。
   admin: 供管理員使用。
   admin-help: 顯示管理員幫助訊息。
   admin-bypass: 切換管理員繞過模式。
@@ -1179,6 +1252,7 @@ description:
   admin-reload: 重新加載配置文件。
   admin-flag: 為王國和領土設置財產旗幟。
   admin-stat: 管理玩家統計數據。
+  admin-event: 管理全球事件及其影響。
 # //// PROPERTIES \\\\
 # 王國和領土內所有財產旗幟的名稱和描述。
 properties:
@@ -1212,6 +1286,8 @@ properties:
   upgrade: 允許玩家升級這個城鎮
   plots-name: 土地劃分
   plots: 允許玩家設置城鎮地塊
+  specialize-name: 專業化
+  specialize: 允許改變貿易專業化
   peaceful-name: 和平
   peaceful: 使王國只能和平
   golems-name: 鐵傀儡
@@ -1230,3 +1306,48 @@ properties:
   shop: 允許玩家創建商店
   arena-name: 競技場
   arena: 允許任何玩家互相戰鬥
+# //// EFFECTS \\\\
+# 所有全域事件效果的標題和描述。
+effects:
+  pvp-name: 所有 PvP
+  pvp: 所有玩家都可以戰鬥
+  war-name: 所有戰爭
+  war: 所有王國都處於戰爭狀態
+  peace-name: 一切平安
+  peace: 所有王國都和平
+  travel-name: 免費旅行
+  travel: 旅行即時且免費
+  shields-name: 免費盾牌
+  shields: 城鎮和首都獲得無限護盾
+  no-shields-name: 無盾牌
+  no-shields: 所有城鎮的盾牌都被打破
+  no-armor-name: 無盔甲
+  no-armor: 所有城鎮裝甲被拆除
+  no-protection-name: 無保護
+  no-protection: 所有城鎮均可離線攻擊
+  no-immunity-name: 沒有免疫力
+  no-immunity: 所有首都都失去豁免權
+  favor-1-name: 優惠折扣 1
+  favor-1: 人情成本減少 20%
+  favor-2-name: 優惠折扣 2
+  favor-2: 人情消耗降低 50%
+  favor-3-name: 人情折扣 3
+  favor-3: 人情消耗降低 80%
+  monument-1-name: 紀念碑戰利品 1
+  monument-1: 城鎮戰利品增加 2 倍
+  monument-2-name: 紀念碑戰利品 2
+  monument-2: 城鎮戰利品增加 5 倍
+  monument-3-name: 紀念碑戰利品 3
+  monument-3: 城鎮戰利品增加 10 倍
+  ruin-1-name: 遺跡戰利品 1
+  ruin-1: 遺跡戰利品增加 2 倍
+  ruin-2-name: 遺跡戰利品 2
+  ruin-2: 遺跡戰利品增加 5 倍
+  ruin-3-name: 遺跡戰利品 3
+  ruin-3: 遺跡戰利品增加 10 倍
+  exp-1-name: 經驗值提升 1
+  exp-1: 經驗球增加 2 倍
+  exp-2-name: 經驗值提升 2
+  exp-2: 經驗球增加 5 倍
+  exp-3-name: 經驗提升 3
+  exp-3: 經驗球增加 10 倍

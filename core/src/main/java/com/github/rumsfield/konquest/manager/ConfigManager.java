@@ -59,6 +59,8 @@ public class ConfigManager{
 		updateConfigVersion("prefix");
 		addConfig("commands", new KonConfig("commands",false));
 		updateConfigVersion("commands");
+		addConfig("town-options", new KonConfig("town-options",false));
+		updateConfigVersion("town-options");
 
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");
@@ -68,13 +70,17 @@ public class ConfigManager{
 		addConfig("camps", new KonConfig("data/camps"));
 		addConfig("ruins", new KonConfig("data/ruins"));
 		addConfig("sanctuaries", new KonConfig("data/sanctuaries"));
+		addConfig("global-events", new KonConfig("data/global-events"));
 
 		// Backup Readme
 		Konquest.getInstance().getPlugin().saveResource("backup-instructions-readme.txt", true);
 
 		// Banners
 		Konquest.getInstance().getPlugin().saveResource("banners/banner-instructions-readme.txt", true);
-		Konquest.getInstance().getPlugin().saveResource("banners/default.png", false);
+		File defaultBannerFile = new File(Konquest.getInstance().getPlugin().getDataFolder(), "banners/default.png");
+		if (!defaultBannerFile.exists()) {
+			Konquest.getInstance().getPlugin().saveResource("banners/default.png", false);
+		}
 
 		// Language files
 		addConfig("lang_english", new KonConfig("lang/english",false));

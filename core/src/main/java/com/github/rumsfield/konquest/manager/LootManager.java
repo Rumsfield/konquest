@@ -473,12 +473,14 @@ public class LootManager implements Timeable{
 		// Get number of loot items
 		int upgradeLevel = konquest.getUpgradeManager().getTownUpgradeLevel(town, KonUpgrade.LOOT);
 		int upgradedLootCount = monumentLootCount + upgradeLevel;
+		int eventLootMultiplier = konquest.getGlobalEventManager().getMonumentLootMultiplier();
+		int numLootCount = upgradedLootCount * eventLootMultiplier;
 		// Update the inventory with loot
 		clearUpperInventory(originalInventory);
 		// Generate new items
 		int finalItemCount = 0;
 		int availableSlot;
-		for (int i=0; i<upgradedLootCount; i++) {
+		for (int i=0; i<numLootCount; i++) {
 			availableSlot = lootInventory.firstEmpty();
 			if(availableSlot != -1) {
 				lootInventory.setItem(availableSlot,lootTable.chooseRandomItem());
@@ -552,7 +554,6 @@ public class LootManager implements Timeable{
 		// Verify capture status
 		Location invLoc = originalInventory.getLocation();
 		if (invLoc == null || invLoc.getWorld() == null) return null;
-		int count = ruinLootCount;
 		boolean isLootAfterCapture = konquest.getCore().getBoolean(CorePath.RUINS_LOOT_AFTER_CAPTURE.getPath());
 		boolean isRuinCaptured = ruin.isCaptureDisabled();
 		if(isLootAfterCapture && !isRuinCaptured) {
@@ -590,10 +591,13 @@ public class LootManager implements Timeable{
 		lootInventory = konquest.getPlugin().getServer().createInventory(originalInventory.getHolder(), originalInventory.getSize(), lootTable.getName());
 		// Update the inventory with loot
 		clearUpperInventory(originalInventory);
+		// Determine loot count
+		int eventLootMultiplier = konquest.getGlobalEventManager().getRuinLootMultiplier();
+		int numLootCount = ruinLootCount * eventLootMultiplier;
 		// Generate new items
 		int finalItemCount = 0;
 		int availableSlot;
-		for(int i=0;i<count;i++) {
+		for(int i=0;i<numLootCount;i++) {
 			availableSlot = lootInventory.firstEmpty();
 			if(availableSlot != -1) {
 				lootInventory.setItem(availableSlot,lootTable.chooseRandomItem());

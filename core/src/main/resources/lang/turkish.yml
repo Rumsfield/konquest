@@ -12,6 +12,7 @@ version: 0.0.0
 # //// LABEL \\\\
 # Eklenti boyunca kullanılan basit kelimeler veya ifadeler.
 label:
+  active: Aktif
   admin: Yönetici
   admin-kingdom: Yönetici Krallığı
   allied-building: Müttefik Yapı
@@ -31,9 +32,11 @@ label:
   cost: Ücret
   critical-hits: Kritik Vuruş
   current: Akım
+  date: Tarih
   diplomacy: Diplomasi
   disabled: Engelli
   friendly-redstone: Dost Kızıltaş
+  enabled: Etkinleştirilmiş
   enemy-redstone: Düşman Kızıltaş
   false: Yanlış
   favor: Para
@@ -48,6 +51,7 @@ label:
   invalid: Geçersiz
   kingdom: Krallık
   kingdom-rank: Krallık Sıralaması
+  kingdom-residents: Krallık Sakinleri
   kingdoms: Krallıklar
   knights: Şovalyeler
   land: Alan
@@ -64,6 +68,7 @@ label:
   monument-templates: Anıt Şablonları
   neutrals: Tarafsızlar
   next: Sonraki
+  none: Hiçbiri
   no-lord: Lordsuz
   no-permission: İzin Yok
   officers: Memurlar
@@ -181,6 +186,7 @@ menu:
     kingdom: Krallık Menüsü
     town: Kasaba Menüsü
     travel: Seyahat Menüsü
+    event: Küresel Etkinlikler Menüsü
     map-auto: Harita Otomatik Modu
     kingdom-chat: Krallık Sohbeti
     admin-bypass: Yönetici Atlama
@@ -200,6 +206,18 @@ menu:
     description-kingdom: Krallığınızı yönetin, diğer krallıklara katılın veya barbar olun.
     description-town: Kasabalarınızı yönetin ve diğer kasabalara katılın.
     description-travel: Çeşitli hedeflere ışınlanın.
+    description-event: Sunucunun genel olaylarıyla ilgili ayrıntıları görüntüleyin.
+  event:
+    title: Konquest Küresel Etkinlikleri
+    global-event: Küresel Etkinlik
+    global-effect: Küresel Etki
+    today: Bugün
+    calendar: Takvim
+    events: Küresel Etkinlikler
+    effects: Küresel Etkiler
+    description-calendar: Etkinlik takvimini aya göre görüntüleyin.
+    description-events: Tüm küresel etkinlikleri göster ve ayrıntıları görüntüle.
+    description-effects: Tüm etkinlik etkilerini ve durumlarını göster.
   stats:
     title: Başarı İstatistikleri
     intro-1: Bu kitabı tekrar açmak için "/k stats" veya "/k s" komutlarını kullan.
@@ -286,6 +304,7 @@ menu:
   options:
     allied-building: Dost oyuncular inşa edebilir
     open: Tüm krallık üyeleri sandık inşa edebilir ve kullanabilir
+    kingdom-residents: Yeni krallık üyeleri yerleşik olarak katılıyor
     plot: Sakinler yalnızca arsalarda sandık inşa edebilir ve kullanabilirler
     friendly-redstone: Krallık üyeleri redstone anahtarlarını ve kapılarını kullanabilir
     redstone: Düşmanlar redstone anahtarlarını ve kapılarını kullanabilir
@@ -500,6 +519,7 @@ generic:
     no-permission: Bunu yapma izniniz yok.
     no-allow: Bunu yapmanıza izin verilmiyor.
     no-player: Bunu yapmak için bir oyuncu olmalısınız!
+    no-event: Bunu küresel etkinlik sırasında yapamazsınız.
     unknown-name: 'Bilinmeyen adı bulamadı, yazımı kontrol edin: %s'
     bad-name: Krallığınızda %s bulunamadı.
     format-name: İsim sadece harf ve/veya rakamlardan oluşmalıdır.
@@ -589,6 +609,28 @@ command:
       error:
         create-exist: Oyuncunun zaten bir kampı var, yeni bir tane oluşturmadan önce mevcut kampı kaldırın.
         destroy-exist: Oyuncunun kampı yok.
+    event:
+      notice:
+        create: '%s olayı başarıyla oluşturuldu, olayı değiştirmek ve başlatmak için bu komutu tekrar kullanın.'
+        remove: '%s olayı kaldırıldı.'
+        start-now: '%s olayı şimdi başlatıldı.'
+        start-date: '%s olayının %s tarihinde başlamasını ayarla.'
+        duration: '%s olayının süresini %s olarak ayarla.'
+        repetition: '%s olayının tekrarını %s olarak ayarla.'
+        effect-add: '%s olayına %s efekti eklendi.'
+        effect-remove: '%s olayından %s efekti kaldırıldı.'
+        enable: '%s genel olayı etkinleştirildi.'
+        disable: '%s genel olayı devre dışı bırakıldı.'
+      error:
+        year: Yıl 2000'den büyük olmalıdır.
+        month: Ay 1 (Ocak) ile 12 (Aralık) arasında olmalıdır.
+        day: Gün 1 ile 31 arasında olmalıdır.
+        hour: Saat 0 ile 23 arasında olmalıdır.
+        minute: Dakika 0 ile 59 arasında olmalıdır.
+        duration: Süre tekrarlama süresinden daha uzun olarak ayarlanamadı. Önce tekrarlamayı artırın.
+        repetition: Tekrarlama süresinden daha kısa olarak ayarlanamadı. Önce süreyi azaltın.
+        effect-conflict: Mevcut etkinlik efekti %s ile çakışan bir efekt eklenemedi.
+        effect-missing: Etkinlikte eksik olduğu için efekt kaldırılamadı.
     flag:
       notice:
         all-properties: Tüm Özellikler
@@ -694,6 +736,34 @@ command:
       fail-far: Talep edilemedi, bölge merkezinden çok uzak.
       fail-claimed: Talep edilemedi, zaten talep edilmiş.
       resident: Araziyi talep edebilmek için %s'ye ikamet eden olarak katılmanız gerekir.
+  event:
+    broadcast:
+      start: Küresel Etkinlik %s başladı! Ayrıntılar için "/k event" komutunu kullanın.
+      end: Küresel Etkinlik %s sona erdi. Ayrıntılar için "/k event" komutunu kullanın.
+      enable: Küresel Olay %s artık etkin ve etkileri aktif.
+      disable: Küresel Olay %s artık devre dışı bırakıldı ve etkileri duraklatıldı.
+    notice:
+      effects: Tüm Küresel Olay Etkileri
+      no-events: Küresel Etkinlik Yok
+      ends: '%s tarihinde sona eriyor'
+      starts: "%s'de başlıyor"
+      events: Küresel Etkinlikler Sayfası %s
+      page: Daha fazla sayfa görüntülemek için "/k event list <page>" komutunu kullanın
+      info: Küresel Etkinlik Bilgileri
+      info-no-active: Aktif Küresel Etkinlik Yok
+      info-no-upcoming: Yaklaşan Küresel Etkinlik Yok
+      info-effects: Aktif Küresel Etkiler
+      info-events: Güncel Küresel Olaylar
+      info-next: Bir Sonraki Küresel Etkinlik
+      details: Küresel Etkinlik Ayrıntıları
+    property:
+      name: Etkinlik Adı
+      duration: Süre Saatler
+      repetition: Tekrar Günleri
+      start-initial: İlk Başlangıç ​​Tarihi
+      start-next: Sonraki Başlangıç ​​Tarihi
+      end-next: Sonraki Bitiş Tarihi
+      effects: Etki Listesi
   favor:
     notice:
       message: "%s para'ınız var, maliyetler..."
@@ -858,6 +928,8 @@ command:
     notice:
       open: '%s tüm krallık üyeleri için erişime açıldı.'
       close: '%s kapatıldı, sadece sakinler inşa edebilir ve konteynerlere erişebilir.'
+      kingdom-resident-enable: '%s artık tüm yeni krallık üyelerini sakin olarak ekliyor.'
+      kingdom-resident-disable: '%s artık krallığa yeni üyeler katmıyor.'
       plot-enable: '%s artık sakinlerin sadece parseller içinde inşa etmesine izin veriyor.'
       plot-disable: '%s artık sakinlerin şehir arazisinde ve parseller içinde inşa etmesine izin veriyor.'
       allied-building-enable: '%s artık müttefiklerin inşa etmesine izin veriyor.'
@@ -1161,6 +1233,7 @@ description:
   score: Bir Oyuncunun mevcut puanını gösterir.
   fly: Dost topraklarda uçar.
   border: Bölgelerin ve planların sınır parçacıklarını açar/kapatır.
+  event: Küresel etkinlikler hakkında ayrıntıları görüntüleyin.
   admin: Yalnızca Yöneticiler için.
   admin-help: Yönetici yardım mesajını gösterir.
   admin-bypass: Yönetici geçiş modunu açar/kapatır.
@@ -1179,6 +1252,7 @@ description:
   admin-reload: Konfigürasyon dosyalarını yeniden yükler.
   admin-flag: Krallık mülkiyet bayraklarını ayarlar.
   admin-stat: Oyuncu istatistiklerini yönetir.
+  admin-event: Küresel olayları ve etkilerini yönetin.
 # //// PROPERTIES \\\\
 # Krallık ve bölgelerdeki tüm mülk bayraklarının adları ve açıklamaları.
 properties:
@@ -1212,6 +1286,8 @@ properties:
   upgrade: Oyuncuların bu şehri yükseltmesine izin ver
   plots-name: Alanlar
   plots: Oyuncuların şehir alanlarını belirlemesine izin ver
+  specialize-name: Uzmanlaşmak
+  specialize: Ticaret uzmanlığının değişmesine izin verin
   peaceful-name: Barışçıl
   peaceful: Bir krallığı sadece barışçıl hale getir
   golems-name: Golem
@@ -1230,3 +1306,48 @@ properties:
   shop: Oyuncuların dükkan yaratmasına izin ver
   arena-name: Arena
   arena: Herhangi bir oyuncunun birbirleriyle savaşmasına izin ver
+# //// EFFECTS \\\\
+# Tüm küresel olay efektlerinin başlıkları ve açıklamaları.
+effects:
+  pvp-name: Tüm PvP
+  pvp: Tüm oyuncular savaşabilir
+  war-name: Tüm Savaş
+  war: Tüm krallıklar savaşta
+  peace-name: Tüm Barış
+  peace: Tüm krallıklar barışta
+  travel-name: Ücretsiz Seyahat
+  travel: Seyahat anında ve ücretsiz
+  shields-name: Ücretsiz Kalkanlar
+  shields: Kasabalar ve başkentler sınırsız kalkan kazanır
+  no-shields-name: Kalkan Yok
+  no-shields: Tüm kasaba kalkanları kırılır
+  no-armor-name: Zırh Yok
+  no-armor: Tüm kasaba zırhları kaldırılır
+  no-protection-name: Koruma Yok
+  no-protection: Tüm kasabalara çevrimdışı saldırılabilir
+  no-immunity-name: Bağışıklık Yok
+  no-immunity: Tüm başkentler bağışıklığı kaybeder
+  favor-1-name: İyilik İndirimi 1
+  favor-1: İyilik maliyetleri %20 azaltılır
+  favor-2-name: İyilik İndirimi 2
+  favor-2: İyilik maliyetleri %50 azaltılır
+  favor-3-name: İyilik İndirimi 3
+  favor-3: Lütuf maliyetleri %80 azaltıldı
+  monument-1-name: Anıt Ganimeti 1
+  monument-1: Kasaba ganimeti 2 kat artırıldı
+  monument-2-name: Anıt Ganimeti 2
+  monument-2: Kasaba ganimeti 5 kat artırıldı
+  monument-3-name: Anıt Ganimeti 3
+  monument-3: Kasaba ganimeti 10 kat artırıldı
+  ruin-1-name: Harabe Ganimeti 1
+  ruin-1: Harabe Ganimeti 2 kat artırıldı
+  ruin-2-name: Harabe Ganimeti 2
+  ruin-2: Harabe Ganimeti 5 kat artırıldı
+  ruin-3-name: Harabe Ganimeti 3
+  ruin-3: Harabe Ganimeti 10 kat artırıldı
+  exp-1-name: DP Artışı 1
+  exp-1: Deneyim Küreleri 2 kat artırıldı
+  exp-2-name: DP Artışı 2
+  exp-2: Deneyim Küreleri 5 kat artırıldı
+  exp-3-name: DP Artışı 3
+  exp-3: Deneyim Küreleri 10 kat artırıldı

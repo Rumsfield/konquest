@@ -5,8 +5,6 @@ version: @version@
 api-version: 1.16
 load: POSTWORLD
 main: com.github.rumsfield.konquest.KonquestPlugin
-libraries:
-  - org.apache.commons:commons-lang3:3.14.0
 depend: [Vault]
 softdepend:
   - ProtocolLib
@@ -72,6 +70,7 @@ permissions:
       konquest.command.settle: true
       konquest.command.travel: true
       konquest.command.favor: true
+      konquest.command.event: true
       konquest.command.quest: true
       konquest.command.score: true
       konquest.command.spy: true
@@ -124,6 +123,10 @@ permissions:
 
   konquest.command.favor:
     description: Display your favor and costs
+    default: true
+
+  konquest.command.event:
+    description: Display details about global events
     default: true
     
   konquest.command.quest:
@@ -190,6 +193,7 @@ permissions:
       konquest.admin.camp: true
       konquest.admin.capture: true
       konquest.admin.claim: true
+      konquest.admin.event: true
       konquest.admin.flag: true
       konquest.admin.help: true
       konquest.admin.kingdom: true
@@ -219,7 +223,11 @@ permissions:
   konquest.admin.claim:
     description: Claim land chunks for the nearest territory
     default: op
-  
+
+  konquest.admin.event:
+    description: Manage global events and their effects
+    default: op
+
   konquest.admin.flag:
     description: Set property flags for Kingdoms and territories
     default: op
@@ -346,3 +354,19 @@ permissions:
   konquest.chatcolor:
     description: Allows players to use color format codes in chat messages
     default: false
+
+  konquest.raid.entry:
+    description: Enables raid alerts upon entering enemy territory
+    default: true
+
+  konquest.raid.first:
+    description: Enables raid alerts on first critical block break in town monuments
+    default: true
+
+  konquest.raid.half:
+    description: Enables raid alerts on half of total critical block break in town monuments
+    default: true
+
+  konquest.raid.last:
+    description: Enables raid alerts on second to last critical block break in town monuments
+    default: true

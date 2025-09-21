@@ -1,0 +1,43 @@
+# Town Option Overrides
+# 
+# All towns and kingdom capitals have a set of options which affect how each town works.
+# By default, the town lords can modify these options in-game.
+# Use this config file to force any town options to a fixed value, and prevent
+# players from modifying the options in-game.
+#
+# The town options are
+#   OPEN                All kingdom members can build and use chests
+#   KINGDOM_RESIDENTS   New kingdom members join as a resident
+#   ALLIED_BUILDING     Allied players can build
+#   PLOTS_ONLY          Residents can only build and use chests in plots
+#   FRIENDLY_REDSTONE   Kingdom members can use redstone switches and doors
+#   ENEMY_REDSTONE      Enemies can use redstone switches and doors
+#   GOLEM_OFFENSE       Iron Golems will attack all enemies who enter
+#
+# Set options in the "global" section, or make a section for a specific town or kingdom capital.
+# Use the kingdom's name for its capital, or a town's name to override options (case sensitive).
+# Use the "global" section to override options for all towns and capitals in the server.
+#
+# Example settings
+# town-options:
+#   global:
+#     ENEMY_REDSTONE: true
+#   RomeKingdom:
+#     OPEN: true
+#   BigTown:
+#     PLOTS_ONLY: true
+#     GOLEM_OFFENSE: false
+#
+# Remember to use the "/k admin reload" command after modifying this file if the server is running.
+# 
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+town-options:
+#  global:
+#    ENEMY_REDSTONE: true
+#  example_town_name:
+#    ALLIED_BUILDING: true
+#    GOLEM_OFFENSE: false
+#  example_kingdom_name:
+#    OPEN: true
+#    ENEMY_REDSTONE: false

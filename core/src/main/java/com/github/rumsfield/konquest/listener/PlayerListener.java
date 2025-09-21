@@ -388,6 +388,8 @@ public class PlayerListener implements Listener {
 		assert player != null;
         // Check that the player is setting a region
         if (!player.isSettingRegion()) return;
+		// Check for blanking timer
+		if (player.isRegionBlank()) return;
 		ChatUtil.printDebug(bukkitPlayer.getName() + " setting region with action "+event.getAction()+", equipment "+event.getHand()+", state is "+player.getRegionType());
 		// Check if the player clicked air (cancel region setup)
 		if (event.getClickedBlock() == null) {
@@ -515,6 +517,7 @@ public class PlayerListener implements Listener {
 			default:
 				break;
 		}
+		player.setRegionBlank();
 		event.setCancelled(true);
     }
 
@@ -893,12 +896,22 @@ public class PlayerListener implements Listener {
     	if(konquest.isWorldIgnored(event.getPlayer().getLocation())) return;
     	Player bukkitPlayer = event.getPlayer();
     	KonPlayer player = playerManager.getPlayer(bukkitPlayer);
-    	int boostPercent = konquest.getCore().getInt(CorePath.KINGDOMS_SMALLEST_EXP_BOOST_PERCENT.getPath());
+    	// Smallest Kingdom Boost
+		int boostPercent = konquest.getCore().getInt(CorePath.KINGDOMS_SMALLEST_EXP_BOOST_PERCENT.getPath());
+		double smallestBoostMultiplier = 1;
     	if(boostPercent > 0 && player != null && player.getKingdom().isSmallest()) {
-    		int baseAmount = event.getAmount();
-    		int boostAmount = ((boostPercent*baseAmount)/100)+baseAmount;
-    		event.setAmount(boostAmount);
+			smallestBoostMultiplier = 1 + ((double)boostPercent / 100);
     	}
+		// Event Boost
+		int eventBoostMultiplier = konquest.getGlobalEventManager().getExpMultiplier();
+		// Apply boost
+		double totalBoostMultiplier = smallestBoostMultiplier * eventBoostMultiplier;
+		if (totalBoostMultiplier > 1) {
+			int baseAmount = event.getAmount();
+			int boostedAmount = (int)(baseAmount * totalBoostMultiplier);
+			event.setAmount(boostedAmount);
+			ChatUtil.printDebug("Applied Exp boost from "+baseAmount+" to "+boostedAmount+" ("+totalBoostMultiplier+"x) to player "+event.getPlayer().getName());
+		}
     }
     
     @EventHandler(priority = EventPriority.HIGH)
@@ -1312,7 +1325,8 @@ public class PlayerListener implements Listener {
 		} else if(territoryTo instanceof KonCamp) {
 			KonCamp camp = (KonCamp)territoryTo;
 			// Attempt to start a raid alert
-			if(!camp.isRaidAlertDisabled() && !player.isAdminBypassActive() && !player.getKingdom().isPeaceful()) {
+			boolean isPerm = player.getBukkitPlayer().hasPermission("konquest.raid.entry");
+			if(!camp.isRaidAlertDisabled() && !player.isAdminBypassActive() && !player.getKingdom().isPeaceful() && isPerm) {
 				// Verify online player
 				if(camp.isOwnerOnline()) {
 					boolean isMember = false;

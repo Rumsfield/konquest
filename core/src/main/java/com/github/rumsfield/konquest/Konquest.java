@@ -94,7 +94,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	private final TravelManager travelManager;
 	private final SanctuaryManager sanctuaryManager;
 	private final TerritoryManager territoryManager;
-	
+	private final GlobalEventManager globalEventManager;
+
 	private Scoreboard scoreboard;
     private Team friendlyTeam;
     private Team enemyTeam;
@@ -155,6 +156,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		this.sanctuaryManager = new SanctuaryManager(this);
 		this.territoryManager = new TerritoryManager(this);
 		this.placeholderManager = new PlaceholderManager(this);
+		this.globalEventManager = new GlobalEventManager(this);
 
 		this.versionHandler = null;
 		
@@ -190,6 +192,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		kingdomManager.initialize(); // Load all kingdoms + towns
 		sanctuaryManager.refresh(); // Update sanctuary references to neutrals kingdom
 		ruinManager.initialize();
+		globalEventManager.initialize();
 		initManagers();
 		initWorlds();
 		kingdomManager.updateKingdomOfflineProtection(true);
@@ -237,6 +240,8 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void disable() {
 		integrationManager.disable();
+		globalEventManager.shutdown();
+		globalEventManager.saveEvents();
 		sanctuaryManager.saveSanctuaries();
 		kingdomManager.saveKingdoms();
 		campManager.saveCamps();
@@ -273,12 +278,13 @@ public class Konquest implements KonquestAPI, Timeable {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
 
-			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.5")) <= 0) {
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.8")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 
 			} else {
 				isVersionSupported = false;
+				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 
 			}
     	} catch (Exception | NoClassDefFoundError e) {
@@ -534,7 +540,8 @@ public class Konquest implements KonquestAPI, Timeable {
 				String.format(lineTemplate,"Town Specializations",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.TOWNS_DISCOUNT_ENABLE.getPath()))),
 				String.format(lineTemplate,"Town Plots",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.PLOTS_ENABLE.getPath()))),
 				String.format(lineTemplate,"Barbarian Camps",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath()))),
-				String.format(lineTemplate,"Barbarian Clans",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath())))
+				String.format(lineTemplate,"Barbarian Clans",ChatUtil.boolean2enable(getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath()))),
+				String.format(lineTemplate,"Global Events",ChatUtil.boolean2enable(getCore().getInt(CorePath.EVENT_INTERVAL.getPath())!=0))
 		};
 		ChatUtil.printConsoleAlert("Feature Summary...");
 		for (String row : status) {
@@ -644,6 +651,7 @@ public class Konquest implements KonquestAPI, Timeable {
 	
 	public void save() {
 		// Save config files
+		globalEventManager.saveEvents();
 		sanctuaryManager.saveSanctuaries();
 		kingdomManager.saveKingdoms();
 		campManager.saveCamps();
@@ -824,6 +832,10 @@ public class Konquest implements KonquestAPI, Timeable {
 	public TravelManager getTravelManager() {
 		return travelManager;
 	}
+
+	public GlobalEventManager getGlobalEventManager() {
+		return globalEventManager;
+	}
 	
 	public long getOfflineTimeoutSeconds() {
 		return offlineTimeoutSeconds;
@@ -896,7 +908,9 @@ public class Konquest implements KonquestAPI, Timeable {
 	 * 			7 - Error, name is a guild [deprecated]
 	 * 			8 - Error, name is a sanctuary
 	 * 			9 - Error, name is a template
-	 * 			10 - Error, name is reserved word
+	 * 		    10 - Error, name is a global event
+	 * 			11 - Error, name is a travel destination
+	 * 		    12 - Error, name is reserved word
 	 */
 	public int validateNameConstraints(String name) {
 		if(name == null || name.equals("") || name.contains(" ") || !StringUtils.isAlphanumeric(name.replace("_",""))) {
@@ -925,9 +939,12 @@ public class Konquest implements KonquestAPI, Timeable {
 		if(sanctuaryManager.isTemplate(name)) {
 			return 9;
 		}
+		if(globalEventManager.isEvent(name)) {
+			return 10;
+		}
 		for(TravelDestination keyword : TravelDestination.values()) {
 			if(name.equalsIgnoreCase(keyword.toString())) {
-				return 10;
+				return 11;
 			}
 		}
 		List<String> reservedWords = new ArrayList<>();
@@ -940,10 +957,11 @@ public class Konquest implements KonquestAPI, Timeable {
 		reservedWords.add("templates");
 		reservedWords.add("template");
 		reservedWords.add("monument");
+		reservedWords.add("event");
 		reservedWords.add("all");
 		for(String word : reservedWords) {
 			if(name.equalsIgnoreCase(word)) {
-				return 10;
+				return 12;
 			}
 		}
 		return 0;
@@ -1410,6 +1428,16 @@ public class Konquest implements KonquestAPI, Timeable {
     	Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
 				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_EGG_THROW, (float)1.0, (float)0.1),1);
     }
+
+	public static void playNotificationGoodSound(Player bukkitPlayer) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)1.0),1);
+	}
+
+	public static void playNotificationBadSound(Player bukkitPlayer) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(instance.getPlugin(),
+				() -> bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_BELL_USE, (float)1.0, (float)0.1),1);
+	}
 
 	/*
 	 * Events and Commands
