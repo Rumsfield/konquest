@@ -180,6 +180,10 @@ public class KonTown extends KonTerritory implements KonquestTown, KonBarDisplay
 		townOptions.clear();
 		for (KonTownOption option : KonTownOption.values()) {
 			townOptions.put(option,option.getDefaultValue());
+			// Special conditions
+			if (option.equals(KonTownOption.KINGDOM_RESIDENTS) && this.getTerritoryType().equals(KonquestTerritoryType.CAPITAL)) {
+				townOptions.put(option,true); // Force initial Kingdom Residents option to true for capitals
+			}
 		}
 		refreshOptionOverrides();
 	}

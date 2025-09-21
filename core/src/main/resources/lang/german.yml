@@ -51,6 +51,7 @@ label:
   invalid: Ungültig
   kingdom: Königreich
   kingdom-rank: Rang des Königreichs
+  kingdom-residents: Bewohner des Königreichs
   kingdoms: Königreiche
   knights: Ritter
   land: Land
@@ -303,6 +304,7 @@ menu:
   options:
     allied-building: Verbündete Spieler können bauen
     open: Alle Königreichsmitglieder können Truhen bauen und verwenden
+    kingdom-residents: Neue Königreichsmitglieder treten als Einwohner bei
     plot: Bewohner können Truhen nur in Plots bauen und verwenden
     friendly-redstone: Königreichsmitglieder können Redstone-Schalter und -Türen verwenden
     redstone: Feinde können Redstone-Schalter und -Türen verwenden
@@ -926,6 +928,8 @@ command:
     notice:
       open: '%s für Zugriff durch alle Königreichsmitglieder geöffnet.'
       close: '%s geschlossen, nur Einwohner dürfen Container bauen und darauf zugreifen.'
+      kingdom-resident-enable: '%s fügt jetzt alle neuen Königreichsmitglieder als Bewohner hinzu.'
+      kingdom-resident-disable: '%s fügt keine neuen Königreichsmitglieder mehr als Bewohner hinzu.'
       plot-enable: '%s erlaubt Einwohnern jetzt nur, innerhalb von Grundstücken zu bauen.'
       plot-disable: '%s erlaubt Einwohnern jetzt, auf Stadtland und innerhalb von Grundstücken zu bauen.'
       allied-building-enable: '%s erlaubt Verbündeten jetzt, zu bauen.'

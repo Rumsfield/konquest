@@ -948,7 +948,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 		 * 		Updates offline protections
 		 * 		Updates border particles for player
 		 * 		Updates discord roles, if enabled
-		 * 		
+		 * 		Updates town/capital residencies, per-options
 		 */
     	
 		// Verify kingdom exists
@@ -1056,12 +1056,14 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		ChatUtil.printDebug("Failed to add member "+ id +" to kingdom "+joinKingdom.getName());
     		return -1;
     	}
-
+		// Update player's kingdom assignment
 		if(isOnline) {
     		onlinePlayer.setKingdom(joinKingdom);
     		onlinePlayer.setExileKingdom(joinKingdom);
     		onlinePlayer.setBarbarian(false);
-    		// Refresh any territory bars
+			// Update player's town residencies
+			addKingdomResidents(onlinePlayer,joinKingdom);
+			// Refresh any territory bars
     		KonTerritory territory = konquest.getTerritoryManager().getChunkTerritory(onlinePlayer.getBukkitPlayer().getLocation());
     		if(territory instanceof KonBarDisplayer) {
     			((KonBarDisplayer)territory).removeBarPlayer(onlinePlayer);
@@ -1069,6 +1071,7 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		}
         	// Updates
         	updateKingdomOfflineProtection();
+			updatePlayerMembershipStats(onlinePlayer);
         	konquest.updateNamePackets(onlinePlayer);
         	konquest.getTerritoryManager().updatePlayerBorderParticles(onlinePlayer);
         	// Apply cool-down
@@ -1079,6 +1082,8 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
     		offlinePlayer.setKingdom(joinKingdom);
     		offlinePlayer.setExileKingdom(joinKingdom);
     		offlinePlayer.setBarbarian(false);
+			// Update offline player's town residencies
+			addKingdomResidents(offlinePlayer,joinKingdom);
     		konquest.getDatabaseThread().getDatabase().setOfflinePlayer(offlinePlayer);
     	}
 		// Update Discord roles
@@ -1601,6 +1606,33 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					break;
 			}
 			return false;
+		}
+	}
+
+	// Used when assigning new kingdom members
+	// Adds players to towns/capital as residents, when options allow
+	private void addKingdomResidents(KonOfflinePlayer player, KonKingdom kingdom) {
+		OfflinePlayer offlinePlayer = player.getOfflineBukkitPlayer();
+		int numMaxResidents = konquest.getCore().getInt(CorePath.TOWNS_MAX_RESIDENT_LIMIT.getPath(),0);
+		for (KonTown townOrCapital : kingdom.getCapitalTowns()) {
+			if (townOrCapital.getTownOption(KonTownOption.KINGDOM_RESIDENTS)) {
+				// Check for joinable conditions
+				if(player.isBarbarian() || townOrCapital.isPlayerResident(offlinePlayer) || !townOrCapital.isJoinable()) {
+					continue;
+				}
+				if(numMaxResidents > 0 && townOrCapital.getNumResidents() >= numMaxResidents) {
+					continue;
+				}
+				// Add the player as a resident
+				townOrCapital.removeJoinRequest(offlinePlayer.getUniqueId());
+				if(townOrCapital.addPlayerResident(offlinePlayer,false)) {
+					for(OfflinePlayer resident : townOrCapital.getPlayerResidents()) {
+						if(resident.isOnline()) {
+							ChatUtil.sendNotice((Player) resident, MessagePath.COMMAND_TOWN_NOTICE_NEW_RESIDENT.getMessage(offlinePlayer.getName(),townOrCapital.getName()));
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -3665,8 +3697,17 @@ public class KingdomManager implements KonquestKingdomManager, Timeable {
 					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_GOLEM_ENABLE.getMessage(town.getName());
 				}
 				break;
+			case KINGDOM_RESIDENTS:
+				if(!value) {
+					// Disable kingdom residents
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_DISABLE.getMessage(town.getName());
+				} else {
+					// Enable kingdom residents
+					statusMessage = MessagePath.COMMAND_TOWN_NOTICE_KINGDOM_RESIDENT_ENABLE.getMessage(town.getName());
+				}
+				break;
 			default:
-				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL.getMessage();
+				statusMessage = MessagePath.GENERIC_ERROR_INTERNAL_MESSAGE.getMessage("Missing town option case "+option+" in KingdomManager#setTownOption");
 				break;
 		}
 		boolean isSenderResident = false;
