@@ -51,6 +51,7 @@ label:
   invalid: 無效
   kingdom: 王國
   kingdom-rank: 王國排名
+  kingdom-residents: 王國居民
   kingdoms: 王國
   knights: 騎士
   land: 土地
@@ -303,6 +304,7 @@ menu:
   options:
     allied-building: 同盟玩家可以建造
     open: 所有王國成員都可以建造和使用箱子
+    kingdom-residents: 新王國成員以居民身分加入
     plot: 居民只能在地塊中建造和使用箱子
     friendly-redstone: 王國成員可以使用紅石開關和門
     redstone: 敵人可以使用紅石開關和門
@@ -926,6 +928,8 @@ command:
     notice:
       open: 開放了 %s，所有王國成員都可以訪問。
       close: 關閉了 %s，只有居民可以建造和訪問容器。
+      kingdom-resident-enable: '%s 現在將所有新王國成員加入為居民。'
+      kingdom-resident-disable: '%s 不再增加新的王國成員作為居民。'
       plot-enable: '%s 現在允許居民只能在地塊內建造。'
       plot-disable: '%s 現在允許居民在城鎮土地內和地塊內建造。'
       allied-building-enable: '%s 現在允許盟友建造。'

@@ -51,6 +51,7 @@ label:
   invalid: Geçersiz
   kingdom: Krallık
   kingdom-rank: Krallık Sıralaması
+  kingdom-residents: Krallık Sakinleri
   kingdoms: Krallıklar
   knights: Şovalyeler
   land: Alan
@@ -303,6 +304,7 @@ menu:
   options:
     allied-building: Dost oyuncular inşa edebilir
     open: Tüm krallık üyeleri sandık inşa edebilir ve kullanabilir
+    kingdom-residents: Yeni krallık üyeleri yerleşik olarak katılıyor
     plot: Sakinler yalnızca arsalarda sandık inşa edebilir ve kullanabilirler
     friendly-redstone: Krallık üyeleri redstone anahtarlarını ve kapılarını kullanabilir
     redstone: Düşmanlar redstone anahtarlarını ve kapılarını kullanabilir
@@ -926,6 +928,8 @@ command:
     notice:
       open: '%s tüm krallık üyeleri için erişime açıldı.'
       close: '%s kapatıldı, sadece sakinler inşa edebilir ve konteynerlere erişebilir.'
+      kingdom-resident-enable: '%s artık tüm yeni krallık üyelerini sakin olarak ekliyor.'
+      kingdom-resident-disable: '%s artık krallığa yeni üyeler katmıyor.'
       plot-enable: '%s artık sakinlerin sadece parseller içinde inşa etmesine izin veriyor.'
       plot-disable: '%s artık sakinlerin şehir arazisinde ve parseller içinde inşa etmesine izin veriyor.'
       allied-building-enable: '%s artık müttefiklerin inşa etmesine izin veriyor.'
