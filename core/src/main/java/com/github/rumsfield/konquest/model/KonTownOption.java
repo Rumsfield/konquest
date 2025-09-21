@@ -6,6 +6,7 @@ import org.bukkit.Material;
 public enum KonTownOption {
 
     OPEN                    (false, MessagePath.LABEL_OPEN.getMessage(),                MessagePath.MENU_OPTIONS_OPEN.getMessage(),                 Material.DARK_OAK_DOOR),
+    KINGDOM_RESIDENTS       (false, MessagePath.LABEL_KINGDOM_RESIDENTS.getMessage(),   MessagePath.MENU_OPTIONS_KINGDOM_RESIDENTS.getMessage(),    Material.LEATHER_HELMET),
     ALLIED_BUILDING         (true,  MessagePath.LABEL_ALLIED_BUILDING.getMessage(),     MessagePath.MENU_OPTIONS_ALLIED_BUILDING.getMessage(),      Material.BRICK_STAIRS),
     PLOTS_ONLY              (false, MessagePath.LABEL_PLOT.getMessage(),                MessagePath.MENU_OPTIONS_PLOT.getMessage(),                 Material.DIAMOND_SHOVEL),
     FRIENDLY_REDSTONE       (true,  MessagePath.LABEL_FRIENDLY_REDSTONE.getMessage(),   MessagePath.MENU_OPTIONS_FRIENDLY_REDSTONE.getMessage(),    Material.LEVER),

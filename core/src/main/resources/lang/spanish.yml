@@ -51,6 +51,7 @@ label:
   invalid: Invalido
   kingdom: Reino
   kingdom-rank: Rango del Reino
+  kingdom-residents: Residentes del Reino
   kingdoms: Reinos
   knights: Caballeros
   land: Tierra
@@ -303,6 +304,7 @@ menu:
   options:
     allied-building: Los jugadores aliados pueden construir
     open: Todos los miembros del reino pueden construir y usar cofres
+    kingdom-residents: Los nuevos miembros del reino se unen como residentes
     plot: Los residentes solo pueden construir y usar cofres en parcelas
     friendly-redstone: Los miembros del reino pueden usar interruptores y puertas de redstone
     redstone: Los enemigos pueden usar interruptores y puertas de redstone
@@ -926,6 +928,8 @@ command:
     notice:
       open: Abierto %s para acceso por todos los miembros del reino.
       close: Cerrado %s, solo los residentes pueden construir y acceder a contenedores.
+      kingdom-resident-enable: '%s ahora agrega a todos los nuevos miembros del reino como residentes.'
+      kingdom-resident-disable: '%s ya no agrega nuevos miembros del reino como residentes.'
       plot-enable: '%s ahora permite que los residentes solo construyan dentro de parcelas.'
       plot-disable: '%s ahora permite que los residentes construyan en tierra del pueblo y dentro de parcelas.'
       allied-building-enable: '%s ahora permite que los aliados construyan.'

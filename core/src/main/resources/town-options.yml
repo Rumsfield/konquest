@@ -7,6 +7,7 @@
 #
 # The town options are
 #   OPEN                All kingdom members can build and use chests
+#   KINGDOM_RESIDENTS   New kingdom members join as a resident
 #   ALLIED_BUILDING     Allied players can build
 #   PLOTS_ONLY          Residents can only build and use chests in plots
 #   FRIENDLY_REDSTONE   Kingdom members can use redstone switches and doors

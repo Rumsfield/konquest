@@ -51,6 +51,7 @@ label:
   invalid: Invalid
   kingdom: Kingdom
   kingdom-rank: Kingdom Rank
+  kingdom-residents: Kingdom Residents
   kingdoms: Kingdoms
   knights: Knights
   land: Land
@@ -303,6 +304,7 @@ menu:
   options:
     allied-building: Allied players can build
     open: All kingdom members can build and use chests
+    kingdom-residents: New kingdom members join as a resident
     plot: Residents can only build and use chests in plots
     friendly-redstone: Kingdom members can use redstone switches and doors
     redstone: Enemies can use redstone switches and doors
@@ -926,6 +928,8 @@ command:
     notice:
       open: Opened %s for access by all kingdom members.
       close: Closed %s, only residents may build and access containers.
+      kingdom-resident-enable: '%s now adds all new kingdom members as residents.'
+      kingdom-resident-disable: '%s no longer adds new kingdom members as residents.'
       plot-enable: '%s now allows residents to only build within plots.'
       plot-disable: '%s now allows residents to build in town land and within plots.'
       allied-building-enable: '%s now allows allies to build.'
