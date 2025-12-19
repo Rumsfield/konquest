@@ -8,8 +8,7 @@ import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 import com.github.rumsfield.konquest.api.event.player.KonquestPlayerConquerEvent;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when an enemy player breaks a block within a town.
@@ -122,7 +121,7 @@ public class KonquestTownAttackEvent extends KonquestTownEvent implements Cancel
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}

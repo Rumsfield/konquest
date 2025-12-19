@@ -4,8 +4,7 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestDiplomacyType;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after a kingdom changes its active diplomatic relationship with another kingdom.
@@ -107,7 +106,7 @@ public class KonquestKingdomDiplomacyEvent extends KonquestKingdomEvent {
      * @return handlers
      */
     @Override
-    @Nonnull
+    @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

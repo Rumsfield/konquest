@@ -7,8 +7,7 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called before a player settles a new town using the "/k settle" command.
@@ -107,7 +106,7 @@ public class KonquestPlayerSettleEvent extends KonquestPlayerEvent implements Ca
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}

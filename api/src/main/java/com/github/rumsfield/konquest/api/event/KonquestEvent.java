@@ -2,10 +2,8 @@ package com.github.rumsfield.konquest.api.event;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import javax.annotation.Nonnull;
-
-
 import com.github.rumsfield.konquest.api.KonquestAPI;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A base event from Konquest, with a reference to the API instance.
@@ -35,7 +33,7 @@ public abstract class KonquestEvent extends Event {
 		return konquest;
 	}
 
-	@Nonnull
+	@NotNull
 	public abstract HandlerList getHandlers();
 
 }

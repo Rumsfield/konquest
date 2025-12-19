@@ -7,8 +7,7 @@ import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCreateKingdo
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after a kingdom is created, either by players or admins.
@@ -84,7 +83,7 @@ public class KonquestKingdomCreateEvent extends KonquestKingdomEvent {
      * @return handlers
      */
     @Override
-    @Nonnull
+    @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

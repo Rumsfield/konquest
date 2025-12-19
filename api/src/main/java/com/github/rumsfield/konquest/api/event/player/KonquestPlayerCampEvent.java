@@ -6,8 +6,7 @@ import org.bukkit.event.Cancellable;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called before a barbarian player places a bed in the wild to create their camp.
@@ -82,7 +81,7 @@ public class KonquestPlayerCampEvent extends KonquestPlayerEvent implements Canc
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}

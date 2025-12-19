@@ -7,8 +7,7 @@ import com.github.rumsfield.konquest.api.event.KonquestEvent;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called before the given player has been exiled from their current kingdom and made into a barbarian.
@@ -94,7 +93,7 @@ public class KonquestPlayerExileEvent extends KonquestEvent implements Cancellab
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}
