@@ -545,6 +545,32 @@ public class CompatibilityUtil {
         return EntityType.EGG;
     }
 
+    /**
+     * Gets the name of a material for the current game version.
+     * In most cases, when the given name is a valid material, this function
+     * returns the same name.
+     * @param name The name of the material, usually from a user config file
+     * @return The supported name for this game version
+     */
+    public static String getMaterialName(String name) {
+        // Map known material name changes, this does not cover all cases.
+        Material testMaterial = Material.matchMaterial(name);
+        if (testMaterial == null) {
+            // No valid material matches the given name
+            // Attempt known alternatives
+            String altName = "";
+            if (name.equals("CHAIN")) {
+                altName = "IRON_CHAIN";
+            }
+            testMaterial = Material.matchMaterial(altName);
+            if (testMaterial != null) {
+                // Found a good alternative name
+                return altName;
+            }
+        }
+        return name;
+    }
+
     /* Utility Operations */
 
     @SuppressWarnings({"removal","deprecation"})

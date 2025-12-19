@@ -3,8 +3,7 @@ package com.github.rumsfield.konquest.api.event.town;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after a barbarian player destroys a town by breaking its final critical block,
@@ -105,7 +104,7 @@ public class KonquestTownDestroyPostEvent extends KonquestTownEvent {
      * @return handlers
      */
     @Override
-    @Nonnull
+    @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

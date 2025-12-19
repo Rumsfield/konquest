@@ -1284,7 +1284,7 @@ public class InfoMenu extends StateMenu {
         result.addIcon(icon);
 
         /* Clan Icon */
-        icon = new InfoIcon(MessagePath.LABEL_CAMP_CLAN.getMessage(), Material.CHAIN, SLOT_CLAN, false);
+        icon = new InfoIcon(MessagePath.LABEL_CAMP_CLAN.getMessage(), Material.CAMPFIRE, SLOT_CLAN, false);
         if (getKonquest().getCampManager().isCampGroupsEnabled()) {
             if (getKonquest().getCampManager().isCampGrouped(infoCamp)) {
                 KonCampGroup clan = getKonquest().getCampManager().getCampGroup(infoCamp);

@@ -7,8 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.Set;
 
@@ -133,7 +132,7 @@ public class KonquestTerritoryChunkEvent extends KonquestEvent implements Cancel
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}

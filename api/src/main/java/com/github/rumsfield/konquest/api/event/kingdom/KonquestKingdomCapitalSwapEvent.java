@@ -5,8 +5,7 @@ import com.github.rumsfield.konquest.api.model.KonquestCapital;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after a kingdom swaps its capital to another town.
@@ -74,7 +73,7 @@ public class KonquestKingdomCapitalSwapEvent extends KonquestKingdomEvent {
      * @return handlers
      */
     @Override
-    @Nonnull
+    @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

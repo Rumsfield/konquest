@@ -2,8 +2,7 @@ package com.github.rumsfield.konquest.api.event.kingdom;
 
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after a kingdom is disbanded and removed.
@@ -55,7 +54,7 @@ public class KonquestKingdomDisbandEvent extends KonquestKingdomEvent {
      * @return handlers
      */
     @Override
-    @Nonnull
+    @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

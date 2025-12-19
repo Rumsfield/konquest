@@ -93,7 +93,8 @@ public class LootManager implements Timeable{
 			int itemAmount = 0;
 			int itemWeight = 0;
 			try {
-				itemType = Material.valueOf(itemName);
+				String compatibleName = CompatibilityUtil.getMaterialName(itemName);
+				itemType = Material.valueOf(compatibleName);
 			} catch(IllegalArgumentException e) {
 				ChatUtil.printConsoleError("Invalid loot item \""+itemName+"\" given in loot.yml path "+pathName+", skipping this item.");
 				status = false;
