@@ -53,6 +53,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 	private boolean isBorderDisplay;
 	private boolean isAfk;
 	private boolean isRegionBlank;
+	private boolean isCampingNotified;
 	private final Timer priorityTitleDisplayTimer;
 	private final Timer borderUpdateLoopTimer;
 	private final Timer monumentTemplateLoopTimer;
@@ -92,6 +93,7 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 		this.isBorderDisplay = true;
 		this.isAfk = false;
 		this.isRegionBlank = false;
+		this.isCampingNotified = false;
 		this.priorityTitleDisplayTimer = new Timer(this);
 		this.borderUpdateLoopTimer = new Timer(this);
 		this.monumentTemplateLoopTimer = new Timer(this);
@@ -143,6 +145,14 @@ public class KonPlayer extends KonOfflinePlayer implements KonquestPlayer, Timea
 			result = directiveProgress.get(dir);
 		}
 		return result;
+	}
+
+	public void notifyCamping() {
+		// Notify once per login session
+		if (isBarbarian() && !isCampingNotified) {
+			ChatUtil.sendNotice(this,MessagePath.PROTECTION_NOTICE_CAMP.getMessage());
+			isCampingNotified = true;
+		}
 	}
 	
 	// Getters

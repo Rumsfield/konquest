@@ -38,7 +38,7 @@ public interface KonquestCamp extends KonquestTerritory {
 	 * 
 	 * @return The bed location
 	 */
-    Location getBedLocation();
+    //Location getBedLocation();
 	
 	/**
 	 * Checks whether this camp is currently protected from attacks.

@@ -15,31 +15,70 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplayer, Timeable {
 	
 	private final OfflinePlayer owner;
+	private final Timer campAttackTimer; // Resets critical hits and clears attacked state
 	private final Timer raidAlertTimer;
 	private final Timer protectedWarmupTimer;
 	private final Timer protectedCountdownTimer;
+	private final BossBar campBarAll;
+	private final HashMap<UUID,Boolean> guests;
+	private final HashMap<KonCampOption,Boolean> campOptions;
+	private final HashMap<KonCampOption,Boolean> campOptionsOverride;
 	private boolean isRaidAlertDisabled;
 	private boolean isOfflineProtected;
-	private Location bedLocation;
-	private final BossBar campBarAll;
+	private boolean isAttacked;
+	private boolean isStowed; // Is the camp being moved
+	private int criticalHits; // How many times the camp block has been broken
+
+	// territory center will be the location of the camp block (campfire)
+
+	// Upgrade Attributes
+	private int upgradeLevel;
+	private int upgradeMaxGuests;
+	private int upgradeMaxHits;
+	private boolean upgradeNoExplode;
+	private boolean upgradeMiningFatigue;
 	
-	public KonCamp(Location loc, OfflinePlayer owner, KonKingdom kingdom, Konquest konquest) {
-		super(loc, MessagePath.TERRITORY_CAMP.getMessage().trim()+"_"+owner.getName(), kingdom, konquest);
+	public KonCamp(Location loc, OfflinePlayer owner, Konquest konquest) {
+		super(loc, MessagePath.TERRITORY_CAMP.getMessage().trim()+" "+owner.getName(), konquest.getKingdomManager().getBarbarians(), konquest);
 		
 		this.owner = owner;
+		this.campAttackTimer = new Timer(this);
 		this.raidAlertTimer = new Timer(this);
 		this.protectedWarmupTimer = new Timer(this);
 		this.protectedCountdownTimer = new Timer(this);
 		this.isRaidAlertDisabled = false;
 		this.isOfflineProtected = false;
-		this.bedLocation = loc;
+		this.isAttacked = false;
 		this.campBarAll = Bukkit.getServer().createBossBar(Konquest.barbarianColor2+getName(), ChatUtil.mapBarColor(Konquest.barbarianColor1), BarStyle.SOLID);
 		this.campBarAll.setVisible(true);
+
+		this.guests = new HashMap<>();
+		this.campOptions = new HashMap<>();
+		this.campOptionsOverride = new HashMap<>();
+		this.isStowed = false;
+		this.criticalHits = 0;
+		this.upgradeLevel = 0;
+		this.upgradeMaxGuests = 1;
+		this.upgradeMaxHits = 1;
+		this.upgradeNoExplode = false;
+		this.upgradeMiningFatigue = false;
+
 		initProtection();
+	}
+
+	public KonCamp copy(KonCamp copyCamp) {
+		// Set land
+		copyCamp.addPointsTranslateToCenter(getChunkPoints(), this.getCenterLoc());
+		// Set guests
+		// Set upgrade
+		// Set options
+		return copyCamp;
 	}
 	
 	private void initProtection() {
@@ -97,14 +136,6 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	
 	public Timer getRaidAlertTimer() {
 		return raidAlertTimer;
-	}
-	
-	public Location getBedLocation() {
-		return bedLocation;
-	}
-	
-	public void setBedLocation(Location loc) {
-		bedLocation = loc;
 	}
 
 	@Override
@@ -190,6 +221,10 @@ public class KonCamp extends KonTerritory implements KonquestCamp, KonBarDisplay
 	
 	public boolean isProtected() {
 		return isOfflineProtected;
+	}
+
+	public boolean isStowed() {
+		return isStowed;
 	}
 	
 	public void applyGlow(Player bukkitPlayer) {

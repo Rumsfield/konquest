@@ -1420,7 +1420,7 @@ public class Konquest implements KonquestAPI, Timeable {
 		loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_USE, (float)0.5, (float)1);
 	}
     
-    public static void playCampGroupSound(Location loc) {
+    public static void playCampUpgradeSound(Location loc) {
     	loc.getWorld().playSound(loc, Sound.BLOCK_FENCE_GATE_OPEN, (float)1.0, (float)0.7);
     }
     

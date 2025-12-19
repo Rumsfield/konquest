@@ -194,9 +194,23 @@ public class InventoryListener implements Listener {
 			}
 		}
 	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onInventoryClose(InventoryCloseEvent event) {
+		// Ignore display menus
+		if(!konquest.getDisplayManager().isNotDisplayMenu(event.getInventory())) return;
+		// Get player
+		Player bukkitPlayer = (Player) event.getPlayer();
+		KonPlayer player = konquest.getPlayerManager().getPlayer(bukkitPlayer);
+		if (player == null) return;
+		// Notify barbarians of camping
+		if (!konquest.getCampManager().isCampSet(player)) {
+			player.notifyCamping();
+		}
+	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
-    public void onInventoryClose(InventoryCloseEvent event) {
+    public void onDisplayMenuClose(InventoryCloseEvent event) {
 		// When a player closes a display menu inventory
 		if(konquest.getDisplayManager().isNotDisplayMenu(event.getInventory())) return;
 		konquest.getDisplayManager().onDisplayMenuClose(event.getInventory(), event.getPlayer());

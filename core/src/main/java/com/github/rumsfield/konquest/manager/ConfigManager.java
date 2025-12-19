@@ -61,6 +61,8 @@ public class ConfigManager{
 		updateConfigVersion("commands");
 		addConfig("town-options", new KonConfig("town-options",false));
 		updateConfigVersion("town-options");
+		addConfig("camp-options", new KonConfig("camp-options",false));
+		updateConfigVersion("camp-options");
 
 		// Data Storage
 		migrateConfigFile("kingdoms.yml","data/kingdoms.yml");

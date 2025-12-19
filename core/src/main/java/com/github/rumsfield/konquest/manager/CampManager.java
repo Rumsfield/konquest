@@ -2,6 +2,7 @@ package com.github.rumsfield.konquest.manager;
 
 import com.github.rumsfield.konquest.Konquest;
 import com.github.rumsfield.konquest.api.event.camp.KonquestCampCreateEvent;
+import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCampEvent;
 import com.github.rumsfield.konquest.api.manager.KonquestCampManager;
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestOfflinePlayer;
@@ -32,24 +33,18 @@ public class CampManager implements KonquestCampManager {
 
 	private final Konquest konquest;
 	private final HashMap<String,KonCamp> barbarianCamps; // player uuids to camps
-	private final HashMap<KonCamp,KonCampGroup> groupMap; // camps to groups
-	private boolean isClanEnabled;
 	private boolean isCampDataNull;
 	
 	public CampManager(Konquest konquest) {
 		this.konquest = konquest;
 		this.barbarianCamps = new HashMap<>();
-		this.groupMap = new HashMap<>();
-		this.isClanEnabled = false;
 		this.isCampDataNull = false;
 	}
 	
 	// intended to be called after database has connected and loaded player tables
 	public void initCamps() {
-		isClanEnabled = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ENABLE.getPath(),false);
 		loadCamps();
-		refreshGroups();
-		ChatUtil.printDebug("Loaded camps and groups");
+		ChatUtil.printDebug("Loaded camps");
 	}
 	
 	public boolean isCampSet(KonquestOfflinePlayer player) {
@@ -113,7 +108,7 @@ public class CampManager implements KonquestCampManager {
 	}
 	
 	/**
-	 * addCamp - primary method for adding a camp for a barbarian
+	 * addCamp - primary method for adding a new camp for a barbarian
 	 * @param loc - location of the camp
 	 * @param player - player adding the camp
 	 * @return status 	0 = success
@@ -122,7 +117,6 @@ public class CampManager implements KonquestCampManager {
 	 * 					3 = player is not a barbarian
 	 * 					4 = camps are disabled
 	 *                  5 = world is invalid
-	 *                  6 = not allowed to join clan group
 	 */
 	public int addCamp(Location loc, KonOfflinePlayer player) {
 		boolean enable = konquest.getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath(),true);
@@ -149,55 +143,108 @@ public class CampManager implements KonquestCampManager {
 					return 1;
 				}
 			}
-			// Verify camp group (clan) allowed placement
-			boolean isOfflineJoinAllow = konquest.getCore().getBoolean(CorePath.CAMPS_CLAN_ALLOW_JOIN_OFFLINE.getPath());
-			if(isClanEnabled) {
-				// Search surroundings for any adjacent camps with online members
-				boolean isAdjacentCampPresent = false;
-				boolean isAnyAdjacentOwnerOnline = false;
-				for(Point point : HelperUtil.getBorderPoints(loc, radius+1)) {
-					if(konquest.getTerritoryManager().isChunkClaimed(point,loc.getWorld()) && konquest.getTerritoryManager().getChunkTerritory(point,loc.getWorld()) instanceof KonCamp) {
-						KonCamp adjCamp = (KonCamp)konquest.getTerritoryManager().getChunkTerritory(point,loc.getWorld());
-						isAdjacentCampPresent = true;
-						if(adjCamp != null && adjCamp.isOwnerOnline()) {
-							isAnyAdjacentOwnerOnline = true;
-						}
-					}
-				}
-				// Check if any adjacent camp has online members
-				if(isAdjacentCampPresent && !isAnyAdjacentOwnerOnline && !isOfflineJoinAllow) {
-					// Prevent this camp from being placed, there are no online owners in the adjacent camps
-					ChatUtil.printDebug("Failed to add camp, no adjacent camps have online members.");
-					return 6;
-				}
-			}
 			// Attempt to add the camp
-			KonCamp newCamp = new KonCamp(loc,player.getOfflineBukkitPlayer(),konquest.getKingdomManager().getBarbarians(),konquest);
+			KonCamp newCamp = new KonCamp(loc,player.getOfflineBukkitPlayer(),konquest);
 			barbarianCamps.put(uuid,newCamp);
 			newCamp.initClaim();
 			// Update bar players
 			newCamp.updateBarPlayers();
-			//update the chunk cache, add points to primary world cache
+			// update the chunk cache, add points to primary world cache
 			konquest.getTerritoryManager().addAllTerritory(loc.getWorld(),newCamp.getChunkList());
-			// Refresh groups
-			refreshGroups();
-			if(groupMap.containsKey(newCamp)) {
-				Konquest.playCampGroupSound(loc);
-				// Notify group
-				for(KonCamp groupCamp : groupMap.get(newCamp).getCamps()) {
-					if(groupCamp.isOwnerOnline()) {
-						KonPlayer ownerOnlinePlayer = konquest.getPlayerManager().getPlayerFromID(groupCamp.getOwner().getUniqueId());
-						if(ownerOnlinePlayer != null) {
-							ChatUtil.sendNotice(ownerOnlinePlayer.getBukkitPlayer(), MessagePath.PROTECTION_NOTICE_CAMP_CLAN_ADD.getMessage(newCamp.getName()));
-						}
-					}
-				}
-			}
 			konquest.getMapHandler().drawUpdateTerritory(newCamp);
 		} else {
 			return 2;
 		}
 		return 0;
+	}
+
+	/*
+	 * TODO
+	 *  Implement the placement logic
+	 *  How to handle placement by players, and admins?
+	 *  - Use common function for placing new and stowed camps
+	 *  - Have wrappers with checks and messages for players and admins separately
+	 *  How does an admin place a camp for someone while their camp is stowed?
+	 *  - If the camp is placed, admin cannot place a new camp, must remove original first.
+	 *  - If the camp is stowed, admin can place a new camp, effectively places the stowed camp for the player.
+	 *  While a camp is stowed, it reserves its original chunk claims but they are not rendered/visible.
+	 *  - If the player logs off or disconnects, the stowed camp is restored.
+	 *  - If the player is killed or otherwise dies, then the camp is destroyed with them.
+	 *  - The player must place the stowed camp for the claims to transfer to a new location.
+	 *  - An item is placed in their inventory to represent the stowed camp??
+	 *  - A camp can only be in a stowed state while the owner is online, "carrying" the camp with them.
+	 */
+
+	// Player must be online performing placement for their own camp
+	public void placeCampForPlayer(Location loc, KonPlayer player) {
+		// Place a new camp if the player has no camp set
+		// Place a stowed camp is the player already has a camp that is stowed
+		// New camps have the default init radius, stowed camps have arbitrary claimed chunks
+		Player bukkitPlayer = player.getBukkitPlayer();
+		String uuid = bukkitPlayer.getUniqueId().toString();
+		// Check for barbarian
+		if (!player.isBarbarian()) {
+			ChatUtil.sendError(bukkitPlayer, MessagePath.PROTECTION_ERROR_CAMP_FAIL_BARBARIAN.getMessage());
+			return;
+		}
+		boolean isNewPlacement = false;
+		boolean isStowedPlacement = false;
+		int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
+		ArrayList<Point> placementPoints = new ArrayList<>();
+		if (barbarianCamps.containsKey(uuid)) {
+			// Camp already exists
+			KonCamp playerCamp = getCamp(uuid);
+			// Check for stowed camp
+			if (!playerCamp.isStowed()) {
+				ChatUtil.sendError(bukkitPlayer, "CHANGE Camp must be stowed first");
+				return;
+			}
+			// Get offset placement points
+			Point pCenterStowed = HelperUtil.toPoint(playerCamp.getCenterLoc());
+			Point pCenterPlace = HelperUtil.toPoint(loc);
+			int dx = pCenterPlace.x - pCenterStowed.x;
+			int dy = pCenterPlace.y - pCenterStowed.y;
+			for (Point pStowed : playerCamp.getChunkPoints()) {
+				placementPoints.add(new Point(pStowed.x+dx,pStowed.y+dy));
+			}
+			isStowedPlacement = true;
+		} else {
+			// Camp does not exist
+			placementPoints.addAll(HelperUtil.getAreaPoints(loc, radius));
+			isNewPlacement = true;
+		}
+
+		// Check for placement restrictions
+		World placeWorld = loc.getWorld();
+		for(Point point : placementPoints) {
+			// Is there overlapping claimed territory
+			if(konquest.getTerritoryManager().isChunkClaimed(point,placeWorld)) {
+				ChatUtil.sendError(bukkitPlayer, "CHANGE Camp cannot overlap with other territory");
+				return;
+			}
+			// Is there a WorldGuard region flag denied
+			if(konquest.getIntegrationManager().getWorldGuard().isEnabled() &&
+					!konquest.getIntegrationManager().getWorldGuard().isChunkClaimAllowed(placeWorld,point,bukkitPlayer)) {
+				ChatUtil.sendError(bukkitPlayer, MessagePath.REGION_ERROR_CLAIM_DENY.getMessage());
+				return;
+			}
+		}
+
+		// Fire event
+		KonquestPlayerCampEvent invokePreEvent = new KonquestPlayerCampEvent(konquest, player, loc);
+		Konquest.callKonquestEvent(invokePreEvent);
+		// Check for cancelled
+		if(invokePreEvent.isCancelled()) {
+			ChatUtil.sendError(bukkitPlayer, "CHANGE Camping denied");
+			return;
+		}
+
+		// Make the camp
+		if (isNewPlacement) {
+
+		}
+
+
 	}
 
 	// Return false to cancel placing a bed
@@ -304,85 +351,7 @@ public class CampManager implements KonquestCampManager {
 		return true;
 	}
 	
-	public boolean isCampGrouped(KonquestCamp camp) {
-		return groupMap.containsKey(camp);
-	}
-	
-	public KonCampGroup getCampGroup(KonquestCamp camp) {
-		return groupMap.get(camp);
-	}
-	
-	public boolean isCampGroupsEnabled() {
-		return isClanEnabled;
-	}
 
-	private void refreshGroups() {
-		groupMap.clear();
-		if(!isClanEnabled) return;
-		int totalGroups = 0;
-		int radius = konquest.getCore().getInt(CorePath.CAMPS_INIT_RADIUS.getPath());
-		Location center;
-		// Evaluate each camp for adjacent camps, creating groups as necessary
-		for(KonCamp currCamp : barbarianCamps.values()) {
-			// Verify camp is not already in a group
-			if(!groupMap.containsKey(currCamp)) {
-				center = currCamp.getCenterLoc();
-				// Search surroundings for all adjacent camps
-				HashSet<KonCamp> adjCamps = new HashSet<>();
-				for(Point point : HelperUtil.getBorderPoints(center, radius+1)) {
-					if(konquest.getTerritoryManager().isChunkClaimed(point,center.getWorld()) && konquest.getTerritoryManager().getChunkTerritory(point,center.getWorld()) instanceof KonCamp) {
-						KonCamp adjCamp = (KonCamp)konquest.getTerritoryManager().getChunkTerritory(point,center.getWorld());
-						adjCamps.add(adjCamp);
-					}
-				}
-				// Find any existing groups
-				HashSet<KonCampGroup> adjGroups = new HashSet<>();
-				for(KonCamp adjCamp : adjCamps) {
-					if(groupMap.containsKey(adjCamp)) {
-						adjGroups.add(groupMap.get(adjCamp));
-					}
-				}
-				// Attempt to form groups
-				if(adjGroups.isEmpty()) {
-					// There are no adjacent groups, try to make one
-					if(!adjCamps.isEmpty()) {
-						// Make a new group with the adjacent camp(s)
-						KonCampGroup campGroup = new KonCampGroup();
-						campGroup.addCamp(currCamp);
-						groupMap.put(currCamp, campGroup);
-						for(KonCamp adjCamp : adjCamps) {
-							campGroup.addCamp(adjCamp);
-							groupMap.put(adjCamp, campGroup);
-						}
-						//barbarianGroups.add(campGroup);
-						totalGroups++;
-					}
-				} else {
-					// There are other adjacent group(s)
-					Iterator<KonCampGroup> groupIter = adjGroups.iterator();
-					if(groupIter.hasNext()) {
-						KonCampGroup mainGroup = groupIter.next(); // choose arbitrary group as main
-						// Add camp and all adjacent camps to main group
-						mainGroup.addCamp(currCamp);
-						groupMap.put(currCamp, mainGroup);
-						for(KonCamp adjCamp : adjCamps) {
-							mainGroup.addCamp(adjCamp);
-							groupMap.put(adjCamp, mainGroup);
-						}
-						// Merge other group(s) into main and prune
-						while(groupIter.hasNext()) {
-							KonCampGroup mergeGroup = groupIter.next();
-							mainGroup.mergeGroup(mergeGroup);
-							mergeGroup.clearCamps();
-							//barbarianGroups.remove(mergeGroup);
-							totalGroups--;
-						}
-					}
-				}
-			}
-		}
-		ChatUtil.printDebug("Refreshed "+totalGroups+" camp groups");
-	}
 	
 	private void loadCamps() {
 		boolean enable = konquest.getCore().getBoolean(CorePath.CAMPS_ENABLE.getPath(),true);

@@ -1,0 +1,106 @@
+# Camp Option Overrides and Upgrades
+#
+# All barbarian camps have a set of options which affect how they work.
+# By default, the camp owners can modify these options in-game.
+# Use this config file to force any camp options to a fixed value, and prevent
+# players from modifying the options in-game.
+#
+# The camp options are
+#   PEACEFUL        Your camp cannot be attacked by other players
+#   TRAVEL          Camp guests can travel to your camp
+#   BUILD           Camp guests can build in your camp
+#   CHEST           Camp guests can open chests in your camp
+#   MOBS            Allow mobs to spawn inside your camp
+#
+# Use the "global" section to override options for all camps in the server. For example,
+# camp-options:
+#   global:
+#     PEACEFUL: false
+#     MOBS: true
+#
+# Barbarian camps can be upgraded to different levels defined in this file.
+# Each level comes with different attributes that affect the camp.
+# Level 1 is the default that new camps start with.
+# Add, remove, or modify the upgrade sections below to customize the upgrade levels.
+#
+# The camp upgrade attributes are
+#   LEVEL           Number level used to order each upgrade, 1 is the default
+#   COST            Amount of favor required to buy the upgrade
+#   GUESTS          Number of guest barbarians that can be added to a camp
+#   CRITICAL_HITS   Number of times the camp block must be broken to destroy a camp
+#   NO_EXPLODE      Whether explosions (TNT, Creepers, etc.) are blocked inside a camp
+#   MINING_FATIGUE  Whether the Mining Fatigue potion effect is applied to enemies inside a camp
+#
+# Use the "upgrades" section to define each camp level. For example,
+# camp-options:
+#   upgrades:
+#     camp_tier_1:
+#       LEVEL: 1
+#       COST: 20
+#       GUESTS: 4
+#       CRITICAL_HITS: 3
+#       NO_EXPLODE: false
+#       MINING_FATIGUE: false
+#
+# Remember to use the "/k admin reload" command after modifying this file if the server is running.
+#
+# /!\ DO NOT MODIFY VERSION /!\
+version: 0.0.0
+camp-options:
+
+  # Camp Option Overrides
+#  global:
+#    PEACEFUL: false
+#    MOBS: true
+
+  # Camp Upgrade Levels
+  upgrades:
+
+    # Default Level
+    camp_default:
+      LEVEL: 1
+      COST: 0
+      GUESTS: 3
+      CRITICAL_HITS: 1
+      NO_EXPLODE: false
+      MINING_FATIGUE: false
+
+    camp_tier_2:
+      LEVEL: 2
+      COST: 50
+      GUESTS: 5
+      CRITICAL_HITS: 3
+      NO_EXPLODE: false
+      MINING_FATIGUE: false
+
+    camp_tier_3:
+      LEVEL: 3
+      COST: 100
+      GUESTS: 7
+      CRITICAL_HITS: 5
+      NO_EXPLODE: false
+      MINING_FATIGUE: false
+
+    camp_tier_4:
+      LEVEL: 4
+      COST: 200
+      GUESTS: 9
+      CRITICAL_HITS: 7
+      NO_EXPLODE: true
+      MINING_FATIGUE: false
+
+    camp_tier_5:
+      LEVEL: 5
+      COST: 400
+      GUESTS: 11
+      CRITICAL_HITS: 9
+      NO_EXPLODE: true
+      MINING_FATIGUE: false
+
+    camp_tier_6:
+      LEVEL: 6
+      COST: 1000
+      GUESTS: 20
+      CRITICAL_HITS: 10
+      NO_EXPLODE: true
+      MINING_FATIGUE: true

@@ -68,6 +68,23 @@ public abstract class KonTerritory implements KonquestTerritory {
 			chunkList.put(point, this);
 		}
 	}
+
+	public void addPointsTranslateToCenter(Set<Point> points, Location center) {
+		// Assume that the given points are relative to the given center
+		// Add the points offset to this territory's center
+		Point pCenterOld = HelperUtil.toPoint(center);
+		if (!points.contains(pCenterOld)) {
+			ChatUtil.printDebug("Failed to add translated points, center is not contained within points.");
+			return;
+		}
+		// Find offsets
+		Point pCenterNew = HelperUtil.toPoint(this.centerLoc);
+		int dx = pCenterNew.x - pCenterOld.x;
+		int dy = pCenterNew.y - pCenterOld.y;
+		for (Point pOld : points) {
+			chunkList.put(new Point(pOld.x+dx,pOld.y+dy), this);
+		}
+	}
 	
 	public boolean removeChunk(Location loc) {
 		return removeChunk(HelperUtil.toPoint(loc));

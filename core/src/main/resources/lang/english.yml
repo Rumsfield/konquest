@@ -21,6 +21,7 @@ label:
   back: Back
   barbarians: Barbarians
   blocks: Blocks
+  build: Build
   bypass: BYPASS
   camps: Camps
   camp-clan: Camp Clan
@@ -28,6 +29,7 @@ label:
   captured: Captured
   changing-capital: Changing to Capital
   changing-town: Changing to Town
+  chest: Chest
   close: Close
   cost: Cost
   critical-hits: Critical Hits
@@ -62,6 +64,7 @@ label:
   loot-type: Loot Type
   map-color: Map Color
   members: Members
+  mobs: Mobs
   modified: Modified
   modifier: Modifier
   monument-template: Monument Template
@@ -309,6 +312,11 @@ menu:
     friendly-redstone: Kingdom members can use redstone switches and doors
     redstone: Enemies can use redstone switches and doors
     golem: Iron Golems will attack all enemies who enter
+    peaceful: Your camp cannot be attacked by other players
+    travel: Camp guests can travel to your camp
+    build: Camp guests can build in your camp
+    chest: Camp guests can open chests in your camp
+    mobs: Mobs can spawn inside your camp
   info:
     camp-placed: Barbarian Camp is placed.
     camp-missing: This player has no camp.
@@ -542,6 +550,7 @@ protection:
     peaceful-player: Your Kingdom is peaceful, and you cannot attack towns.
     peaceful-victim: You cannot attack players in peaceful kingdoms.
     peaceful-attacker: Your Kingdom is peaceful, and you cannot attack players.
+    camp: Make a camp to protect yourself, use command /k camp.
     camp-destroy: Destroyed %s!
     camp-destroy-owner: Your camp has been destroyed!
     camp-create: Successfully set up your Camp.
@@ -1227,6 +1236,7 @@ description:
   travel: Teleport to other Territories.
   kingdom: Create or manage kingdoms.
   town: Manage Towns you belong to.
+  camp: Manage your Barbarian Camp.
   quest: Display your quest log.
   stats: Display your Accomplishment stats.
   prefix: Set your prefix title.

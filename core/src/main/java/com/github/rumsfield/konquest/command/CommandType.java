@@ -21,6 +21,7 @@ public enum CommandType {
 	LIST    (Material.PAPER,            "konquest.command.list",    "l",  new ListCommand(),      MessagePath.DESCRIPTION_LIST.getMessage()),
 	KINGDOM (Material.DIAMOND_HELMET,   "konquest.command.kingdom", "k",  new KingdomCommand(),   MessagePath.DESCRIPTION_KINGDOM.getMessage()),
 	TOWN    (Material.OBSIDIAN,         "konquest.command.town",    "t",  new TownCommand(),      MessagePath.DESCRIPTION_TOWN.getMessage()),
+	CAMP    (Material.ORANGE_BED,       "konquest.command.camp",    "a",  new CampCommand(),      MessagePath.DESCRIPTION_CAMP.getMessage()),
 	MAP     (Material.FILLED_MAP,       "konquest.command.map",     "m",  new MapCommand(),       MessagePath.DESCRIPTION_MAP.getMessage()),
 	SETTLE  (Material.DIAMOND_PICKAXE,  "konquest.command.settle",  "",   new SettleCommand(),    MessagePath.DESCRIPTION_SETTLE.getMessage()),
 	CLAIM   (Material.DIAMOND_SHOVEL,   "konquest.command.claim",   "",   new ClaimCommand(),     MessagePath.DESCRIPTION_CLAIM.getMessage()),
