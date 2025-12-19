@@ -6,8 +6,7 @@ import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called before the given player has been assigned to the given kingdom.
@@ -92,7 +91,7 @@ public class KonquestPlayerKingdomEvent extends KonquestPlayerEvent implements C
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}

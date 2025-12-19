@@ -259,29 +259,36 @@ public class Konquest implements KonquestAPI, Timeable {
     	boolean isProtocolLibEnabled = integrationManager.getProtocolLib().isEnabled();
     	// Version-specific cases
     	try {
+			// Minimum supported version
 			if (CompatibilityUtil.apiVersion.compareTo(new Version("1.16")) < 0) {
 				isVersionSupported = false;
 
+			// Version 1_16_R3 compatibility handler up to MC 1.16.5
 			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.16.5")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_16_R3(); }
 
+			// Version 1_17_R1 compatibility handler up to MC 1.17.1
 			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.17.1")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_17_R1(); }
 
+			// Version 1_18_R1 compatibility handler up to MC 1.18.1
 			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.18.1")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R1(); }
 
+			// Version 1_18_R2 compatibility handler up to MC 1.18.2
 			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.18.2")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_18_R2(); }
 
-			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.8")) <= 0) {
+			// Version 1_19_R1 compatibility handler up to latest known MC version
+			} else if (CompatibilityUtil.apiVersion.compareTo(new Version("1.21.11")) <= 0) {
 				isVersionSupported = true;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }
 
+			// Default to version 1_19_R1 for unsupported MC versions
 			} else {
 				isVersionSupported = false;
 				if(isProtocolLibEnabled) { versionHandler = new Handler_1_19_R1(); }

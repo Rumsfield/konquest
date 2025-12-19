@@ -7,8 +7,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called before an enemy player captures a town for their own kingdom.
@@ -111,7 +110,7 @@ public class KonquestTownCaptureEvent extends KonquestTownEvent implements Cance
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}

@@ -6,9 +6,8 @@ import org.bukkit.Location;
 import com.github.rumsfield.konquest.api.KonquestAPI;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Called after a player breaks a camp's bed to destroy it.
@@ -84,7 +83,7 @@ public class KonquestCampDestroyPostEvent extends KonquestCampEvent {
      * @return handlers
      */
     @Override
-    @Nonnull
+    @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

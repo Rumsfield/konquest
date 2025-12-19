@@ -5,8 +5,7 @@ import com.github.rumsfield.konquest.api.model.KonquestKingdom;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import com.github.rumsfield.konquest.api.model.KonquestTown;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after an enemy player captures a town for their own kingdom.
@@ -84,7 +83,7 @@ public class KonquestTownCapturePostEvent extends KonquestTownEvent {
      * @return handlers
      */
     @Override
-    @Nonnull
+    @NotNull
     public HandlerList getHandlers() {
         return handlers;
     }

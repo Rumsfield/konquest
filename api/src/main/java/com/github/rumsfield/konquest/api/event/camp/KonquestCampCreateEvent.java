@@ -5,8 +5,7 @@ import com.github.rumsfield.konquest.api.event.player.KonquestPlayerCampEvent;
 import com.github.rumsfield.konquest.api.model.KonquestCamp;
 import com.github.rumsfield.konquest.api.model.KonquestPlayer;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called after a new camp is created by a barbarian player.
@@ -58,7 +57,7 @@ public class KonquestCampCreateEvent extends KonquestCampEvent {
 	 * @return handlers
 	 */
 	@Override
-	@Nonnull
+	@NotNull
 	public HandlerList getHandlers() {
 		return handlers;
 	}
