@@ -4,8 +4,9 @@ plugins {
     `maven-publish`
 }
 
-repositories{
+repositories {
     mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
 
     // WorldEdit & WorldGuard
     maven("https://maven.enginehub.org/repo/")
@@ -38,18 +39,16 @@ repositories{
 
     // EssentialsX
     maven("https://repo.essentialsx.net/releases/")
-    maven("https://papermc.io/repo/repository/maven-public/")
 }
 
-dependencies{
-    // Spigot
-    compileOnly("org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT") // Primary API
+dependencies {
+    // Latest Paper API
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-1.17.1-R0.1-SNAPSHOT-remapped") // for nms packets, local lib
     compileOnly("org.spigotmc:spigot-1.16.5-R0.1-SNAPSHOT") // for nms packets, local lib
 
     // Integrated third-party plugins
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
-    compileOnly("com.github.jikoo.OpenInv:openinvapi:4.3.1")
     compileOnly("net.kyori:adventure-api:4.17.0")
     compileOnly("com.ghostchu:quickshop-common:6.2.0.6")
     compileOnly("com.ghostchu:quickshop-api:6.2.0.6")
@@ -58,7 +57,7 @@ dependencies{
     compileOnly("us.dynmap:dynmap-api:3.6")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.discordsrv:discordsrv:1.29.0")
-    compileOnly("me.clip:placeholderapi:2.11.2")
+    compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.0")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.15")
@@ -86,14 +85,18 @@ tasks {
     }
 
     processResources {
-        // Apply filtering only to specific text-based files.
         filesMatching("**/*.yml") {
             filter<org.apache.tools.ant.filters.ReplaceTokens>("tokens" to mapOf("version" to project.version))
         }
     }
 }
 
-java{
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+
+configurations.all {
+    exclude(group = "org.spigotmc", module = "spigot-api")
 }
